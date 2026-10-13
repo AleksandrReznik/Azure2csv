@@ -1,3 +1,0 @@
-﻿"Organization","Process","Type","Parent","IsDefault","Enabled","Projects","ProjectNames"
-"res-2a7f96d2e7","Agile","system","","False","True","1","Project ee43017d87"
-"res-2a7f96d2e7","Process f974d80832","inherited","Agile","True","True","1","Project ab03e5cf64"

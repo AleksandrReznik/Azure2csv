@@ -1,0 +1,3 @@
+﻿"Organization","Project","Path","IsBranch","Parent","Owner","Created","LastChangeset","LastChange","DaysSinceLastChange","LastChangeBy","Files","SizeMB","FilesCapped","Pipelines","ExportedTo"
+"res-73d92bec83","Project c2ce191245","$/Project c2ce191245/Trunk/Main","True","","User 72dc4ffaba","2015-03-01T00:00:00Z","120","2023-05-10T00:00:00Z","1238","User 72dc4ffaba","3","3.5","False","1",""
+"res-73d92bec83","Project c2ce191245","$/Project c2ce191245/Trunk/tv-f32c75a6dc","True","$/Project c2ce191245/Trunk/Main","User 72dc4ffaba","2016-01-01T00:00:00Z","95","2022-01-01T00:00:00Z","1732","User 72dc4ffaba","1","0.5","False","0",""

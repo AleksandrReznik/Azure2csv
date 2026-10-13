@@ -1,19 +1,19 @@
 {
   "tool": "azure2csv",
   "version": "2.0.0",
-  "startedUtc": "2026-10-08T09:45:22Z",
-  "finishedUtc": "2026-10-08T09:45:25Z",
-  "durationSec": 2.9,
+  "startedUtc": "2026-10-13T20:03:07Z",
+  "finishedUtc": "2026-10-13T20:03:10Z",
+  "durationSec": 3.0,
   "host": {
     "OutputBase": "C:\\azure2csv",
+    "CloudShell": false,
+    "AzAccounts": "9.9.9-test",
     "ClouddriveExists": false,
     "PSVersion": "7.4.13",
-    "AzAccounts": "9.9.9-test",
     "OS": "Windows",
-    "CloudShell": false,
     "PSEdition": "Core"
   },
-  "tenantId": "500ccfff-8253-4d98-85a7-0a6ccdf95ae6",
+  "tenantId": "78496e83-9641-4692-8154-0aa819859d8c",
   "account": "[masked]",
   "options": {
     "profile": "Full",
@@ -136,12 +136,12 @@
     "inScope": 2,
     "skipped": [
       {
-        "id": "8a5bbc65-8e4a-4555-817e-8b5788727e25",
+        "id": "c00b6918-c93c-4bf0-a799-c709c04c6356",
         "reason": "Subscription state Disabled"
       },
       {
-        "id": "b4baa97f-fcc6-49c8-b294-2aa59e053d7e",
-        "reason": "Belongs to another tenant (f723f3f5-3875-4c5d-8aeb-6a3ce55cc6e4), e.g. Azure Lighthouse"
+        "id": "937ea426-32f9-4004-887c-f59e6e15c9f9",
+        "reason": "Belongs to another tenant (30305acb-39fb-4acc-ab49-ed83f541bb45), e.g. Azure Lighthouse"
       }
     ]
   },
@@ -324,7 +324,7 @@
       "Stage": "Dataset:Cost",
       "Status": "Partial",
       "DurationSec": 0.0,
-      "Note": "2026-08-30 to 2026-09-28; sub-4defd4a49d: Unavailable: HTTP 400 BadRequest: Offer MS-AZR-0063P is not supported for this query."
+      "Note": "2026-08-30 to 2026-09-28; sub-e9d7ff8106: Unavailable: HTTP 400 BadRequest: Offer MS-AZR-0063P is not supported for this query."
     },
     {
       "Stage": "Dataset:AzureDevOps",
@@ -748,48 +748,48 @@
     }
   ],
   "apiCalls": {
-    "Throttled": 1,
     "SecretsHidden": 2,
-    "Retries": 1,
-    "SleepSec": 5.0,
     "web": 1,
-    "graph": 37,
+    "arg": 33,
+    "ado": 73,
     "kudu": 0,
     "arm": 177,
-    "ado": 73,
-    "arg": 33
+    "Retries": 1,
+    "graph": 37,
+    "SleepSec": 5.0,
+    "Throttled": 1
   },
   "files": [
     {
-      "file": "ADO/res-2a7f96d2e7/admins.csv",
+      "file": "ADO/res-73d92bec83/admins.csv",
       "rows": 4
     },
     {
-      "file": "ADO/res-2a7f96d2e7/agentPools.csv",
+      "file": "ADO/res-73d92bec83/agentPools.csv",
       "rows": 4
     },
     {
-      "file": "ADO/res-2a7f96d2e7/agents.csv",
+      "file": "ADO/res-73d92bec83/agents.csv",
       "rows": 2
     },
     {
-      "file": "ADO/res-2a7f96d2e7/deploymentGroups.csv",
+      "file": "ADO/res-73d92bec83/deploymentGroups.csv",
       "rows": 1
     },
     {
-      "file": "ADO/res-2a7f96d2e7/environments.csv",
+      "file": "ADO/res-73d92bec83/environments.csv",
       "rows": 1
     },
     {
-      "file": "ADO/res-2a7f96d2e7/extensions.csv",
+      "file": "ADO/res-73d92bec83/extensions.csv",
       "rows": 2
     },
     {
-      "file": "ADO/res-2a7f96d2e7/feedPermissions.csv",
+      "file": "ADO/res-73d92bec83/feedPermissions.csv",
       "rows": 4
     },
     {
-      "file": "ADO/res-2a7f96d2e7/feeds.csv",
+      "file": "ADO/res-73d92bec83/feeds.csv",
       "rows": 2
     },
     {
@@ -797,55 +797,55 @@
       "rows": 4
     },
     {
-      "file": "ADO/res-2a7f96d2e7/packages.csv",
+      "file": "ADO/res-73d92bec83/packages.csv",
       "rows": 9
     },
     {
-      "file": "ADO/res-2a7f96d2e7/pipelines.csv",
+      "file": "ADO/res-73d92bec83/pipelines.csv",
       "rows": 3
     },
     {
-      "file": "ADO/res-2a7f96d2e7/processes.csv",
+      "file": "ADO/res-73d92bec83/processes.csv",
       "rows": 2
     },
     {
-      "file": "ADO/res-2a7f96d2e7/projects.csv",
+      "file": "ADO/res-73d92bec83/projects.csv",
       "rows": 2
     },
     {
-      "file": "ADO/res-2a7f96d2e7/releasePipelines.csv",
+      "file": "ADO/res-73d92bec83/releasePipelines.csv",
       "rows": 1
     },
     {
-      "file": "ADO/res-2a7f96d2e7/repositories.csv",
+      "file": "ADO/res-73d92bec83/repositories.csv",
       "rows": 3
     },
     {
-      "file": "ADO/res-2a7f96d2e7/secureFiles.csv",
+      "file": "ADO/res-73d92bec83/secureFiles.csv",
       "rows": 1
     },
     {
-      "file": "ADO/res-2a7f96d2e7/serviceConnections.csv",
+      "file": "ADO/res-73d92bec83/serviceConnections.csv",
       "rows": 3
     },
     {
-      "file": "ADO/res-2a7f96d2e7/serviceHooks.csv",
+      "file": "ADO/res-73d92bec83/serviceHooks.csv",
       "rows": 1
     },
     {
-      "file": "ADO/res-2a7f96d2e7/tfvc.csv",
+      "file": "ADO/res-73d92bec83/tfvc.csv",
       "rows": 2
     },
     {
-      "file": "ADO/res-2a7f96d2e7/users.csv",
+      "file": "ADO/res-73d92bec83/users.csv",
       "rows": 4
     },
     {
-      "file": "ADO/res-2a7f96d2e7/variableGroups.csv",
+      "file": "ADO/res-73d92bec83/variableGroups.csv",
       "rows": 2
     },
     {
-      "file": "ADO/res-2a7f96d2e7/workItems.csv",
+      "file": "ADO/res-73d92bec83/workItems.csv",
       "rows": 3
     },
     {
@@ -1201,7 +1201,7 @@
       "rows": 11
     },
     {
-      "file": "azure2csv_20261008-124522_500ccfff.xlsx",
+      "file": "azure2csv_20261013-230307_78496e83.xlsx",
       "rows": 104
     }
   ],
@@ -1225,7 +1225,7 @@
       "Detail": ""
     },
     {
-      "Area": "x-389e09138c groups (Resource Graph)",
+      "Area": "x-b13df6e9dc groups (Resource Graph)",
       "Status": "Collected",
       "Items": 4,
       "Detail": ""
@@ -1252,7 +1252,7 @@
       "Area": "Move support data (Microsoft Learn)",
       "Status": "Collected",
       "Items": 16,
-      "Detail": "Source: https://raw.githubusercontent.com/MicrosoftDocs/azure-docs/main/articles/azure-resource-manager/x-389e09138c/move-support-resources.md (CC BY 4.0)"
+      "Detail": "Source: https://raw.githubusercontent.com/MicrosoftDocs/azure-docs/main/articles/azure-resource-manager/x-b13df6e9dc/move-support-resources.md (CC BY 4.0)"
     },
     {
       "Area": "Diagnostic settings (ARM)",
@@ -1309,10 +1309,10 @@
       "Detail": ""
     },
     {
-      "Area": "x-389e09138c groups without a subscription in scope (ARM)",
+      "Area": "x-b13df6e9dc groups without a subscription in scope (ARM)",
       "Status": "Collected",
       "Items": 0,
-      "Detail": "Every x-389e09138c group has a subscription in scope below it"
+      "Detail": "Every x-b13df6e9dc group has a subscription in scope below it"
     },
     {
       "Area": "RBAC principal names (Microsoft Graph)",
@@ -1393,10 +1393,10 @@
       "Detail": "14 items of 10 types below 16 resources, 92 calls"
     },
     {
-      "Area": "Cost (Cost x-389e09138c)",
+      "Area": "Cost (Cost x-b13df6e9dc)",
       "Status": "Partial",
       "Items": 4,
-      "Detail": "2026-08-30 to 2026-09-28; sub-4defd4a49d: Unavailable: HTTP 400 BadRequest: Offer MS-AZR-0063P is not supported for this query."
+      "Detail": "2026-08-30 to 2026-09-28; sub-e9d7ff8106: Unavailable: HTTP 400 BadRequest: Offer MS-AZR-0063P is not supported for this query."
     },
     {
       "Area": "Azure DevOps tenant organization list",
@@ -1405,22 +1405,22 @@
       "Detail": ""
     },
     {
-      "Area": "Azure DevOps MG 8bb705ea44-ado",
+      "Area": "Azure DevOps MG c9d3fd3baa-ado",
       "Status": "Partial",
       "Items": 2,
-      "Detail": "secure files of Project ee43017d87: HTTP 403 Forbidden: VS800075: The project does not allow access to secure files.; feed permissions: not readable for 1 of 2 feed(s) with your feed role - feed owners can read them (feed-1807987d85)"
+      "Detail": "secure files of Project c2ce191245: HTTP 403 Forbidden: VS800075: The project does not allow access to secure files.; feed permissions: not readable for 1 of 2 feed(s) with your feed role - feed owners can read them (feed-e078727790)"
     },
     {
-      "Area": "Azure DevOps res-9a28e6e5f8",
+      "Area": "Azure DevOps res-514a918bf6",
       "Status": "Skipped",
       "Items": null,
-      "Detail": "No access with this account: Connected to another Entra tenant (f723f3f5-3875-4c5d-8aeb-6a3ce55cc6e4) - sign in to that tenant to inventory it"
+      "Detail": "No access with this account: Connected to another Entra tenant (30305acb-39fb-4acc-ab49-ed83f541bb45) - sign in to that tenant to inventory it"
     },
     {
-      "Area": "Azure DevOps MG 8bb705ea44-MG 50030a0995",
+      "Area": "Azure DevOps MG c9d3fd3baa-MG 95ce1107b2",
       "Status": "Skipped",
       "Items": null,
-      "Detail": "No access with this account: HTTP 401 UnauthorizedRequestException: TF400813: The user 'u-bea8387201@MG 8bb705ea44.onmicrosoft.com' is not authorized to access this resource."
+      "Detail": "No access with this account: HTTP 401 UnauthorizedRequestException: TF400813: The user 'u-aa222842f9@MG c9d3fd3baa.onmicrosoft.com' is not authorized to access this resource."
     },
     {
       "Area": "Azure DevOps pipeline export",
@@ -1546,7 +1546,7 @@
       "Area": "Excel workbook",
       "Status": "Collected",
       "Items": null,
-      "Detail": "azure2csv_20261008-124522_500ccfff.xlsx"
+      "Detail": "azure2csv_20261013-230307_78496e83.xlsx"
     },
     {
       "Area": "Mask self-check",

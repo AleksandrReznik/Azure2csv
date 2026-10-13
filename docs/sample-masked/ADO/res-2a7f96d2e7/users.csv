@@ -1,5 +1,0 @@
-﻿"Organization","User","DisplayName","Origin","UserType","License","LicenseSource","Status","Paid","LastAccess","DaysSinceLastAccess","DateAdded"
-"res-2a7f96d2e7","u-bea8387201@MG 8bb705ea44.onmicrosoft.com","User 0b59bbf728","Entra ID","member","Basic","account","active","True","2026-09-28T00:00:00Z","1","2019-01-01T00:00:00Z"
-"res-2a7f96d2e7","u-8eb9d2d285@d-5917d960d8","User 9092b186d3","Entra ID","member","Basic","account","active","True","2026-02-01T00:00:00Z","240","2020-01-01T00:00:00Z"
-"res-2a7f96d2e7","u-e00baa9a43@d-811da0b11e","User 5da38582c7","Entra ID","guest","Stakeholder","account","active","False","","","2025-01-01T00:00:00Z"
-"res-2a7f96d2e7","u-47ea98b6cc@d-5d93a4e85b.example","User 45d93d9941","Microsoft account","","Basic + Test Plans","account","active","True","","","2026-09-20T00:00:00Z"

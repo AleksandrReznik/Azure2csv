@@ -8,8 +8,9 @@ $global:TW_S3 = '33333333-aaaa-bbbb-cccc-000000000003'
 $global:TW_S4 = '44444444-aaaa-bbbb-cccc-000000000004'
 $global:TW_OtherTenant = 'bbbbbbbb-9999-8888-7777-666666666666'
 
-# Non-ASCII samples: "Vilniaus saltinis" with s-caron, "Aerzte" with a-umlaut, Tokyo in kanji
-$global:TW_Lt = 'Vilniaus ' + [char]0x0161 + 'altinis'
+# Non-ASCII samples: Lithuanian "Zalias azuolas" (green oak) with Z-caron, a-ogonek and z-caron, "Aerzte" with
+# a-umlaut, Tokyo in kanji
+$global:TW_Lt = [char]0x017D + 'alias ' + [char]0x0105 + [char]0x017E + 'uolas'
 $global:TW_De = [char]0x00C4 + 'rzte'
 $global:TW_Jp = [string][char]0x6771 + [char]0x4EAC
 
@@ -210,7 +211,7 @@ function New-TWWorld {
     $res.Add((New-TWRes $S1 'rg-network' 'Microsoft.Network/networkInterfaces' 'nic-orphan' ([ordered]@{
                     ipConfigurations = @([ordered]@{ id = 'x'; name = 'ipconfig1'; properties = [ordered]@{ privateIPAddress = '10.0.1.99'; subnet = [ordered]@{ id = $snetApp } } }); hostedWorkloads = @()
                 })))
-    $res.Add((New-TWRes $S1 'rg-data' 'Microsoft.Network/publicIPAddresses' 'pip-app01' ([ordered]@{ ipAddress = '20.50.60.70'; publicIPAllocationMethod = 'Static'; publicIPAddressVersion = 'IPv4'
+    $res.Add((New-TWRes $S1 'rg-data' 'Microsoft.Network/publicIPAddresses' 'pip-app01' ([ordered]@{ ipAddress = '198.51.100.70'; publicIPAllocationMethod = 'Static'; publicIPAddressVersion = 'IPv4'
                     ipConfiguration = [ordered]@{ id = $nicApp + '/ipConfigurations/ipconfig1' }; dnsSettings = [ordered]@{ fqdn = 'contoso-app.westeurope.cloudapp.azure.com' } }) -Sku ([ordered]@{ name = 'Standard'; tier = 'Regional' }) -Zones @('1', '2', '3')))
     $res.Add((New-TWRes $S1 'rg-legacy' 'Microsoft.Network/publicIPAddresses' 'pip-basic' ([ordered]@{ publicIPAllocationMethod = 'Dynamic'; publicIPAddressVersion = 'IPv4' }) -Sku ([ordered]@{ name = 'Basic'; tier = 'Regional' })))
     $res.Add((New-TWRes $S1 'rg-legacy' 'Microsoft.Network/loadBalancers' 'lb-basic' ([ordered]@{ backendAddressPools = @(); inboundNatRules = @(); frontendIPConfigurations = @() }) -Sku ([ordered]@{ name = 'Basic'; tier = 'Regional' })))
@@ -294,7 +295,7 @@ function New-TWWorld {
                     networkProfile = [ordered]@{ networkInterfaces = @([ordered]@{ id = $nicDev }) }
                     extended = [ordered]@{ instanceView = [ordered]@{ powerState = [ordered]@{ code = 'PowerState/deallocated' } } } })))
     $res.Add((New-TWRes $S2 'rg-dev' 'Microsoft.Compute/disks' 'vm-dev01_OsDisk' ([ordered]@{ diskSizeGB = 30; diskState = 'Reserved' }) -Sku ([ordered]@{ name = 'StandardSSD_LRS'; tier = 'Standard' }) -ManagedBy $vmDev))
-    $res.Add((New-TWRes $S2 'rg-dev' 'Microsoft.Network/publicIPAddresses' 'pip-app01' ([ordered]@{ ipAddress = '52.1.1.99'; publicIPAllocationMethod = 'Static' }) -Sku ([ordered]@{ name = 'Standard'; tier = 'Regional' })))
+    $res.Add((New-TWRes $S2 'rg-dev' 'Microsoft.Network/publicIPAddresses' 'pip-app01' ([ordered]@{ ipAddress = '198.51.100.99'; publicIPAllocationMethod = 'Static' }) -Sku ([ordered]@{ name = 'Standard'; tier = 'Regional' })))
     $res.Add((New-TWRes $S2 'NetworkWatcherRG' 'Microsoft.Network/networkWatchers' 'NetworkWatcher_westeurope' ([ordered]@{})))
     # Azure DevOps organizations billed to S1 (organization data: Add-TWAdoFixtures)
     $res.Add((New-TWRes $S1 'rg-app' 'Microsoft.VisualStudio/account' 'contoso-ado' ([ordered]@{ AccountURL = 'https://contoso-ado.visualstudio.com/' }) -Location 'global'))
@@ -807,7 +808,7 @@ function Add-TWGovernanceFixtures {
             type = 'microsoft.managedservices/registrationassignments'; subscriptionId = $S2; propertiesJson = (ConvertTo-Json -Compress -InputObject ([ordered]@{ registrationDefinitionId = $lhDef; provisioningState = 'Succeeded' })) })
     # Entra: administrative units and directory settings are readable; the policies need Policy.Read.All (PolicyReadAllowed)
     $w.GraphRoutes.Add(@{ Method = 'GET'; Pattern = '^/v1\.0/directory/administrativeUnits'; Handler = { param($path, $body, $m) [ordered]@{ value = @(
-                    [ordered]@{ id = '0a000000-0000-0000-0000-0000000000d1'; displayName = 'AU Vilnius'; description = 'Vilnius office'; visibility = $null; membershipType = 'Dynamic'; membershipRule = '(user.country -eq "LT")' }) } } })
+                    [ordered]@{ id = '0a000000-0000-0000-0000-0000000000d1'; displayName = 'AU Head Office'; description = 'Head office staff'; visibility = $null; membershipType = 'Dynamic'; membershipRule = '(user.country -eq "LT")' }) } } })
     $w.GraphRoutes.Add(@{ Method = 'GET'; Pattern = '^/v1\.0/groupSettings'; Handler = { param($path, $body, $m) [ordered]@{ value = @(
                     [ordered]@{ id = '0a000000-0000-0000-0000-0000000000d2'; displayName = 'Group.Unified'; templateId = '62375ab9-6b52-47ed-826b-58e47e0e304b'
                         values = @([ordered]@{ name = 'EnableGroupCreation'; value = 'false' }, [ordered]@{ name = 'PrefixSuffixNamingRequirement'; value = 'GRP-[GroupName]' }) }) } } })
@@ -827,7 +828,7 @@ function Add-TWGovernanceFixtures {
                 }
                 'identity/conditionalAccess/namedLocations' {
                     return [ordered]@{ value = @(
-                            [ordered]@{ '@odata.type' = '#microsoft.graph.ipNamedLocation'; id = 'ca000000-0000-0000-0000-0000000000b1'; displayName = 'Vilnius office'; isTrusted = $true; ipRanges = @([ordered]@{ '@odata.type' = '#microsoft.graph.iPv4CidrRange'; cidrAddress = '203.0.113.0/24' }); createdDateTime = '2024-01-01T00:00:00Z' }
+                            [ordered]@{ '@odata.type' = '#microsoft.graph.ipNamedLocation'; id = 'ca000000-0000-0000-0000-0000000000b1'; displayName = 'Head office'; isTrusted = $true; ipRanges = @([ordered]@{ '@odata.type' = '#microsoft.graph.iPv4CidrRange'; cidrAddress = '203.0.113.0/24' }); createdDateTime = '2024-01-01T00:00:00Z' }
                             [ordered]@{ '@odata.type' = '#microsoft.graph.countryNamedLocation'; id = 'ca000000-0000-0000-0000-0000000000b2'; displayName = 'Baltics'; countriesAndRegions = @('LT', 'LV', 'EE'); includeUnknownCountriesAndRegions = $false }) }
                 }
                 'policies/authorizationPolicy' {
@@ -1127,7 +1128,7 @@ function Add-TWAdoFixtures {
     $a.Users1 = @((& $mkUser 'alex.admin@contoso.onmicrosoft.com' 'Alex Admin' 'aad' 'member' 'express' 'Basic' 'account' '2026-09-28T00:00:00Z' '2019-01-01T00:00:00Z'),
         (& $mkUser 'former.dev@contoso.com' 'Former Dev' 'aad' 'member' 'express' 'Basic' 'account' '2026-02-01T00:00:00Z' '2020-01-01T00:00:00Z'))
     $a.Users2 = @((& $mkUser 'pat@fabrikam.com' 'Pat Partner' 'aad' 'guest' 'stakeholder' 'Stakeholder' 'account' $never '2025-01-01T00:00:00Z'),
-        (& $mkUser 'someone@outlook.com' 'Someone Private' 'msa' '' 'advanced' 'Basic + Test Plans' 'account' $never '2026-09-20T00:00:00Z'))
+        (& $mkUser 'someone@example.org' 'Someone Private' 'msa' '' 'advanced' 'Basic + Test Plans' 'account' $never '2026-09-20T00:00:00Z'))
     $a.Groups = @(
         [ordered]@{ descriptor = 'vssgp.pca'; displayName = 'Project Collection Administrators'; principalName = '[contoso-ado]\Project Collection Administrators'; origin = 'vsts'; subjectKind = 'group' }
         [ordered]@{ descriptor = 'vssgp.pa1'; displayName = 'Project Administrators'; principalName = '[Web Shop]\Project Administrators'; origin = 'vsts'; subjectKind = 'group' }
@@ -1251,7 +1252,7 @@ function Add-TWAdoFixtures {
     & $add '^vsblob\.dev\.azure\.com/contoso-ado/_apis/clienttools/ArtifactTool/release\?osName=' {
         param($path, $body, $m)
         [ordered]@{ name = 'ArtifactTool'; rid = 'win-x64'; version = '0.2.574'
-            uri = 'https://08wvsblobprodsu6weus73.vsblob.vsassets.io/artifacttool/artifacttool-win-x64-Release_0.2.574.zip?sv=2019-07-07&sr=b&sig=SASSIGNATURE42&sp=r' }
+            uri = 'https://contosotools00.vsblob.vsassets.io/artifacttool/artifacttool-win-x64-Release_0.2.574.zip?sv=2019-07-07&sr=b&sig=SASSIGNATURE42&sp=r' }
     }
     & $add ('^pkgs\.dev\.azure\.com/contoso-ado/(?:' + $proj + ')?_packaging/([0-9a-f-]{36})/upack/packages/([^/]+)/versions/([^?]+)\?api-version=7\.1-preview\.1') {
         param($path, $body, $m)

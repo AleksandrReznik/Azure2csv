@@ -234,7 +234,7 @@ Test-Case 'Resource Graph paging returned every resource (page size 7)' {
 Test-Case 'VM with NIC in another RG and public IP in a third RG gets correct networking (v1 bug)' {
     $vm = $all | Where-Object { $_.Name -eq 'vm-app01' }
     Assert-Equal 'nic-app01:10.0.1.4' $vm.PrivateIP
-    Assert-Equal 'nic-app01:20.50.60.70' $vm.PublicIP 'must not pick the same-named public IP of subscription 2'
+    Assert-Equal 'nic-app01:198.51.100.70' $vm.PublicIP 'must not pick the same-named public IP of subscription 2'
     Assert-Equal 'nic-app01:vnet-hub' $vm.vnet
     Assert-Equal 'nic-app01:snet-app' $vm.subnet
     Assert-Equal '10.0.0.4, 10.0.0.5' $vm.vnetDNS
@@ -450,7 +450,7 @@ Test-Case 'VM migration profile (sizes, disks, agents, backup)' {
     Assert-Equal 'True' $a.HybridBenefit
     Assert-Equal 'running' $a.PowerState
     Assert-Equal 'True' $a.AzureMonitorAgent
-    Assert-Equal 'nic-app01:20.50.60.70' $a.PublicIPs
+    Assert-Equal 'nic-app01:198.51.100.70' $a.PublicIPs
     $l = $vms | Where-Object Name -eq 'vm-legacy01'
     Assert-Equal 'True' $l.UnmanagedDisks
     Assert-Equal 'True' $l.LegacyMonitoringAgent
@@ -1248,7 +1248,7 @@ Test-Case 'Entra: group owners, administrative units, directory settings, custom
     Assert-Equal 'alex.admin@contoso.onmicrosoft.com' $admins.Owners; Assert-Equal '1' $admins.OwnerCount
     Assert-Equal '0' ($g | Where-Object DisplayName -eq 'All Staff').OwnerCount
     $au = @(Import-TWCsv $r 'entraAdministrativeUnits.csv')
-    Assert-Equal 1 $au.Count; Assert-Equal 'AU Vilnius' $au[0].DisplayName; Assert-Equal 'Dynamic' $au[0].MembershipType
+    Assert-Equal 1 $au.Count; Assert-Equal 'AU Head Office' $au[0].DisplayName; Assert-Equal 'Dynamic' $au[0].MembershipType
     $s = Import-TWCsv $r 'entraSettings.csv'
     Assert-Equal 2 @($s).Count; Assert-Equal 'false' ($s | Where-Object Name -eq 'EnableGroupCreation').Value; Assert-Equal 'Group.Unified' @($s)[0].Setting
     $rd = @(Import-TWCsv $r 'entraRoleDefinitions.csv')
@@ -1275,7 +1275,7 @@ Test-Case 'Entra policies: refused for the sign-in of a user (a note, no warning
     Assert-Equal 'mfa OR compliantDevice' $ca[0].GrantControls; Assert-Equal 'signInFrequency' $ca[0].SessionControls
     $loc = Import-TWCsv $r 'entraNamedLocations.csv'
     Assert-Equal 2 @($loc).Count
-    $ip = $loc | Where-Object DisplayName -eq 'Vilnius office'
+    $ip = $loc | Where-Object DisplayName -eq 'Head office'
     Assert-Equal 'IP ranges' $ip.Type; Assert-Equal '203.0.113.0/24' $ip.IpRanges; Assert-Equal 'True' $ip.IsTrusted
     Assert-Equal 'LT, LV, EE' ($loc | Where-Object DisplayName -eq 'Baltics').Countries
     $set = Import-TWCsv $r 'entraPolicySettings.csv'
@@ -1677,7 +1677,7 @@ Test-Case 'Azure DevOps: agent pools (hosted, scale set, deployment), agents (of
     $old = $ag | Where-Object Agent -eq 'oldagent'
     Assert-Equal 'True' $old.Outdated; Assert-Equal 'offline' $old.Status
     $u = Import-TWCsv $run8 'ADO/contoso-ado/users.csv'
-    Assert-Equal 'Microsoft account' ($u | Where-Object User -eq 'someone@outlook.com').Origin
+    Assert-Equal 'Microsoft account' ($u | Where-Object User -eq 'someone@example.org').Origin
     $pat = $u | Where-Object User -eq 'pat@fabrikam.com'
     Assert-Equal 'guest' $pat.UserType; Assert-Equal '' $pat.LastAccess; Assert-Equal 'False' $pat.Paid
     Assert-Equal '240' ($u | Where-Object User -eq 'former.dev@contoso.com').DaysSinceLastAccess
@@ -2092,12 +2092,12 @@ Write-Host 'Mask mode' -ForegroundColor Cyan
 $run7 = Invoke-TWRun -Params @{ ReportProfile = 'Full'; NoHtml = $false; Mask = $true }
 $originals = @($global:TW_Tenant, $global:TW_S1, $global:TW_S2, $global:TW_S3, $global:TW_S4, 'Contoso Production', 'Contoso Development', 'Contoso Legacy',
     'rg-app', 'rg-network', 'rg-data', 'rg-legacy', 'vm-app01', 'vm-legacy01', 'nic-app01', 'stcontosodata', 'stlegacyvhds', 'kv-contoso', 'sql-contoso',
-    'aks-contoso', 'vnet-hub', 'vnet-spoke', 'snet-app', 'nsg-app', 'Allow-RDP-Internet', 'pip-app01', '20.50.60.70', '52.1.1.99', 'CC-100', 'contoso-web',
+    'aks-contoso', 'vnet-hub', 'vnet-spoke', 'snet-app', 'nsg-app', 'Allow-RDP-Internet', 'pip-app01', '198.51.100.70', '198.51.100.99', 'CC-100', 'contoso-web',
     $global:TW_Lt, $global:TW_De, 'alex.admin', 'Alex Admin', 'Pat Partner', 'pat_fabrikam', 'jonas@contoso.com', 'contoso.com', 'Contoso Web App',
     'Legacy Integration', 'g-app-admins', 'Tier0 Admins', 'Contoso baseline', 'Contoso VM Operator', 'mg-contoso', 'mg-landingzones', 'Landing Zones',
     'lock-network', 'activitylog-to-law', 'law-contoso', 'aa-contoso', 'Start-VMs', 'sp-monitoring', 'Monitoring Vendor', 'uai-app', 'legacy-waiver', 'require-app-tag',
     'contoso-ado', 'fabrikam-old', 'Web Shop', 'Legacy App', 'webshop', 'legacy-code', 'Contoso Prod (WIF)', 'Legacy SPN', 'contoso-github', 'Scale Agents',
-    'build01', 'oldagent', 'buildbox-old', 'former.dev', 'Former Dev', 'someone@outlook.com', 'Someone Private', 'kv-secrets', 'signing.pfx', 'dg-web',
+    'build01', 'oldagent', 'buildbox-old', 'former.dev', 'Former Dev', 'someone@example.org', 'Someone Private', 'kv-secrets', 'signing.pfx', 'dg-web',
     'contoso-packages', 'Contoso Agile', 'Release-42', 'v1-secretish', 'SECRETTOKEN42', 'do-not-export', 'hooks.slack.com', 'vmss-agents',
     'contoso-sandbox', 'contoso-archive', 'Contoso.Core', 'contoso/ui', 'webshop-lib', 'contoso-utils', 'contoso-tools', 'contoso-rs', 'webshop-assets', 'Project Collection Build Service', 'S-1-9-1551374245')
 

@@ -1,13 +1,9 @@
 {
-  "owner": {
-    "Vilniaus šaltinis": "",
-    "Ärzte": ""
-  },
   "app": {
     "contoso-web": ""
   },
-  "site": {
-    "東京": ""
+  "hidden-title": {
+    "Operations": ""
   },
   "costcenter": {
     "CC-100": ""
@@ -15,8 +11,12 @@
   "dept": {
     "Ärzte": ""
   },
-  "hidden-title": {
-    "Operations": ""
+  "site": {
+    "東京": ""
+  },
+  "owner": {
+    "Žalias ąžuolas": "",
+    "Ärzte": ""
   },
   "env": {
     "prod": "",

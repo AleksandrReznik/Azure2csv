@@ -3,4 +3,4 @@
 "Owner","8e3af657-a8ff-443c-a75c-2fe8c4bcb635","BuiltInRole","False","[masked]","*","","","","/","3","0","True"
 "Reader","acdd72a7-3385-48ef-bd42-f606fba81ae7","BuiltInRole","False","[masked]","*/read","","","","/","1","0","True"
 "User Access Administrator","18d7d88d-d35e-4fb5-a5c3-7773c20a72d9","BuiltInRole","False","[masked]","*/read; Microsoft.Authorization/*","","","","/","1","0","True"
-"Role f9c16dd19e","0d28dd8f-4dfc-4e2f-a259-b9551829b554","CustomRole","True","[masked]","Microsoft.Compute/virtualMachines/*; Microsoft.Compute/virtualMachines/start/action","","","","/subscriptions/3342e47d-f7ee-45fa-9302-3715225561a0","1","1","True"
+"Role a682bd8ec0","368ae0f9-d219-4ea0-a730-5d64357e7bb1","CustomRole","True","[masked]","Microsoft.Compute/virtualMachines/*; Microsoft.Compute/virtualMachines/start/action","","","","/subscriptions/29e2b342-4a4e-4619-b67a-aab075938750","1","1","True"

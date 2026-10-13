@@ -1,2 +1,2 @@
 ﻿"DisplayName","Description","Visibility","MembershipType","MembershipRule","Id"
-"AU Vilnius","Vilnius office","","Dynamic","(user.country -eq ""LT"")","0a000000-0000-0000-0000-0000000000d1"
+"AU Head Office","Head office staff","","Dynamic","(user.country -eq ""LT"")","0a000000-0000-0000-0000-0000000000d1"

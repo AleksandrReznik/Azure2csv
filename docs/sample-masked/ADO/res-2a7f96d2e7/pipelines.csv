@@ -1,4 +1,0 @@
-﻿"Organization","Project","Pipeline","PipelineId","Folder","Type","YamlFile","RepositoryType","Repository","AgentPool","Status","LastRun","DaysSinceLastRun","LastResult","Modified","ModifiedBy","ExportedFile"
-"res-2a7f96d2e7","Project ab03e5cf64","Pipeline 305d6e85c4","11","","YAML","/x-d1205511ac","Azure Repos Git","repo-e1b4daa2f3","Azure Pipelines","enabled","2026-09-28T00:00:00Z","1","succeeded","2024-01-10T00:00:00Z","User 0b59bbf728",""
-"res-2a7f96d2e7","Project ab03e5cf64","Pipeline 5f15241929","12","x-3f4a1e52ca","Classic","","GitHub","x-b46ef98cc2","Default","disabled","2025-03-01T00:00:00Z","577","failed","2020-05-01T00:00:00Z","User 9092b186d3",""
-"res-2a7f96d2e7","Project ee43017d87","Pipeline 7d59954804","13","","Classic","","TFVC","Project ee43017d87","Default","enabled","2023-05-11T00:00:00Z","1237","succeeded","2018-01-01T00:00:00Z","User 9092b186d3",""

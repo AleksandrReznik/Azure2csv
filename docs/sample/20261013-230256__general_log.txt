@@ -1,0 +1,191 @@
+﻿[23:02:56] INFO    azure2csv 2.0.0  -  https://it4it.solutions  -  aleksandr@reznik.lt
+[23:02:56] INFO    Reports (58): Resources, Tags, DiagnosticSettings, MoveSupport, CrossReferences, Locks, Snapshot, ArmTemplates, ChildResources, VirtualNetworks, NetworkSecurity, Routing, PublicIPs, PrivateEndpoints, PrivateDNS, NetworkInterfaces, LoadBalancers, AppGateways, Firewalls, Gateways, DnsRecords, VMs, Disks, AKS, AppService, ScaleSets, ContainerRegistries, ContainerApps, Storage, SQL, KeyVault, Databases, Messaging, Monitoring, Backup, Automation, AzureCode, Advisor, Retirements, Orphans, Cost, AzureDevOps, AzureDevOpsPipelines, ManagementGroups, Policy, RBAC, Defender, Lighthouse, ResourceProviders, TenantTransfer, EntraTenant, EntraUsers, EntraGroups, EntraGroupMembers, EntraApps, EntraAppAssignments, EntraRoles, EntraPolicies
+[23:02:56] INFO    PowerShell 7.4.13, Az.Accounts 9.9.9-test
+[23:02:56] INFO    Tenant aaaaaaaa-1111-2222-3333-444444444444, signed in as alex.admin@contoso.onmicrosoft.com
+[23:02:56] INFO    Output folder: C:\azure2csv\azure2csv_20261013-230256_aaaaaaaa
+[23:02:56] STEP    Subscriptions: Subscriptions in scope (ARM)
+[23:02:56] WARN    Subscription 33333333-aaaa-bbbb-cccc-000000000003 Contoso Legacy skipped: Subscription state Disabled
+[23:02:56] WARN    Subscription 44444444-aaaa-bbbb-cccc-000000000004 Fabrikam Customer skipped: Belongs to another tenant (bbbbbbbb-9999-8888-7777-666666666666), e.g. Azure Lighthouse
+[23:02:56] OK      2 subscription(s) in scope, 2 skipped
+[23:02:56] STEP    Containers: Subscription tags/management group chain and resource groups (Resource Graph)
+[23:02:56] OK      7 resource groups
+[23:02:56] STEP    ManagementGroups: Management groups (Resource Graph)
+[23:02:56] OK      4 management groups
+[23:02:56] STEP    Resources: All resources with properties (Resource Graph)
+[23:02:56] OK      63 resources, 41 resource types
+[23:02:56] STEP    GraphTables: Other Resource Graph tables: DNS records, firewall rules, backup policies, App Service configuration...
+[23:02:56] OK      5 items from 14 other Resource Graph tables
+[23:02:56] STEP    ResourceTimes: Created/changed time of resources (ARM, one call per subscription page)
+[23:02:56] STEP    MoveData: Microsoft Learn move-support table
+[23:02:56] STEP    Diagnostics: Diagnostic settings (ARM, one call per resource)
+[23:02:56] INFO    Diagnostic settings: about 48 calls, estimated 0.2 min (skip with -SkipReports DiagnosticSettings)
+[23:02:56] OK      3 diagnostic settings on 40 checked resources
+[23:02:56] STEP    Locks: Management locks (ARM)
+[23:02:56] STEP    RoleDefinitions: Role definitions (ARM)
+[23:02:56] STEP    RoleAssignments: Role assignments and deny assignments (ARM)
+[23:02:56] OK      9 role assignments
+[23:02:56] STEP    Pim: PIM for Azure resources: eligible and time-bound role assignments (ARM)
+[23:02:56] OK      1 eligible role assignments (PIM)
+[23:02:56] STEP    PolicyAssignments: Policy assignments incl. inherited (ARM)
+[23:02:56] STEP    PolicyExemptions: Policy exemptions (ARM)
+[23:02:56] STEP    PolicyDefinitions: Custom and assigned policy/initiative definitions (ARM)
+[23:02:56] STEP    ManagementGroupScope: Role and policy objects at management groups that no subscription in scope is below (ARM)
+[23:02:56] STEP    Principals: Names of RBAC principals (Microsoft Graph getByIds)
+[23:02:56] STEP    DefenderPlans: Defender for Cloud plans (Resource Graph)
+[23:02:56] STEP    Lighthouse: Azure Lighthouse delegations (Resource Graph)
+[23:02:56] STEP    PolicyStates: Policy compliance states (Resource Graph)
+[23:02:57] STEP    BackupItems: Backup protected items (Resource Graph)
+[23:02:57] STEP    AppServiceConfig: App Service site configuration (Resource Graph)
+[23:02:57] STEP    Advisor: Advisor recommendations (Resource Graph)
+[23:02:57] STEP    ComputeSkus: VM size capabilities per region (ARM)
+[23:02:57] STEP    RunbookContent: Published runbook code (ARM, one call per runbook)
+[23:02:57] STEP    AzureCode: Code and definitions stored in Azure resources (ARM)
+[23:02:57] VERBOSE Code export failed: API Management apim-contoso soap-api OpenAPI: No OpenAPI export (SOAP, GraphQL and WebSocket APIs have none)
+[23:02:57] OK      Code export: 24 files (API Management (3), Data Factory (2), Deployment script (2), Log alert rule (2), Policy definition (2), Runbook (2), Sentinel analytics rule (2), Stream Analytics (2), Custom role (1), Dashboard (1), DSC configuration (1), Logic App (1), Policy initiative (1), Template spec (1), Workbook (1)), 1 not exported
+[23:02:57] STEP    ArmTemplates: ARM template and Bicep export of every resource group (ARM, one or two calls per resource group)
+[23:02:57] VERBOSE ARM template not exported: Contoso Development / rg-dev: Json: HTTP 403 AuthorizationFailed: The client does not have authorization to perform action 'Microsoft.Resources/subscriptions/resourcegroups/exportTemplate/action' over scope '/subscriptions/22222222-aaaa-bbbb-cccc-000000000...
+[23:02:57] OK      ARM templates: 5 resource groups exported (2 with gaps), 1 not exported, 1 empty -> templates folder
+[23:02:57] STEP    Providers: Resource providers: registration state and API versions (ARM, one call per subscription)
+[23:02:57] OK      7 provider registrations in 2 subscription(s), API versions of 9 resource types
+[23:02:57] STEP    ChildResources: Child resources that Resource Graph does not list (ARM, several calls per resource)
+[23:02:57] INFO    16 resources with child resources to read: at least 90 calls
+[23:02:57] OK      Child resources: 14 items of 10 types below 16 resources, 92 calls
+[23:02:57] STEP    Cost: Actual cost per resource (Cost Management)
+[23:02:57] VERBOSE Throttled by Azure (HTTP 429): arm /subscriptions/11111111-aaaa-bbbb-cccc-000000000001/providers/Microsoft.CostManagement/query?api-version=2023-11-01 - retry 1 of 6 in 3s
+[23:02:57] STEP    AzureDevOps: Azure DevOps organizations (Azure DevOps REST with the Az sign-in)
+[23:02:57] OK      Azure DevOps contoso-ado: connected as Alex Admin, 2 project(s)
+[23:02:57] VERBOSE TFVC Web Shop: not checked - source control Git, TFVC not enabled, no pipeline maps $/Web Shop
+[23:02:57] VERBOSE TFVC Legacy App: source control Tfvc, used by pipelines True, branch list: 1 answer(s), 2 branch(es) under $/Legacy App
+[23:02:57] VERBOSE TFVC $/Legacy App/Trunk/Main: 4 items listed in 0 s
+[23:02:57] DETAIL  TFVC $/Legacy App/Trunk/Main: 3 files, 3.5 MB, last changeset 120
+[23:02:57] VERBOSE TFVC $/Legacy App/Trunk/Dev: 2 items listed in 0 s
+[23:02:57] DETAIL  TFVC $/Legacy App/Trunk/Dev: 1 files, 0.5 MB, last changeset 95
+[23:02:57] OK      Azure DevOps contoso-ado: TFVC in 1 project(s), 2 branch(es) or folder(s)
+[23:02:57] WARN    Azure DevOps contoso-ado: secure files of Legacy App: HTTP 403 Forbidden: VS800075: The project does not allow access to secure files.
+[23:02:57] WARN    Azure DevOps contoso-ado: feed permissions: not readable for 1 of 2 feed(s) with your feed role - feed owners can read them (webshop-feed)
+[23:02:57] WARN    Azure DevOps fabrikam-old: no access - Connected to another Entra tenant (bbbbbbbb-9999-8888-7777-666666666666) - sign in to that tenant to inventory it
+[23:02:57] WARN    Azure DevOps contoso-sandbox: no access - HTTP 401 UnauthorizedRequestException: TF400813: The user 'alex.admin@contoso.onmicrosoft.com' is not authorized to access this resource.
+[23:02:57] STEP    AzureDevOpsPipelines: Azure DevOps pipeline export (YAML files and definitions)
+[23:02:57] STEP    EntraTenant: Organization, domains, licenses (Graph)
+[23:02:57] STEP    EntraUsers: Users (Graph)
+[23:02:57] WARN    Sign-in activity not available (access denied - needs AuditLog.Read.All + Reports Reader/Global Reader + Entra ID P1 (HTTP 403 Authorization_RequestDenied: Insufficient privileges to complete the operation.))
+[23:02:57] STEP    EntraGroups: Groups (Graph)
+[23:02:57] STEP    EntraGroupMembers: Group members (Graph, one call per group)
+[23:02:57] STEP    EntraApps: App registrations (Graph)
+[23:02:57] STEP    EntraServicePrincipals: Service principals incl. managed identities (Graph)
+[23:02:57] STEP    EntraAppPermissions: Application permissions and delegated consents (Graph)
+[23:02:57] STEP    EntraAppAssignments: Users and groups assigned to enterprise applications (Graph, one call per application)
+[23:02:57] STEP    EntraDirectoryRoles: Directory role definitions and assignments (Graph)
+[23:02:57] STEP    EntraPolicies: Conditional Access, named locations and tenant-wide policies, when the sign-in may read them (Graph)
+[23:02:57] VERBOSE Entra policies - Conditional Access policy not readable: HTTP 403 Authorization_RequestDenied: Insufficient privileges to complete the operation.
+[23:02:57] VERBOSE Entra policies - Named location not readable: HTTP 403 Authorization_RequestDenied: Insufficient privileges to complete the operation.
+[23:02:57] VERBOSE Entra policies - Authentication strength not readable: HTTP 403 Authorization_RequestDenied: Insufficient privileges to complete the operation.
+[23:02:57] VERBOSE Entra policies - Authorization policy not readable: HTTP 403 Authorization_RequestDenied: Insufficient privileges to complete the operation.
+[23:02:57] VERBOSE Entra policies - Security defaults not readable: HTTP 403 Authorization_RequestDenied: Insufficient privileges to complete the operation.
+[23:02:57] VERBOSE Entra policies - Authentication methods policy not readable: HTTP 403 Authorization_RequestDenied: Insufficient privileges to complete the operation.
+[23:02:57] VERBOSE Entra policies - Admin consent request policy not readable: HTTP 403 Authorization_RequestDenied: Insufficient privileges to complete the operation.
+[23:02:57] VERBOSE Entra policies - Cross-tenant access (default) not readable: HTTP 403 Authorization_RequestDenied: Insufficient privileges to complete the operation.
+[23:02:57] VERBOSE Entra policies - Cross-tenant access (partner) not readable: HTTP 403 Authorization_RequestDenied: Insufficient privileges to complete the operation.
+[23:02:57] INFO    Conditional Access and tenant policies: not readable with this sign-in (needs Policy.Read.All)
+[23:02:57] STEP    Building reports
+[23:02:58] OK      Snapshot: 141 objects as JSON -> snapshot folder
+[23:02:59] OK      Azure DevOps: 1 of 4 organization(s) collected -> ADO folder
+[23:02:59] DETAIL  Not exported in this run: Git and TFVC repositories (add AzureDevOpsRepos to -Reports), packages (add AzureDevOpsPackages to -Reports)
+[23:02:59] OK      4 Azure DevOps pipelines exported to ADO\<organization>\<project>\pipelines
+[23:02:59] INFO    2 value(s) of secret properties Azure returned (authorization keys, shared keys, passwords) were replaced with (not exported)
+[23:02:59] STEP    Findings
+[23:02:59] OK      42 findings (10 high); 0 rules not evaluated because their data was not selected
+[23:02:59] STEP    Writing files
+[23:03:00] DETAIL  ADO/organizations.csv                   4 rows
+[23:03:00] DETAIL  advisor.csv                             4 rows
+[23:03:00] DETAIL  aks.csv                                 1 rows
+[23:03:00] DETAIL  alertRules.csv                          1 rows
+[23:03:00] DETAIL  allResources.csv                       72 rows
+[23:03:00] DETAIL  applicationGateways.csv                 1 rows
+[23:03:00] DETAIL  appPermissions.csv                      6 rows
+[23:03:00] DETAIL  appServiceApps.csv                      1 rows
+[23:03:00] DETAIL  appServicePlans.csv                     2 rows
+[23:03:00] DETAIL  automationAccounts.csv                  1 rows
+[23:03:00] DETAIL  backupItems.csv                         1 rows
+[23:03:00] DETAIL  childResources.csv                     14 rows
+[23:03:00] DETAIL  childResourceTypes.csv                 80 rows
+[23:03:00] DETAIL  code/index.csv                         25 rows
+[23:03:00] DETAIL  cost.csv                                4 rows
+[23:03:00] DETAIL  credentials.csv                         3 rows
+[23:03:00] DETAIL  crossReferences.csv                     7 rows
+[23:03:00] DETAIL  defenderPlans.csv                       4 rows
+[23:03:00] DETAIL  diagnosticSettings.csv                  3 rows
+[23:03:00] DETAIL  directoryRoles.csv                      3 rows
+[23:03:00] DETAIL  disks.csv                               4 rows
+[23:03:00] DETAIL  dnsRecords.csv                          2 rows
+[23:03:00] DETAIL  entraAdministrativeUnits.csv            1 rows
+[23:03:00] DETAIL  entraAppAssignments.csv                 3 rows
+[23:03:00] DETAIL  entraApplications.csv                   2 rows
+[23:03:00] DETAIL  entraConditionalAccess.csv              0 rows
+[23:03:00] DETAIL  entraDomains.csv                        2 rows
+[23:03:00] DETAIL  entraGroupMembers.csv                   2 rows
+[23:03:00] DETAIL  entraGroups.csv                         4 rows
+[23:03:00] DETAIL  entraLicenses.csv                       2 rows
+[23:03:00] DETAIL  entraNamedLocations.csv                 0 rows
+[23:03:00] DETAIL  entraPolicySettings.csv                 0 rows
+[23:03:00] DETAIL  entraRoleDefinitions.csv                1 rows
+[23:03:00] DETAIL  entraServicePrincipals.csv              3 rows
+[23:03:00] DETAIL  entraSettings.csv                       2 rows
+[23:03:00] DETAIL  entraTenant.csv                         1 rows
+[23:03:00] DETAIL  entraUsers.csv                          5 rows
+[23:03:00] DETAIL  firewallRules.csv                       1 rows
+[23:03:00] DETAIL  keyVaultObjects.csv                     1 rows
+[23:03:00] DETAIL  keyVaults.csv                           1 rows
+[23:03:00] DETAIL  lighthouse.csv                          1 rows
+[23:03:00] DETAIL  loadBalancers.csv                       1 rows
+[23:03:00] DETAIL  locks.csv                               2 rows
+[23:03:00] DETAIL  logAnalyticsWorkspaces.csv              1 rows
+[23:03:00] DETAIL  managedIdentities.csv                   3 rows
+[23:03:00] DETAIL  managementGroups.csv                    4 rows
+[23:03:00] DETAIL  moveSupport.csv                        41 rows
+[23:03:00] DETAIL  natGateways.csv                         1 rows
+[23:03:00] DETAIL  networkInterfaces.csv                   4 rows
+[23:03:00] DETAIL  nsgRules.csv                            3 rows
+[23:03:00] DETAIL  nsgs.csv                                2 rows
+[23:03:00] DETAIL  orphans.csv                            13 rows
+[23:03:00] DETAIL  peerings.csv                            2 rows
+[23:03:00] DETAIL  policyAssignments.csv                   3 rows
+[23:03:00] DETAIL  policyCompliance.csv                    4 rows
+[23:03:00] DETAIL  policyDefinitions.csv                   3 rows
+[23:03:00] DETAIL  policyExemptions.csv                    2 rows
+[23:03:00] DETAIL  policySetDefinitions.csv                1 rows
+[23:03:00] DETAIL  privateDnsLinks.csv                     1 rows
+[23:03:00] DETAIL  privateDnsZones.csv                     2 rows
+[23:03:00] DETAIL  privateEndpoints.csv                    1 rows
+[23:03:00] DETAIL  publicIps.csv                           3 rows
+[23:03:00] DETAIL  RBAC_deny_assignments.csv               1 rows
+[23:03:00] DETAIL  RBAC_eligible_assignments.csv           1 rows
+[23:03:00] DETAIL  RBAC_role_assignments.csv               9 rows
+[23:03:00] DETAIL  RBAC_roles.csv                          5 rows
+[23:03:00] DETAIL  resourceProviders.csv                   7 rows
+[23:03:00] DETAIL  resourceTypes.csv                      46 rows
+[23:03:00] DETAIL  retirements.csv                        13 rows
+[23:03:00] DETAIL  routes.csv                              1 rows
+[23:03:00] DETAIL  routeTables.csv                         2 rows
+[23:03:00] DETAIL  runbooks.csv                            2 rows
+[23:03:00] DETAIL  snapshot/index.csv                    141 rows
+[23:03:00] DETAIL  sqlDatabases.csv                        1 rows
+[23:03:00] DETAIL  sqlFirewallRules.csv                    2 rows
+[23:03:00] DETAIL  sqlManagedInstances.csv                 0 rows
+[23:03:00] DETAIL  sqlServers.csv                          1 rows
+[23:03:00] DETAIL  sqlVirtualMachines.csv                  1 rows
+[23:03:00] DETAIL  storageAccounts.csv                     2 rows
+[23:03:00] DETAIL  storageContainers.csv                   3 rows
+[23:03:00] DETAIL  storageFileShares.csv                   1 rows
+[23:03:00] DETAIL  subnets.csv                             5 rows
+[23:03:00] DETAIL  subscriptions.csv                       4 rows
+[23:03:00] DETAIL  tags.csv                                9 rows
+[23:03:00] DETAIL  templates/index.csv                     7 rows
+[23:03:00] DETAIL  templates/notExported.csv               1 rows
+[23:03:00] DETAIL  tenantTransferImpact.csv               16 rows
+[23:03:00] DETAIL  vms.csv                                 3 rows
+[23:03:00] DETAIL  vnets.csv                               3 rows
+[23:03:00] DETAIL  ADO/contoso-ado/                       56 rows in 21 files
+[23:03:00] OK      HTML summary: C:\azure2csv\azure2csv_20261013-230256_aaaaaaaa\summary.html
+[23:03:03] OK      Excel workbook: C:\azure2csv\azure2csv_20261013-230256_aaaaaaaa\azure2csv_20261013-230256_aaaaaaaa.xlsx
+[23:03:03] OK      Done in 00:00:06: 2 subscription(s), 63 resources, 115 files, 42 findings (10 high).

@@ -1,3 +1,0 @@
-﻿"Organization","Publisher","PublisherId","Extension","ExtensionId","Version","Source","BuiltIn","Disabled","Scopes","LastPublished"
-"res-2a7f96d2e7","Microsoft","ms","Code Search","vss-code-search","19.0.0","Microsoft","True","False","","2025-01-01T00:00:00Z"
-"res-2a7f96d2e7","SonarSource","sonarsource","SonarQube","sonarqube","6.0.0","Third-party","False","False","vso.build; vso.code","2026-05-01T00:00:00Z"

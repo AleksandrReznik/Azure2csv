@@ -14,7 +14,7 @@
     "3"
   ],
   "properties": {
-    "ipAddress": "20.50.60.70",
+    "ipAddress": "198.51.100.70",
     "publicIPAllocationMethod": "Static",
     "publicIPAddressVersion": "IPv4",
     "ipConfiguration": {

@@ -1,3 +1,0 @@
-﻿"Organization","Project","ProjectId","Visibility","State","Process","ProcessType","SourceControl","LastUpdate","Repositories","Pipelines","ReleasePipelines","ServiceConnections","WorkItems","Description"
-"res-2a7f96d2e7","Project ab03e5cf64","1fa15cff-3de5-409b-93ae-09db91895642","private","wellFormed","Process f974d80832","inherited","Git","2026-09-01T00:00:00Z","2","2","1","2","165","[masked]"
-"res-2a7f96d2e7","Project ee43017d87","7836552f-b58a-4a42-8c6f-76b285307db7","public","wellFormed","Agile","system","Tfvc","2021-01-01T00:00:00Z","1","1","0","2","10",""

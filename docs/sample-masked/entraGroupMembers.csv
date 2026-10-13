@@ -1,3 +1,3 @@
 ﻿"GroupName","GroupId","MemberName","MemberType","MemberUPN","MemberAppId","MemberId"
-"Group c94ab5597c","afefd4b8-1021-43ab-aa49-0c692ec72d3d","User 0b59bbf728","user","u-bea8387201@MG 8bb705ea44.onmicrosoft.com","","2610f777-e3d3-4bed-a2c8-9d654a10b7b5"
-"Group c94ab5597c","afefd4b8-1021-43ab-aa49-0c692ec72d3d","App 31f7169ad3","servicePrincipal","","83abd36b-3161-4cd5-a6c1-c28a7699372f","0c2032da-1023-4096-b8ea-2755c361ae29"
+"Group 73f37a6a5e","93614f6e-c199-4296-8e9c-acfdbb976584","User 224467689c","user","u-aa222842f9@MG c9d3fd3baa.onmicrosoft.com","","623598c7-0061-4e59-a539-863294f4f1e3"
+"Group 73f37a6a5e","93614f6e-c199-4296-8e9c-acfdbb976584","App 736c12b25a","servicePrincipal","","e1dfd2ec-5a56-4460-9f86-688a77f01ec9","bd680b7e-70ce-41e3-a86a-e4dab9d8c3ce"

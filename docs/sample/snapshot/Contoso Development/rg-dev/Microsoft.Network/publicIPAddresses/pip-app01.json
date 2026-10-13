@@ -9,7 +9,7 @@
     "tier": "Regional"
   },
   "properties": {
-    "ipAddress": "52.1.1.99",
+    "ipAddress": "198.51.100.99",
     "publicIPAllocationMethod": "Static",
     "provisioningState": "Succeeded"
   }
