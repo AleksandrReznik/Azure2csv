@@ -1,0 +1,14 @@
+{
+  "id": "/providers/Microsoft.Management/managementGroups/mg-sandbox",
+  "name": "mg-sandbox",
+  "type": "Microsoft.Management/managementGroups",
+  "properties": {
+    "displayName": "Sandbox",
+    "details": {
+      "parent": {
+        "id": "/providers/Microsoft.Management/managementGroups/mg-contoso",
+        "name": "mg-contoso"
+      }
+    }
+  }
+}

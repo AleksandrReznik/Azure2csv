@@ -1,0 +1,4 @@
+﻿"RoleName","IsBuiltIn","IsPrivilegedRole","PrincipalName","PrincipalType","PrincipalUPN","PrincipalAppId","PrincipalId","IsGuest","Scope","AssignmentType","Source"
+"Global Administrator","True","True","Alex Admin","user","alex.admin@contoso.onmicrosoft.com","","0a000000-0000-0000-0000-0000000000a1","False","/","Active","roleManagement"
+"Global Administrator","True","True","Pat Partner","user","pat_fabrikam.com#EXT#@contoso.onmicrosoft.com","","0a000000-0000-0000-0000-0000000000a2","True","/","Active","roleManagement"
+"Security Reader","True","False","sp-monitoring","servicePrincipal","","abababab-0000-0000-0000-0000000000c1","0a000000-0000-0000-0000-0000000000c1","False","/","Active","roleManagement"

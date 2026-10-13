@@ -1,0 +1,23 @@
+{
+  "id": 12,
+  "name": "webshop-classic",
+  "path": "\\Legacy",
+  "queueStatus": "disabled",
+  "process": {
+    "type": 1
+  },
+  "repository": {
+    "type": "GitHub",
+    "name": "contoso/webshop"
+  },
+  "queue": {
+    "name": "Default",
+    "pool": {
+      "name": "Default"
+    }
+  },
+  "createdDate": "2020-05-01T00:00:00Z",
+  "authoredBy": {
+    "displayName": "Former Dev"
+  }
+}

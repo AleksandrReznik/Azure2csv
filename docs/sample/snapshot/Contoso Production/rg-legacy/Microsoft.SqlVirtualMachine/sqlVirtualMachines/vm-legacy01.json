@@ -1,0 +1,15 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-legacy/providers/Microsoft.SqlVirtualMachine/sqlVirtualMachines/vm-legacy01",
+  "name": "vm-legacy01",
+  "type": "Microsoft.SqlVirtualMachine/sqlVirtualMachines",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "virtualMachineResourceId": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-legacy/providers/Microsoft.Compute/virtualMachines/vm-legacy01",
+    "sqlImageOffer": "SQL2014SP3-WS2012R2",
+    "sqlImageSku": "Standard",
+    "sqlServerLicenseType": "PAYG",
+    "sqlManagement": "LightWeight",
+    "provisioningState": "Succeeded"
+  }
+}

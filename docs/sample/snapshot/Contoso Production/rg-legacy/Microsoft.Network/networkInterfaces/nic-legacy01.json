@@ -1,0 +1,29 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-legacy/providers/Microsoft.Network/networkInterfaces/nic-legacy01",
+  "name": "nic-legacy01",
+  "type": "Microsoft.Network/networkInterfaces",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "ipConfigurations": [
+      {
+        "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-legacy/providers/Microsoft.Network/networkInterfaces/nic-legacy01/ipConfigurations/ipconfig1",
+        "name": "ipconfig1",
+        "properties": {
+          "privateIPAddress": "10.1.1.10",
+          "primary": true,
+          "subnet": {
+            "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/virtualNetworks/vnet-spoke/subnets/snet-web"
+          }
+        }
+      }
+    ],
+    "dnsSettings": {
+      "dnsServers": []
+    },
+    "virtualMachine": {
+      "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-legacy/providers/Microsoft.Compute/virtualMachines/vm-legacy01"
+    },
+    "provisioningState": "Succeeded"
+  }
+}

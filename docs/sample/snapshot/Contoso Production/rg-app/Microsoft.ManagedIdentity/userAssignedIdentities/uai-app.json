@@ -1,0 +1,13 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.ManagedIdentity/userAssignedIdentities/uai-app",
+  "name": "uai-app",
+  "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "principalId": "eeeeeeee-0000-0000-0000-000000000009",
+    "clientId": "ffffffff-0000-0000-0000-000000000009",
+    "tenantId": "aaaaaaaa-1111-2222-3333-444444444444",
+    "provisioningState": "Succeeded"
+  }
+}

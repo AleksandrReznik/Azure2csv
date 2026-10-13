@@ -1,0 +1,8 @@
+# Output of a run started inside the repository folder: never commit the inventory of a real tenant.
+/azure2csv_*/
+/azure2csv_*.zip
+/*.PRIVATE-maskmap.csv
+/*__general_log*.txt
+
+# Draft of the blog post for it4it.solutions (published on the site, not here).
+/blog-post.html

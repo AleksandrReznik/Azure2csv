@@ -1,0 +1,27 @@
+{
+  "name": "la-orders",
+  "type": "Microsoft.Logic/workflows",
+  "location": "westeurope",
+  "properties": {
+    "state": "Enabled",
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "triggers": {
+        "manual": {
+          "type": "Request",
+          "kind": "Http"
+        }
+      },
+      "actions": {
+        "reply": {
+          "type": "Response",
+          "inputs": {
+            "statusCode": 200
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "parameters": {}
+  }
+}

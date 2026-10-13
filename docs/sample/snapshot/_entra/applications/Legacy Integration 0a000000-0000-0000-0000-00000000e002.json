@@ -1,0 +1,19 @@
+{
+  "id": "0a000000-0000-0000-0000-00000000e002",
+  "appId": "aa000000-0000-0000-0000-000000000002",
+  "displayName": "Legacy Integration",
+  "signInAudience": "AzureADMultipleOrgs",
+  "createdDateTime": "2018-02-01T00:00:00Z",
+  "passwordCredentials": [
+    {
+      "displayName": "forever",
+      "keyId": "11110000-0000-0000-0000-000000000003",
+      "startDateTime": "2024-01-01T00:00:00Z",
+      "endDateTime": "2027-01-01T00:00:00Z"
+    }
+  ],
+  "keyCredentials": [],
+  "requiredResourceAccess": [],
+  "owners": [],
+  "notes": "Owned by the former integration team"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "r1",
+  "kind": "Scheduled",
+  "properties": {
+    "displayName": "Brute force",
+    "query": "SigninLogs | where ResultType != 0"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "ls-sql",
+  "properties": {
+    "type": "AzureSqlDatabase",
+    "typeProperties": {
+      "connectionString": "**********"
+    }
+  }
+}

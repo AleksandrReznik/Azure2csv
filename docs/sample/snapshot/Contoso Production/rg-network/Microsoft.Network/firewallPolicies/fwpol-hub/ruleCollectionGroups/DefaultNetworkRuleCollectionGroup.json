@@ -1,0 +1,38 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/firewallPolicies/fwpol-hub/ruleCollectionGroups/DefaultNetworkRuleCollectionGroup",
+  "name": "DefaultNetworkRuleCollectionGroup",
+  "type": "Microsoft.Network/firewallPolicies/ruleCollectionGroups",
+  "location": "westeurope",
+  "properties": {
+    "priority": 200,
+    "ruleCollections": [
+      {
+        "name": "allow-dns",
+        "priority": 100,
+        "ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+        "action": {
+          "type": "Allow"
+        },
+        "rules": [
+          {
+            "name": "dns-out",
+            "ruleType": "NetworkRule",
+            "ipProtocols": [
+              "UDP",
+              "TCP"
+            ],
+            "sourceAddresses": [
+              "10.0.0.0/16"
+            ],
+            "destinationAddresses": [
+              "168.63.129.16"
+            ],
+            "destinationPorts": [
+              "53"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-data",
+  "name": "rg-data",
+  "type": "microsoft.resources/subscriptions/resourcegroups",
+  "location": "westeurope",
+  "tags": {
+    "app": "contoso-web"
+  },
+  "properties": {
+    "provisioningState": "Succeeded"
+  }
+}

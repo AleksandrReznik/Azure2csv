@@ -1,0 +1,17 @@
+{
+  "id": "0a000000-0000-0000-0000-0000000000b1",
+  "displayName": "g-app-admins",
+  "securityEnabled": true,
+  "mailEnabled": false,
+  "groupTypes": [],
+  "isAssignableToRole": false,
+  "createdDateTime": "2021-01-01T00:00:00Z",
+  "owners": [
+    {
+      "@odata.type": "#microsoft.graph.user",
+      "id": "0a000000-0000-0000-0000-0000000000a1",
+      "displayName": "Alex Admin",
+      "userPrincipalName": "alex.admin@contoso.onmicrosoft.com"
+    }
+  ]
+}

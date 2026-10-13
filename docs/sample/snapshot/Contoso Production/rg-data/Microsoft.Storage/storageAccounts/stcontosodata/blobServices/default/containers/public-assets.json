@@ -1,0 +1,9 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-data/providers/Microsoft.Storage/storageAccounts/stcontosodata/blobServices/default/containers/public-assets",
+  "name": "public-assets",
+  "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+  "properties": {
+    "publicAccess": "Blob",
+    "hasImmutabilityPolicy": false
+  }
+}

@@ -1,0 +1,6 @@
+﻿"RoleName","roleID","RoleType","IsCustom","Descr","Actions","NotActions","DataActions","NotDataActions","AssignableScopes","AssignmentCount","Subscriptions","HasWildcardActions"
+"Contributor","b24988ac-6180-42a0-ab88-20f7382dd24c","BuiltInRole","False","Contributor role","*","","","","/","3","0","True"
+"Owner","8e3af657-a8ff-443c-a75c-2fe8c4bcb635","BuiltInRole","False","Owner role","*","","","","/","3","0","True"
+"Reader","acdd72a7-3385-48ef-bd42-f606fba81ae7","BuiltInRole","False","Reader role","*/read","","","","/","1","0","True"
+"User Access Administrator","18d7d88d-d35e-4fb5-a5c3-7773c20a72d9","BuiltInRole","False","User Access Administrator role","*/read; Microsoft.Authorization/*","","","","/","1","0","True"
+"Contoso VM Operator","c0c0c0c0-1111-2222-3333-444444444444","CustomRole","True","Contoso VM Operator role","Microsoft.Compute/virtualMachines/*; Microsoft.Compute/virtualMachines/start/action","","","","/subscriptions/11111111-aaaa-bbbb-cccc-000000000001","1","1","True"

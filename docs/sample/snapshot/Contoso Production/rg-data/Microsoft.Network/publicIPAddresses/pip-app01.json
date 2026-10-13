@@ -1,0 +1,28 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-data/providers/Microsoft.Network/publicIPAddresses/pip-app01",
+  "name": "pip-app01",
+  "type": "Microsoft.Network/publicIPAddresses",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "sku": {
+    "name": "Standard",
+    "tier": "Regional"
+  },
+  "zones": [
+    "1",
+    "2",
+    "3"
+  ],
+  "properties": {
+    "ipAddress": "20.50.60.70",
+    "publicIPAllocationMethod": "Static",
+    "publicIPAddressVersion": "IPv4",
+    "ipConfiguration": {
+      "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/networkInterfaces/nic-app01/ipConfigurations/ipconfig1"
+    },
+    "dnsSettings": {
+      "fqdn": "contoso-app.westeurope.cloudapp.azure.com"
+    },
+    "provisioningState": "Succeeded"
+  }
+}

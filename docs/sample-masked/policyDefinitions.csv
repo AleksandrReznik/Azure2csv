@@ -1,0 +1,4 @@
+﻿"Name","DisplayName","PolicyType","Mode","Category","Version","Deprecated","Preview","Effect","DefinedAt","AssignmentCount","Parameters","Description","Id"
+"cccc23c7-8427-4f53-ad12-b6a63eb452b3","Allowed virtual machine size SKUs","BuiltIn","Indexed","Compute","1.0.1","False","False","Deny","x-8fd9e923f7","1","","","/providers/Microsoft.Authorization/policyDefinitions/cccc23c7-8427-4f53-ad12-b6a63eb452b3"
+"pol-c422c82fc6","Policy 3a29ccddfc","Custom","All","General","","True","False","Deny","/subscriptions/3342e47d-f7ee-45fa-9302-3715225561a0","0","","","/subscriptions/3342e47d-f7ee-45fa-9302-3715225561a0/providers/Microsoft.Authorization/policyDefinitions/pol-c422c82fc6"
+"pol-acdc576973","Policy afd17b1591","Custom","Indexed","Tags","","False","False","Audit (parameter)","/subscriptions/3342e47d-f7ee-45fa-9302-3715225561a0","1","effect","","/subscriptions/3342e47d-f7ee-45fa-9302-3715225561a0/providers/Microsoft.Authorization/policyDefinitions/pol-acdc576973"

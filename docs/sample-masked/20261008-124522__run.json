@@ -1,0 +1,1560 @@
+{
+  "tool": "azure2csv",
+  "version": "2.0.0",
+  "startedUtc": "2026-10-08T09:45:22Z",
+  "finishedUtc": "2026-10-08T09:45:25Z",
+  "durationSec": 2.9,
+  "host": {
+    "OutputBase": "C:\\azure2csv",
+    "ClouddriveExists": false,
+    "PSVersion": "7.4.13",
+    "AzAccounts": "9.9.9-test",
+    "OS": "Windows",
+    "CloudShell": false,
+    "PSEdition": "Core"
+  },
+  "tenantId": "500ccfff-8253-4d98-85a7-0a6ccdf95ae6",
+  "account": "[masked]",
+  "options": {
+    "profile": "Full",
+    "reports": [],
+    "addReports": [],
+    "skipReports": [],
+    "selected": [
+      "Resources",
+      "Tags",
+      "DiagnosticSettings",
+      "MoveSupport",
+      "CrossReferences",
+      "Locks",
+      "Snapshot",
+      "ArmTemplates",
+      "ChildResources",
+      "VirtualNetworks",
+      "NetworkSecurity",
+      "Routing",
+      "PublicIPs",
+      "PrivateEndpoints",
+      "PrivateDNS",
+      "NetworkInterfaces",
+      "LoadBalancers",
+      "AppGateways",
+      "Firewalls",
+      "Gateways",
+      "DnsRecords",
+      "VMs",
+      "Disks",
+      "AKS",
+      "AppService",
+      "ScaleSets",
+      "ContainerRegistries",
+      "ContainerApps",
+      "Storage",
+      "SQL",
+      "KeyVault",
+      "Databases",
+      "Messaging",
+      "Monitoring",
+      "Backup",
+      "Automation",
+      "AzureCode",
+      "Advisor",
+      "Retirements",
+      "Orphans",
+      "Cost",
+      "AzureDevOps",
+      "AzureDevOpsPipelines",
+      "ManagementGroups",
+      "Policy",
+      "RBAC",
+      "Defender",
+      "Lighthouse",
+      "ResourceProviders",
+      "TenantTransfer",
+      "EntraTenant",
+      "EntraUsers",
+      "EntraGroups",
+      "EntraGroupMembers",
+      "EntraApps",
+      "EntraAppAssignments",
+      "EntraRoles",
+      "EntraPolicies"
+    ],
+    "datasets": [
+      "Subscriptions",
+      "Containers",
+      "ManagementGroups",
+      "Resources",
+      "GraphTables",
+      "ResourceTimes",
+      "MoveData",
+      "Diagnostics",
+      "Locks",
+      "RoleDefinitions",
+      "RoleAssignments",
+      "Pim",
+      "PolicyAssignments",
+      "PolicyExemptions",
+      "PolicyDefinitions",
+      "ManagementGroupScope",
+      "Principals",
+      "DefenderPlans",
+      "Lighthouse",
+      "PolicyStates",
+      "BackupItems",
+      "AppServiceConfig",
+      "Advisor",
+      "ComputeSkus",
+      "RunbookContent",
+      "AzureCode",
+      "ArmTemplates",
+      "Providers",
+      "ChildResources",
+      "Cost",
+      "AzureDevOps",
+      "AzureDevOpsPipelines",
+      "EntraTenant",
+      "EntraUsers",
+      "EntraGroups",
+      "EntraGroupMembers",
+      "EntraApps",
+      "EntraServicePrincipals",
+      "EntraAppPermissions",
+      "EntraAppAssignments",
+      "EntraDirectoryRoles",
+      "EntraPolicies"
+    ],
+    "costDays": 30,
+    "mask": true,
+    "zip": true,
+    "noExcel": false,
+    "noHtml": false,
+    "subscriptionFilter": 0,
+    "managementGroupFilter": false
+  },
+  "subscriptions": {
+    "inScope": 2,
+    "skipped": [
+      {
+        "id": "8a5bbc65-8e4a-4555-817e-8b5788727e25",
+        "reason": "Subscription state Disabled"
+      },
+      {
+        "id": "b4baa97f-fcc6-49c8-b294-2aa59e053d7e",
+        "reason": "Belongs to another tenant (f723f3f5-3875-4c5d-8aeb-6a3ce55cc6e4), e.g. Azure Lighthouse"
+      }
+    ]
+  },
+  "stages": [
+    {
+      "Stage": "Dataset:Subscriptions",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:Containers",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:ManagementGroups",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:Resources",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:GraphTables",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": "appserviceresources 1, dnsresources 2, networkresources 1, recoveryservicesresources 1"
+    },
+    {
+      "Stage": "Dataset:ResourceTimes",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:MoveData",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:Diagnostics",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": "Types without diagnostic settings (learned): microsoft.network/natgateways"
+    },
+    {
+      "Stage": "Dataset:Locks",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:RoleDefinitions",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:RoleAssignments",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:Pim",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:PolicyAssignments",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:PolicyExemptions",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:PolicyDefinitions",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:ManagementGroupScope",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:Principals",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:DefenderPlans",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:Lighthouse",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:PolicyStates",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:BackupItems",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:AppServiceConfig",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:Advisor",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:ComputeSkus",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:RunbookContent",
+      "Status": "Skipped",
+      "DurationSec": 0.0,
+      "Note": "Disabled with -Mask"
+    },
+    {
+      "Stage": "Dataset:AzureCode",
+      "Status": "Skipped",
+      "DurationSec": 0.0,
+      "Note": "Disabled with -Mask"
+    },
+    {
+      "Stage": "Dataset:ArmTemplates",
+      "Status": "Skipped",
+      "DurationSec": 0.0,
+      "Note": "Disabled with -Mask"
+    },
+    {
+      "Stage": "Dataset:Providers",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:ChildResources",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": "14 items of 10 types below 16 resources, 92 calls"
+    },
+    {
+      "Stage": "Dataset:Cost",
+      "Status": "Partial",
+      "DurationSec": 0.0,
+      "Note": "2026-08-30 to 2026-09-28; sub-4defd4a49d: Unavailable: HTTP 400 BadRequest: Offer MS-AZR-0063P is not supported for this query."
+    },
+    {
+      "Stage": "Dataset:AzureDevOps",
+      "Status": "Partial",
+      "DurationSec": 0.1,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:AzureDevOpsPipelines",
+      "Status": "Skipped",
+      "DurationSec": 0.0,
+      "Note": "Disabled with -Mask"
+    },
+    {
+      "Stage": "Dataset:EntraTenant",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:EntraUsers",
+      "Status": "Partial",
+      "DurationSec": 0.0,
+      "Note": "Sign-in activity not available (access denied - needs AuditLog.Read.All + Reports Reader/Global Reader + Entra ID P1 (HTTP 403 Authorization_RequestDenied: Insufficient privileges to complete the operation.))"
+    },
+    {
+      "Stage": "Dataset:EntraGroups",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:EntraGroupMembers",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:EntraApps",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:EntraServicePrincipals",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:EntraAppPermissions",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:EntraAppAssignments",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": "2 applications asked"
+    },
+    {
+      "Stage": "Dataset:EntraDirectoryRoles",
+      "Status": "Collected",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Dataset:EntraPolicies",
+      "Status": "Skipped",
+      "DurationSec": 0.0,
+      "Note": "This sign-in may not read Conditional Access and the tenant policies (needs the Microsoft Graph permission Policy.Read.All, for example a service principal with that application permission) - HTTP 403 Authorization_RequestDenied: Insufficient privileges to complete the operation."
+    },
+    {
+      "Stage": "Report:Resources",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:Tags",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:DiagnosticSettings",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:MoveSupport",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:CrossReferences",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:Locks",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:Snapshot",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:ArmTemplates",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:ChildResources",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:VirtualNetworks",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:NetworkSecurity",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:Routing",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:PublicIPs",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:PrivateEndpoints",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:PrivateDNS",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:NetworkInterfaces",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:LoadBalancers",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:AppGateways",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:Firewalls",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:Gateways",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:DnsRecords",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:VMs",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:Disks",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:AKS",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:AppService",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:ScaleSets",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:ContainerRegistries",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:ContainerApps",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:Storage",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:SQL",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:KeyVault",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:Databases",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:Messaging",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:Monitoring",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:Backup",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:Automation",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:AzureCode",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:Advisor",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:Retirements",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:Orphans",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:Cost",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:AzureDevOps",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:AzureDevOpsPipelines",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:ManagementGroups",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:Policy",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:RBAC",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:Defender",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:Lighthouse",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:ResourceProviders",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:TenantTransfer",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:EntraTenant",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:EntraUsers",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:EntraGroups",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:EntraGroupMembers",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:EntraApps",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:EntraAppAssignments",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:EntraRoles",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    },
+    {
+      "Stage": "Report:EntraPolicies",
+      "Status": "Built",
+      "DurationSec": 0.0,
+      "Note": ""
+    }
+  ],
+  "apiCalls": {
+    "Throttled": 1,
+    "SecretsHidden": 2,
+    "Retries": 1,
+    "SleepSec": 5.0,
+    "web": 1,
+    "graph": 37,
+    "kudu": 0,
+    "arm": 177,
+    "ado": 73,
+    "arg": 33
+  },
+  "files": [
+    {
+      "file": "ADO/res-2a7f96d2e7/admins.csv",
+      "rows": 4
+    },
+    {
+      "file": "ADO/res-2a7f96d2e7/agentPools.csv",
+      "rows": 4
+    },
+    {
+      "file": "ADO/res-2a7f96d2e7/agents.csv",
+      "rows": 2
+    },
+    {
+      "file": "ADO/res-2a7f96d2e7/deploymentGroups.csv",
+      "rows": 1
+    },
+    {
+      "file": "ADO/res-2a7f96d2e7/environments.csv",
+      "rows": 1
+    },
+    {
+      "file": "ADO/res-2a7f96d2e7/extensions.csv",
+      "rows": 2
+    },
+    {
+      "file": "ADO/res-2a7f96d2e7/feedPermissions.csv",
+      "rows": 4
+    },
+    {
+      "file": "ADO/res-2a7f96d2e7/feeds.csv",
+      "rows": 2
+    },
+    {
+      "file": "ADO/organizations.csv",
+      "rows": 4
+    },
+    {
+      "file": "ADO/res-2a7f96d2e7/packages.csv",
+      "rows": 9
+    },
+    {
+      "file": "ADO/res-2a7f96d2e7/pipelines.csv",
+      "rows": 3
+    },
+    {
+      "file": "ADO/res-2a7f96d2e7/processes.csv",
+      "rows": 2
+    },
+    {
+      "file": "ADO/res-2a7f96d2e7/projects.csv",
+      "rows": 2
+    },
+    {
+      "file": "ADO/res-2a7f96d2e7/releasePipelines.csv",
+      "rows": 1
+    },
+    {
+      "file": "ADO/res-2a7f96d2e7/repositories.csv",
+      "rows": 3
+    },
+    {
+      "file": "ADO/res-2a7f96d2e7/secureFiles.csv",
+      "rows": 1
+    },
+    {
+      "file": "ADO/res-2a7f96d2e7/serviceConnections.csv",
+      "rows": 3
+    },
+    {
+      "file": "ADO/res-2a7f96d2e7/serviceHooks.csv",
+      "rows": 1
+    },
+    {
+      "file": "ADO/res-2a7f96d2e7/tfvc.csv",
+      "rows": 2
+    },
+    {
+      "file": "ADO/res-2a7f96d2e7/users.csv",
+      "rows": 4
+    },
+    {
+      "file": "ADO/res-2a7f96d2e7/variableGroups.csv",
+      "rows": 2
+    },
+    {
+      "file": "ADO/res-2a7f96d2e7/workItems.csv",
+      "rows": 3
+    },
+    {
+      "file": "advisor.csv",
+      "rows": 4
+    },
+    {
+      "file": "aks.csv",
+      "rows": 1
+    },
+    {
+      "file": "alertRules.csv",
+      "rows": 1
+    },
+    {
+      "file": "allResources.csv",
+      "rows": 72
+    },
+    {
+      "file": "applicationGateways.csv",
+      "rows": 1
+    },
+    {
+      "file": "appPermissions.csv",
+      "rows": 6
+    },
+    {
+      "file": "appServiceApps.csv",
+      "rows": 1
+    },
+    {
+      "file": "appServicePlans.csv",
+      "rows": 2
+    },
+    {
+      "file": "automationAccounts.csv",
+      "rows": 1
+    },
+    {
+      "file": "backupItems.csv",
+      "rows": 1
+    },
+    {
+      "file": "childResources.csv",
+      "rows": 14
+    },
+    {
+      "file": "childResourceTypes.csv",
+      "rows": 80
+    },
+    {
+      "file": "cost.csv",
+      "rows": 4
+    },
+    {
+      "file": "credentials.csv",
+      "rows": 3
+    },
+    {
+      "file": "crossReferences.csv",
+      "rows": 7
+    },
+    {
+      "file": "defenderPlans.csv",
+      "rows": 4
+    },
+    {
+      "file": "diagnosticSettings.csv",
+      "rows": 3
+    },
+    {
+      "file": "directoryRoles.csv",
+      "rows": 3
+    },
+    {
+      "file": "disks.csv",
+      "rows": 4
+    },
+    {
+      "file": "dnsRecords.csv",
+      "rows": 2
+    },
+    {
+      "file": "entraAdministrativeUnits.csv",
+      "rows": 1
+    },
+    {
+      "file": "entraAppAssignments.csv",
+      "rows": 3
+    },
+    {
+      "file": "entraApplications.csv",
+      "rows": 2
+    },
+    {
+      "file": "entraConditionalAccess.csv",
+      "rows": 0
+    },
+    {
+      "file": "entraDomains.csv",
+      "rows": 2
+    },
+    {
+      "file": "entraGroupMembers.csv",
+      "rows": 2
+    },
+    {
+      "file": "entraGroups.csv",
+      "rows": 4
+    },
+    {
+      "file": "entraLicenses.csv",
+      "rows": 2
+    },
+    {
+      "file": "entraNamedLocations.csv",
+      "rows": 0
+    },
+    {
+      "file": "entraPolicySettings.csv",
+      "rows": 0
+    },
+    {
+      "file": "entraRoleDefinitions.csv",
+      "rows": 1
+    },
+    {
+      "file": "entraServicePrincipals.csv",
+      "rows": 3
+    },
+    {
+      "file": "entraSettings.csv",
+      "rows": 2
+    },
+    {
+      "file": "entraTenant.csv",
+      "rows": 1
+    },
+    {
+      "file": "entraUsers.csv",
+      "rows": 5
+    },
+    {
+      "file": "firewallRules.csv",
+      "rows": 1
+    },
+    {
+      "file": "keyVaultObjects.csv",
+      "rows": 1
+    },
+    {
+      "file": "keyVaults.csv",
+      "rows": 1
+    },
+    {
+      "file": "lighthouse.csv",
+      "rows": 1
+    },
+    {
+      "file": "loadBalancers.csv",
+      "rows": 1
+    },
+    {
+      "file": "locks.csv",
+      "rows": 2
+    },
+    {
+      "file": "logAnalyticsWorkspaces.csv",
+      "rows": 1
+    },
+    {
+      "file": "managedIdentities.csv",
+      "rows": 3
+    },
+    {
+      "file": "managementGroups.csv",
+      "rows": 4
+    },
+    {
+      "file": "moveSupport.csv",
+      "rows": 41
+    },
+    {
+      "file": "natGateways.csv",
+      "rows": 1
+    },
+    {
+      "file": "networkInterfaces.csv",
+      "rows": 4
+    },
+    {
+      "file": "nsgRules.csv",
+      "rows": 3
+    },
+    {
+      "file": "nsgs.csv",
+      "rows": 2
+    },
+    {
+      "file": "orphans.csv",
+      "rows": 13
+    },
+    {
+      "file": "peerings.csv",
+      "rows": 2
+    },
+    {
+      "file": "policyAssignments.csv",
+      "rows": 3
+    },
+    {
+      "file": "policyCompliance.csv",
+      "rows": 4
+    },
+    {
+      "file": "policyDefinitions.csv",
+      "rows": 3
+    },
+    {
+      "file": "policyExemptions.csv",
+      "rows": 2
+    },
+    {
+      "file": "policySetDefinitions.csv",
+      "rows": 1
+    },
+    {
+      "file": "privateDnsLinks.csv",
+      "rows": 1
+    },
+    {
+      "file": "privateDnsZones.csv",
+      "rows": 2
+    },
+    {
+      "file": "privateEndpoints.csv",
+      "rows": 1
+    },
+    {
+      "file": "publicIps.csv",
+      "rows": 3
+    },
+    {
+      "file": "RBAC_deny_assignments.csv",
+      "rows": 1
+    },
+    {
+      "file": "RBAC_eligible_assignments.csv",
+      "rows": 1
+    },
+    {
+      "file": "RBAC_role_assignments.csv",
+      "rows": 9
+    },
+    {
+      "file": "RBAC_roles.csv",
+      "rows": 5
+    },
+    {
+      "file": "resourceProviders.csv",
+      "rows": 7
+    },
+    {
+      "file": "resourceTypes.csv",
+      "rows": 46
+    },
+    {
+      "file": "retirements.csv",
+      "rows": 12
+    },
+    {
+      "file": "routes.csv",
+      "rows": 1
+    },
+    {
+      "file": "routeTables.csv",
+      "rows": 2
+    },
+    {
+      "file": "runbooks.csv",
+      "rows": 2
+    },
+    {
+      "file": "sqlDatabases.csv",
+      "rows": 1
+    },
+    {
+      "file": "sqlFirewallRules.csv",
+      "rows": 2
+    },
+    {
+      "file": "sqlManagedInstances.csv",
+      "rows": 0
+    },
+    {
+      "file": "sqlServers.csv",
+      "rows": 1
+    },
+    {
+      "file": "sqlVirtualMachines.csv",
+      "rows": 1
+    },
+    {
+      "file": "storageAccounts.csv",
+      "rows": 2
+    },
+    {
+      "file": "storageContainers.csv",
+      "rows": 3
+    },
+    {
+      "file": "storageFileShares.csv",
+      "rows": 1
+    },
+    {
+      "file": "subnets.csv",
+      "rows": 5
+    },
+    {
+      "file": "subscriptions.csv",
+      "rows": 4
+    },
+    {
+      "file": "tags.csv",
+      "rows": 9
+    },
+    {
+      "file": "tenantTransferImpact.csv",
+      "rows": 16
+    },
+    {
+      "file": "vms.csv",
+      "rows": 3
+    },
+    {
+      "file": "vnets.csv",
+      "rows": 3
+    },
+    {
+      "file": "findings.csv",
+      "rows": 42
+    },
+    {
+      "file": "coverage.csv",
+      "rows": 57
+    },
+    {
+      "file": "tagList.json",
+      "rows": 7
+    },
+    {
+      "file": "summary.html",
+      "rows": 11
+    },
+    {
+      "file": "azure2csv_20261008-124522_500ccfff.xlsx",
+      "rows": 104
+    }
+  ],
+  "findings": {
+    "High": 10,
+    "Medium": 24,
+    "Low": 8,
+    "Info": 0
+  },
+  "coverage": [
+    {
+      "Area": "Subscriptions",
+      "Status": "Collected",
+      "Items": 2,
+      "Detail": "2 skipped"
+    },
+    {
+      "Area": "Resource groups and subscription details (Resource Graph)",
+      "Status": "Collected",
+      "Items": 7,
+      "Detail": ""
+    },
+    {
+      "Area": "x-389e09138c groups (Resource Graph)",
+      "Status": "Collected",
+      "Items": 4,
+      "Detail": ""
+    },
+    {
+      "Area": "Resources (Resource Graph)",
+      "Status": "Collected",
+      "Items": 63,
+      "Detail": ""
+    },
+    {
+      "Area": "Other Resource Graph tables (DNS records, firewall rules, backup policies...)",
+      "Status": "Collected",
+      "Items": 5,
+      "Detail": "appserviceresources 1, dnsresources 2, networkresources 1, recoveryservicesresources 1"
+    },
+    {
+      "Area": "Created/changed times (ARM)",
+      "Status": "Collected",
+      "Items": 63,
+      "Detail": ""
+    },
+    {
+      "Area": "Move support data (Microsoft Learn)",
+      "Status": "Collected",
+      "Items": 16,
+      "Detail": "Source: https://raw.githubusercontent.com/MicrosoftDocs/azure-docs/main/articles/azure-resource-manager/x-389e09138c/move-support-resources.md (CC BY 4.0)"
+    },
+    {
+      "Area": "Diagnostic settings (ARM)",
+      "Status": "Collected",
+      "Items": 3,
+      "Detail": "Types without diagnostic settings (learned): microsoft.network/natgateways"
+    },
+    {
+      "Area": "Locks (ARM)",
+      "Status": "Collected",
+      "Items": 2,
+      "Detail": ""
+    },
+    {
+      "Area": "Role definitions (ARM)",
+      "Status": "Collected",
+      "Items": 5,
+      "Detail": ""
+    },
+    {
+      "Area": "Deny assignments (ARM)",
+      "Status": "Collected",
+      "Items": 1,
+      "Detail": ""
+    },
+    {
+      "Area": "Role assignments (ARM)",
+      "Status": "Collected",
+      "Items": 9,
+      "Detail": ""
+    },
+    {
+      "Area": "PIM for Azure resources (ARM)",
+      "Status": "Collected",
+      "Items": 1,
+      "Detail": "1 eligible assignments"
+    },
+    {
+      "Area": "Policy assignments (ARM)",
+      "Status": "Collected",
+      "Items": 3,
+      "Detail": ""
+    },
+    {
+      "Area": "Policy exemptions (ARM)",
+      "Status": "Collected",
+      "Items": 2,
+      "Detail": ""
+    },
+    {
+      "Area": "Policy definitions and initiatives (ARM)",
+      "Status": "Collected",
+      "Items": 4,
+      "Detail": ""
+    },
+    {
+      "Area": "x-389e09138c groups without a subscription in scope (ARM)",
+      "Status": "Collected",
+      "Items": 0,
+      "Detail": "Every x-389e09138c group has a subscription in scope below it"
+    },
+    {
+      "Area": "RBAC principal names (Microsoft Graph)",
+      "Status": "Collected",
+      "Items": 5,
+      "Detail": "5 of 6 principals found"
+    },
+    {
+      "Area": "Defender for Cloud plans (Resource Graph)",
+      "Status": "Collected",
+      "Items": 4,
+      "Detail": ""
+    },
+    {
+      "Area": "Azure Lighthouse delegations (Resource Graph)",
+      "Status": "Collected",
+      "Items": 2,
+      "Detail": ""
+    },
+    {
+      "Area": "Policy compliance (Resource Graph)",
+      "Status": "Collected",
+      "Items": 4,
+      "Detail": ""
+    },
+    {
+      "Area": "Backup protected items (Resource Graph)",
+      "Status": "Collected",
+      "Items": 1,
+      "Detail": ""
+    },
+    {
+      "Area": "App Service configuration (Resource Graph)",
+      "Status": "Collected",
+      "Items": 1,
+      "Detail": ""
+    },
+    {
+      "Area": "Advisor recommendations (Resource Graph)",
+      "Status": "Collected",
+      "Items": 4,
+      "Detail": ""
+    },
+    {
+      "Area": "VM size capabilities (ARM)",
+      "Status": "Collected",
+      "Items": 3,
+      "Detail": ""
+    },
+    {
+      "Area": "Runbook content export",
+      "Status": "Skipped",
+      "Items": null,
+      "Detail": "Disabled with -Mask (runbook code can contain names and secrets)"
+    },
+    {
+      "Area": "Code export",
+      "Status": "Skipped",
+      "Items": null,
+      "Detail": "Disabled with -Mask (code and definitions contain names and settings)"
+    },
+    {
+      "Area": "ARM template export",
+      "Status": "Skipped",
+      "Items": null,
+      "Detail": "Disabled with -Mask (complete resource definitions)"
+    },
+    {
+      "Area": "Resource providers (ARM)",
+      "Status": "Collected",
+      "Items": 7,
+      "Detail": "API versions of 9 resource types"
+    },
+    {
+      "Area": "Child resources (ARM)",
+      "Status": "Collected",
+      "Items": 14,
+      "Detail": "14 items of 10 types below 16 resources, 92 calls"
+    },
+    {
+      "Area": "Cost (Cost x-389e09138c)",
+      "Status": "Partial",
+      "Items": 4,
+      "Detail": "2026-08-30 to 2026-09-28; sub-4defd4a49d: Unavailable: HTTP 400 BadRequest: Offer MS-AZR-0063P is not supported for this query."
+    },
+    {
+      "Area": "Azure DevOps tenant organization list",
+      "Status": "Collected",
+      "Items": 3,
+      "Detail": ""
+    },
+    {
+      "Area": "Azure DevOps MG 8bb705ea44-ado",
+      "Status": "Partial",
+      "Items": 2,
+      "Detail": "secure files of Project ee43017d87: HTTP 403 Forbidden: VS800075: The project does not allow access to secure files.; feed permissions: not readable for 1 of 2 feed(s) with your feed role - feed owners can read them (feed-1807987d85)"
+    },
+    {
+      "Area": "Azure DevOps res-9a28e6e5f8",
+      "Status": "Skipped",
+      "Items": null,
+      "Detail": "No access with this account: Connected to another Entra tenant (f723f3f5-3875-4c5d-8aeb-6a3ce55cc6e4) - sign in to that tenant to inventory it"
+    },
+    {
+      "Area": "Azure DevOps MG 8bb705ea44-MG 50030a0995",
+      "Status": "Skipped",
+      "Items": null,
+      "Detail": "No access with this account: HTTP 401 UnauthorizedRequestException: TF400813: The user 'u-bea8387201@MG 8bb705ea44.onmicrosoft.com' is not authorized to access this resource."
+    },
+    {
+      "Area": "Azure DevOps pipeline export",
+      "Status": "Skipped",
+      "Items": null,
+      "Detail": "Disabled with -Mask (pipeline definitions contain names and settings)"
+    },
+    {
+      "Area": "Entra tenant (organization)",
+      "Status": "Collected",
+      "Items": 1,
+      "Detail": ""
+    },
+    {
+      "Area": "Entra domains",
+      "Status": "Collected",
+      "Items": 2,
+      "Detail": ""
+    },
+    {
+      "Area": "Entra licenses (subscribedSkus)",
+      "Status": "Collected",
+      "Items": 2,
+      "Detail": ""
+    },
+    {
+      "Area": "Entra administrative units",
+      "Status": "Collected",
+      "Items": 1,
+      "Detail": ""
+    },
+    {
+      "Area": "Entra directory settings",
+      "Status": "Collected",
+      "Items": 1,
+      "Detail": ""
+    },
+    {
+      "Area": "Entra users",
+      "Status": "Partial",
+      "Items": 5,
+      "Detail": "Sign-in activity not available (access denied - needs AuditLog.Read.All + Reports Reader/Global Reader + Entra ID P1 (HTTP 403 Authorization_RequestDenied: Insufficient privileges to complete the operation.))"
+    },
+    {
+      "Area": "Entra groups",
+      "Status": "Collected",
+      "Items": 4,
+      "Detail": ""
+    },
+    {
+      "Area": "Entra group members",
+      "Status": "Collected",
+      "Items": 2,
+      "Detail": ""
+    },
+    {
+      "Area": "Entra app registrations",
+      "Status": "Collected",
+      "Items": 2,
+      "Detail": ""
+    },
+    {
+      "Area": "Entra service principals and managed identities",
+      "Status": "Collected",
+      "Items": 6,
+      "Detail": ""
+    },
+    {
+      "Area": "Entra API permissions (application + delegated)",
+      "Status": "Collected",
+      "Items": 6,
+      "Detail": ""
+    },
+    {
+      "Area": "Entra application assignments",
+      "Status": "Collected",
+      "Items": 3,
+      "Detail": "2 applications asked"
+    },
+    {
+      "Area": "Entra directory roles",
+      "Status": "Collected",
+      "Items": 3,
+      "Detail": "Active assignments; PIM eligible assignments are not readable with the Az sign-in token"
+    },
+    {
+      "Area": "Entra policies (Conditional Access, named locations, tenant policies)",
+      "Status": "Skipped",
+      "Items": 0,
+      "Detail": "This sign-in may not read Conditional Access and the tenant policies (needs the Microsoft Graph permission Policy.Read.All, for example a service principal with that application permission) - HTTP 403 Authorization_RequestDenied: Insufficient privileges to complete the operation."
+    },
+    {
+      "Area": "Configuration snapshot",
+      "Status": "Skipped",
+      "Items": null,
+      "Detail": "Disabled with -Mask (complete resource definitions)"
+    },
+    {
+      "Area": "Secret values",
+      "Status": "Info",
+      "Items": null,
+      "Detail": "2 value(s) of secret properties Azure returned (authorization keys, shared keys, passwords) were replaced with (not exported)"
+    },
+    {
+      "Area": "Report AppCode",
+      "Status": "NotSelected",
+      "Items": null,
+      "Detail": "code\\<subscription>\\<resource group>\\<app>\\wwwroot\\ (+ code\\index.csv)"
+    },
+    {
+      "Area": "Report AzureDevOpsRepos",
+      "Status": "NotSelected",
+      "Items": null,
+      "Detail": "ADO\\<organization>\\<project>\\repos\\ folder (+ ExportedTo columns)"
+    },
+    {
+      "Area": "Report AzureDevOpsPackages",
+      "Status": "NotSelected",
+      "Items": null,
+      "Detail": "ADO\\<organization>\\<project>\\feeds\\ folder (+ ExportedTo column in packages.csv)"
+    },
+    {
+      "Area": "Excel workbook",
+      "Status": "Collected",
+      "Items": null,
+      "Detail": "azure2csv_20261008-124522_500ccfff.xlsx"
+    },
+    {
+      "Area": "Mask self-check",
+      "Status": "Info",
+      "Items": 7,
+      "Detail": "7 remaining original names were replaced by the safety net"
+    }
+  ],
+  "warnings": 8,
+  "errors": []
+}

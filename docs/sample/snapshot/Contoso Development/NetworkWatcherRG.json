@@ -1,0 +1,9 @@
+{
+  "id": "/subscriptions/22222222-aaaa-bbbb-cccc-000000000002/resourceGroups/NetworkWatcherRG",
+  "name": "NetworkWatcherRG",
+  "type": "microsoft.resources/subscriptions/resourcegroups",
+  "location": "westeurope",
+  "properties": {
+    "provisioningState": "Succeeded"
+  }
+}

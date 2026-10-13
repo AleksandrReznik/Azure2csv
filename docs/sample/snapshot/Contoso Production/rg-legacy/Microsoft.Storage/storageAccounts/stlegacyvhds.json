@@ -1,0 +1,22 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-legacy/providers/Microsoft.Storage/storageAccounts/stlegacyvhds",
+  "name": "stlegacyvhds",
+  "type": "Microsoft.Storage/storageAccounts",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "kind": "Storage",
+  "sku": {
+    "name": "Standard_LRS",
+    "tier": "Standard"
+  },
+  "properties": {
+    "minimumTlsVersion": "TLS1_2",
+    "supportsHttpsTrafficOnly": true,
+    "allowBlobPublicAccess": true,
+    "allowSharedKeyAccess": true,
+    "networkAcls": {
+      "defaultAction": "Allow"
+    },
+    "provisioningState": "Succeeded"
+  }
+}

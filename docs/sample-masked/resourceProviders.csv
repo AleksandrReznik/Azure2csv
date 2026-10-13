@@ -1,0 +1,8 @@
+﻿"SubscriptionName","Namespace","RegistrationState","RegistrationPolicy","ResourceTypes","Resources"
+"sub-4defd4a49d","Microsoft.Compute","Registered","RegistrationRequired","1","2"
+"sub-4defd4a49d","Microsoft.Network","Registered","RegistrationRequired","2","4"
+"sub-461d69c4ad","Microsoft.Compute","Registered","RegistrationRequired","1","8"
+"sub-461d69c4ad","Microsoft.KeyVault","Registering","RegistrationRequired","1","1"
+"sub-461d69c4ad","Microsoft.Network","Registered","RegistrationRequired","2","19"
+"sub-461d69c4ad","Microsoft.Sql","Registered","RegistrationRequired","2","3"
+"sub-461d69c4ad","Microsoft.Storage","Registered","RegistrationRequired","2","2"

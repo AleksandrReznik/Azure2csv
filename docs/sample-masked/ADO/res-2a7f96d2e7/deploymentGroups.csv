@@ -1,0 +1,2 @@
+﻿"Organization","Project","DeploymentGroup","Machine","AgentStatus","AgentVersion","Tags","AzureVmId"
+"res-2a7f96d2e7","Project ab03e5cf64","Deployment group 1d4f7a10db","vm-ffc1f660da","online","3.236.1","web","/subscriptions/3342e47d-f7ee-45fa-9302-3715225561a0/resourceGroups/rg-dbd6ad73c0/providers/Microsoft.Compute/virtualMachines/vm-ffc1f660da"

@@ -1,0 +1,23 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/networkInterfaces/nic-orphan",
+  "name": "nic-orphan",
+  "type": "Microsoft.Network/networkInterfaces",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "ipConfigurations": [
+      {
+        "id": "x",
+        "name": "ipconfig1",
+        "properties": {
+          "privateIPAddress": "10.0.1.99",
+          "subnet": {
+            "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/virtualNetworks/vnet-hub/subnets/snet-app"
+          }
+        }
+      }
+    ],
+    "hostedWorkloads": [],
+    "provisioningState": "Succeeded"
+  }
+}

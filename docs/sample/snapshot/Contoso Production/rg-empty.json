@@ -1,0 +1,9 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-empty",
+  "name": "rg-empty",
+  "type": "microsoft.resources/subscriptions/resourcegroups",
+  "location": "northeurope",
+  "properties": {
+    "provisioningState": "Succeeded"
+  }
+}

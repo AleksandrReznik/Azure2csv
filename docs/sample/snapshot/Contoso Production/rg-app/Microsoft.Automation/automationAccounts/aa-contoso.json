@@ -1,0 +1,15 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Automation/automationAccounts/aa-contoso",
+  "name": "aa-contoso",
+  "type": "Microsoft.Automation/automationAccounts",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "state": "Ok",
+    "publicNetworkAccess": true,
+    "sku": {
+      "name": "Basic"
+    },
+    "provisioningState": "Succeeded"
+  }
+}

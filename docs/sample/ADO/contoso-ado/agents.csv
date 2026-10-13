@@ -1,0 +1,3 @@
+﻿"Organization","Pool","Agent","ComputerName","Version","MajorVersion","Outdated","OS","Status","Enabled","LastJob","DaysSinceLastJob","LastJobResult","CreatedOn","AzureVmId"
+"contoso-ado","Default","build01","vm-app01","3.236.1","3","False","Microsoft Windows 10.0.20348","online","True","2026-09-28T09:00:00Z","0","succeeded","2023-01-01T00:00:00Z","/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01"
+"contoso-ado","Default","oldagent","buildbox-old","2.217.2","2","True","Linux","offline","True","2024-11-01T00:00:00Z","697","failed","2020-01-01T00:00:00Z",""

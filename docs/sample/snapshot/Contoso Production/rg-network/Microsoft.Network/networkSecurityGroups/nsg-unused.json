@@ -1,0 +1,12 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/networkSecurityGroups/nsg-unused",
+  "name": "nsg-unused",
+  "type": "Microsoft.Network/networkSecurityGroups",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "securityRules": [],
+    "defaultSecurityRules": [],
+    "provisioningState": "Succeeded"
+  }
+}

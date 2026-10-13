@@ -1,0 +1,10 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/applicationSecurityGroups/asg-web",
+  "name": "asg-web",
+  "type": "Microsoft.Network/applicationSecurityGroups",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "provisioningState": "Succeeded"
+  }
+}

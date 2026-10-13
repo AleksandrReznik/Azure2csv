@@ -1,0 +1,11 @@
+{
+  "id": "contoso.onmicrosoft.com",
+  "authenticationType": "Managed",
+  "isDefault": false,
+  "isInitial": true,
+  "isVerified": true,
+  "isRoot": true,
+  "supportedServices": [
+    "Email"
+  ]
+}

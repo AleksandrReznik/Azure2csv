@@ -1,0 +1,16 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001",
+  "subscriptionId": "11111111-aaaa-bbbb-cccc-000000000001",
+  "displayName": "Contoso Production",
+  "state": "Enabled",
+  "tenantId": "aaaaaaaa-1111-2222-3333-444444444444",
+  "authorizationSource": "RoleBased",
+  "subscriptionPolicies": {
+    "quotaId": "EnterpriseAgreement_2014-09-01",
+    "spendingLimit": "Off"
+  },
+  "tags": {
+    "env": "prod",
+    "costcenter": "CC-100"
+  }
+}

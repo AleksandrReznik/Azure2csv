@@ -1,0 +1,13 @@
+{
+  "severity": 2,
+  "enabled": true,
+  "criteria": {
+    "allOf": [
+      {
+        "query": "AppExceptions | summarize count() by bin(TimeGenerated, 5m)",
+        "timeAggregation": "Count"
+      }
+    ]
+  },
+  "provisioningState": "Succeeded"
+}

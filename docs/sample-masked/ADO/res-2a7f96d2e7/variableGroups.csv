@@ -1,0 +1,3 @@
+﻿"Organization","Projects","VariableGroup","VariableGroupId","Type","KeyVault","ServiceConnection","Variables","SecretVariables","VariableNames","CreatedBy","ModifiedOn"
+"res-2a7f96d2e7","Project ab03e5cf64","Variables 8604a06048","1","Library","","","2","1","x-cf423cb978; x-bbca6f341c","User 0b59bbf728","2026-08-01T00:00:00Z"
+"res-2a7f96d2e7","Project ab03e5cf64","Variables 63d879676c","2","Key Vault","kv-6bf36ba3de","Connection 2cc217b0c5","1","1","x-b6abe92353","User 0b59bbf728","2026-08-01T00:00:00Z"

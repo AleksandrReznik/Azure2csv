@@ -1,0 +1,2 @@
+﻿"Organization","Project","Event","Consumer","Action","TargetHost","Status","CreatedBy","ModifiedDate"
+"contoso-ado","Web Shop","git.push","webHooks","httpRequest","hooks.slack.com","enabled","Alex Admin","2026-01-01T00:00:00Z"

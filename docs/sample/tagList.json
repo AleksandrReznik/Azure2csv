@@ -1,0 +1,25 @@
+{
+  "owner": {
+    "Vilniaus šaltinis": "",
+    "Ärzte": ""
+  },
+  "app": {
+    "contoso-web": ""
+  },
+  "site": {
+    "東京": ""
+  },
+  "costcenter": {
+    "CC-100": ""
+  },
+  "dept": {
+    "Ärzte": ""
+  },
+  "hidden-title": {
+    "Operations": ""
+  },
+  "env": {
+    "prod": "",
+    "dev": ""
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/vm-app01_OsDisk",
+  "name": "vm-app01_OsDisk",
+  "type": "Microsoft.Compute/disks",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "managedBy": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+  "sku": {
+    "name": "Premium_LRS",
+    "tier": "Premium"
+  },
+  "zones": [
+    "1"
+  ],
+  "properties": {
+    "diskSizeGB": 128,
+    "diskState": "Attached",
+    "osType": "Windows",
+    "timeCreated": "2023-05-01T10:00:00Z",
+    "encryption": {
+      "type": "EncryptionAtRestWithPlatformKey"
+    },
+    "networkAccessPolicy": "AllowAll",
+    "provisioningState": "Succeeded"
+  }
+}

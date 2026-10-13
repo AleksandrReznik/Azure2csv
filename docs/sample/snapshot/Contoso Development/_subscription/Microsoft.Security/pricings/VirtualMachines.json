@@ -1,0 +1,11 @@
+{
+  "id": "/subscriptions/22222222-aaaa-bbbb-cccc-000000000002/providers/Microsoft.Security/pricings/VirtualMachines",
+  "name": "VirtualMachines",
+  "type": "Microsoft.Security/pricings",
+  "properties": {
+    "pricingTier": "Free",
+    "subPlan": null,
+    "enablementTime": "2024-03-01T00:00:00Z",
+    "extensions": []
+  }
+}

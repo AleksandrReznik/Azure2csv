@@ -1,0 +1,302 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {},
+  "variables": {},
+  "resources": [
+    {
+      "type": "microsoft.compute/virtualmachines",
+      "apiVersion": "2024-05-01",
+      "name": "vm-app01",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.compute/virtualmachines/extensions",
+      "apiVersion": "2024-05-01",
+      "name": "AzureMonitorWindowsAgent",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.compute/disks",
+      "apiVersion": "2024-05-01",
+      "name": "vm-app01_OsDisk",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.compute/disks",
+      "apiVersion": "2024-05-01",
+      "name": "vm-app01_data0",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.web/serverfarms",
+      "apiVersion": "2024-05-01",
+      "name": "asp-empty",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.web/serverfarms",
+      "apiVersion": "2024-05-01",
+      "name": "asp-web",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.web/sites",
+      "apiVersion": "2024-05-01",
+      "name": "app-contoso",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.automation/automationaccounts",
+      "apiVersion": "2024-05-01",
+      "name": "aa-contoso",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.automation/automationaccounts/runbooks",
+      "apiVersion": "2024-05-01",
+      "name": "Start-VMs",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.automation/automationaccounts/runbooks",
+      "apiVersion": "2024-05-01",
+      "name": "Cleanup",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.containerservice/managedclusters",
+      "apiVersion": "2024-05-01",
+      "name": "aks-contoso",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.managedidentity/userassignedidentities",
+      "apiVersion": "2024-05-01",
+      "name": "uai-app",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.visualstudio/account",
+      "apiVersion": "2024-05-01",
+      "name": "contoso-ado",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.visualstudio/account",
+      "apiVersion": "2024-05-01",
+      "name": "fabrikam-old",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.visualstudio/account",
+      "apiVersion": "2024-05-01",
+      "name": "a0a0a0a0-0000-0000-0000-000000000009",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.logic/workflows",
+      "apiVersion": "2024-05-01",
+      "name": "la-orders",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.resources/deploymentscripts",
+      "apiVersion": "2024-05-01",
+      "name": "ds-seed",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.insights/workbooks",
+      "apiVersion": "2024-05-01",
+      "name": "0e0e0e0e-0000-0000-0000-000000000001",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.portal/dashboards",
+      "apiVersion": "2024-05-01",
+      "name": "dash-ops",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.insights/scheduledqueryrules",
+      "apiVersion": "2024-05-01",
+      "name": "alert-errors",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.apimanagement/service",
+      "apiVersion": "2024-05-01",
+      "name": "apim-contoso",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    }
+  ]
+}

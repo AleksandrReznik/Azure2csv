@@ -1,0 +1,18 @@
+{
+  "id": "0a000000-0000-0000-0000-00000000d001",
+  "appId": "aa000000-0000-0000-0000-000000000001",
+  "displayName": "Contoso Web App",
+  "servicePrincipalType": "Application",
+  "accountEnabled": true,
+  "appOwnerOrganizationId": "aaaaaaaa-1111-2222-3333-444444444444",
+  "tags": [
+    "WindowsAzureActiveDirectoryIntegratedApp"
+  ],
+  "appRoles": [
+    {
+      "id": "ad000000-0000-0000-0000-000000000001",
+      "value": "Orders.Admin",
+      "displayName": "Orders administrator"
+    }
+  ]
+}

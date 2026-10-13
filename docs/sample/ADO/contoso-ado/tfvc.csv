@@ -1,0 +1,3 @@
+﻿"Organization","Project","Path","IsBranch","Parent","Owner","Created","LastChangeset","LastChange","DaysSinceLastChange","LastChangeBy","Files","SizeMB","FilesCapped","Pipelines","ExportedTo"
+"contoso-ado","Legacy App","$/Legacy App/Trunk/Main","True","","Former Dev","2015-03-01T00:00:00Z","120","2023-05-10T00:00:00Z","1238","Former Dev","3","3.5","False","1",""
+"contoso-ado","Legacy App","$/Legacy App/Trunk/Dev","True","$/Legacy App/Trunk/Main","Former Dev","2016-01-01T00:00:00Z","95","2022-01-01T00:00:00Z","1732","Former Dev","1","0.5","False","0",""

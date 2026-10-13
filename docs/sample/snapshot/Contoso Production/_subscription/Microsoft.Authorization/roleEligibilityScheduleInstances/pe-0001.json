@@ -1,0 +1,33 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/providers/Microsoft.Authorization/roleEligibilityScheduleInstances/pe-0001",
+  "name": "pe-0001",
+  "properties": {
+    "scope": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001",
+    "roleDefinitionId": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/providers/Microsoft.Authorization/roleDefinitions/8e3af657-a8ff-443c-a75c-2fe8c4bcb635",
+    "principalId": "0a000000-0000-0000-0000-0000000000a2",
+    "principalType": "User",
+    "status": "Provisioned",
+    "startDateTime": "2026-01-01T00:00:00Z",
+    "endDateTime": "2026-12-31T00:00:00Z",
+    "memberType": "Direct",
+    "createdOn": "2026-01-01T00:00:00Z",
+    "expandedProperties": {
+      "principal": {
+        "id": "0a000000-0000-0000-0000-0000000000a2",
+        "displayName": "Pat Partner",
+        "email": "pat@fabrikam.com",
+        "type": "User"
+      },
+      "roleDefinition": {
+        "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/providers/Microsoft.Authorization/roleDefinitions/8e3af657-a8ff-443c-a75c-2fe8c4bcb635",
+        "displayName": "Owner",
+        "type": "BuiltInRole"
+      },
+      "scope": {
+        "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001",
+        "displayName": "Contoso Production",
+        "type": "subscription"
+      }
+    }
+  }
+}

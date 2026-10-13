@@ -1,0 +1,176 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {},
+  "variables": {},
+  "resources": [
+    {
+      "type": "microsoft.network/publicipaddresses",
+      "apiVersion": "2024-05-01",
+      "name": "pip-app01",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.compute/disks",
+      "apiVersion": "2024-05-01",
+      "name": "disk-orphan",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.storage/storageaccounts",
+      "apiVersion": "2024-05-01",
+      "name": "stcontosodata",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.keyvault/vaults",
+      "apiVersion": "2024-05-01",
+      "name": "kv-contoso",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.sql/servers",
+      "apiVersion": "2024-05-01",
+      "name": "sql-contoso",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.sql/servers/databases",
+      "apiVersion": "2024-05-01",
+      "name": "appdb",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.sql/servers/databases",
+      "apiVersion": "2024-05-01",
+      "name": "master",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.recoveryservices/vaults",
+      "apiVersion": "2024-05-01",
+      "name": "rsv-contoso",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.operationalinsights/workspaces",
+      "apiVersion": "2024-05-01",
+      "name": "law-contoso",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.datafactory/factories",
+      "apiVersion": "2024-05-01",
+      "name": "adf-contoso",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.streamanalytics/streamingjobs",
+      "apiVersion": "2024-05-01",
+      "name": "asa-telemetry",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.operationsmanagement/solutions",
+      "apiVersion": "2024-05-01",
+      "name": "SecurityInsights(law-contoso)",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+﻿"GroupName","GroupId","MemberName","MemberType","MemberUPN","MemberAppId","MemberId"
+"g-app-admins","0a000000-0000-0000-0000-0000000000b1","Alex Admin","user","alex.admin@contoso.onmicrosoft.com","","0a000000-0000-0000-0000-0000000000a1"
+"g-app-admins","0a000000-0000-0000-0000-0000000000b1","sp-monitoring","servicePrincipal","","abababab-0000-0000-0000-0000000000c1","0a000000-0000-0000-0000-0000000000c1"

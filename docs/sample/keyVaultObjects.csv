@@ -1,0 +1,2 @@
+﻿"SubscriptionName","ResourceGroup","KeyVault","Name","Type","Enabled","Expires","NotBefore","Created","Updated","ContentType","KeyType","KeySize","Managed","Id"
+"Contoso Production","rg-data","kv-contoso","sql-admin-login","Microsoft.KeyVault/vaults/secrets","True","1798761600","","","","text/plain","","","","/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-data/providers/Microsoft.KeyVault/vaults/kv-contoso/secrets/sql-admin-login"

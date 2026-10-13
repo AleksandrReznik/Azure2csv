@@ -1,0 +1,18 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/providers/Microsoft.Authorization/policyAssignments/allowed-vm-skus",
+  "name": "allowed-vm-skus",
+  "properties": {
+    "displayName": "Allowed VM sizes",
+    "scope": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001",
+    "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/cccc23c7-8427-4f53-ad12-b6a63eb452b3",
+    "enforcementMode": "DoNotEnforce",
+    "parameters": {
+      "listOfAllowedSKUs": {
+        "value": [
+          "Standard_D4s_v5",
+          "Standard_B2s"
+        ]
+      }
+    }
+  }
+}

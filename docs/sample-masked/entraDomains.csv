@@ -1,0 +1,3 @@
+﻿"Domain","AuthenticationType","IsDefault","IsInitial","IsVerified","IsRoot","SupportedServices","PasswordValidityDays"
+"d-5917d960d8","Federated","True","False","True","True","Email, OfficeCommunicationsOnline",""
+"MG 8bb705ea44.onmicrosoft.com","Managed","False","True","True","True","Email",""

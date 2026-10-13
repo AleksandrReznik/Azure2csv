@@ -1,0 +1,2 @@
+﻿"SubscriptionName","ResourceGroup","StorageAccount","Name","QuotaGB","AccessTier","Protocols","RootSquash","LeaseState","LastModified","Id"
+"Contoso Production","rg-data","stcontosodata","profiles","100","TransactionOptimized","SMB","","","","/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-data/providers/Microsoft.Storage/storageAccounts/stcontosodata/fileServices/default/shares/profiles"

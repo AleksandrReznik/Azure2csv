@@ -1,0 +1,66 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/networkSecurityGroups/nsg-app",
+  "name": "nsg-app",
+  "type": "Microsoft.Network/networkSecurityGroups",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "securityRules": [
+      {
+        "name": "Allow-RDP-Internet",
+        "properties": {
+          "priority": 100,
+          "direction": "Inbound",
+          "access": "Allow",
+          "protocol": "Tcp",
+          "sourceAddressPrefix": "Internet",
+          "sourcePortRange": "*",
+          "destinationAddressPrefix": "*",
+          "destinationPortRange": "3389"
+        }
+      },
+      {
+        "name": "Allow-HTTPS",
+        "properties": {
+          "priority": 110,
+          "direction": "Inbound",
+          "access": "Allow",
+          "protocol": "Tcp",
+          "sourceAddressPrefix": "*",
+          "sourcePortRange": "*",
+          "destinationAddressPrefixes": [
+            "10.0.1.4",
+            "10.0.1.5"
+          ],
+          "destinationPortRanges": [
+            "443",
+            "8443"
+          ],
+          "description": "=HYPERLINK(\"http://evil\")"
+        }
+      }
+    ],
+    "defaultSecurityRules": [
+      {
+        "name": "AllowVnetInBound",
+        "properties": {
+          "priority": 65000,
+          "direction": "Inbound",
+          "access": "Allow",
+          "protocol": "*",
+          "sourceAddressPrefix": "VirtualNetwork",
+          "sourcePortRange": "*",
+          "destinationAddressPrefix": "VirtualNetwork",
+          "destinationPortRange": "*",
+          "description": "Allow inbound traffic from all VMs in VNET"
+        }
+      }
+    ],
+    "subnets": [
+      {
+        "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/virtualNetworks/vnet-hub/subnets/snet-app"
+      }
+    ],
+    "provisioningState": "Succeeded"
+  }
+}

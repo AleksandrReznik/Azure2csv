@@ -1,0 +1,89 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+  "name": "vm-app01",
+  "type": "Microsoft.Compute/virtualMachines",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "identity": {
+    "type": "SystemAssigned, UserAssigned",
+    "principalId": "eeeeeeee-0000-0000-0000-000000000001",
+    "tenantId": "aaaaaaaa-1111-2222-3333-444444444444",
+    "userAssignedIdentities": {
+      "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.ManagedIdentity/userAssignedIdentities/uai-app": {
+        "principalId": "eeeeeeee-0000-0000-0000-000000000009",
+        "clientId": "ffffffff-0000-0000-0000-000000000009"
+      }
+    }
+  },
+  "zones": [
+    "1"
+  ],
+  "tags": {
+    "app": "contoso-web",
+    "owner": "Vilniaus šaltinis"
+  },
+  "properties": {
+    "hardwareProfile": {
+      "vmSize": "Standard_D4s_v5"
+    },
+    "licenseType": "Windows_Server",
+    "priority": "Regular",
+    "storageProfile": {
+      "osDisk": {
+        "osType": "Windows",
+        "name": "vm-app01_OsDisk",
+        "managedDisk": {
+          "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/vm-app01_OsDisk"
+        },
+        "diskSizeGB": 128
+      },
+      "dataDisks": [
+        {
+          "lun": 0,
+          "name": "vm-app01_data0",
+          "managedDisk": {
+            "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/vm-app01_data0"
+          },
+          "diskSizeGB": 512
+        }
+      ],
+      "imageReference": {
+        "publisher": "MicrosoftWindowsServer",
+        "offer": "WindowsServer",
+        "sku": "2019-datacenter-gensecond",
+        "version": "latest",
+        "exactVersion": "17763.4252.230404"
+      }
+    },
+    "osProfile": {
+      "computerName": "vm-app01"
+    },
+    "networkProfile": {
+      "networkInterfaces": [
+        {
+          "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/networkInterfaces/nic-app01"
+        }
+      ]
+    },
+    "securityProfile": {
+      "securityType": "TrustedLaunch"
+    },
+    "diagnosticsProfile": {
+      "bootDiagnostics": {
+        "enabled": true
+      }
+    },
+    "extended": {
+      "instanceView": {
+        "powerState": {
+          "code": "PowerState/running"
+        },
+        "osName": "Windows Server 2019 Datacenter",
+        "osVersion": "10.0.17763",
+        "hyperVGeneration": "V2"
+      }
+    },
+    "timeCreated": "2023-05-01T10:00:00Z",
+    "provisioningState": "Succeeded"
+  }
+}

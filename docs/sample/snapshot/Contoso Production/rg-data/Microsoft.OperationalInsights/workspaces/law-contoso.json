@@ -1,0 +1,14 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-data/providers/Microsoft.OperationalInsights/workspaces/law-contoso",
+  "name": "law-contoso",
+  "type": "Microsoft.OperationalInsights/workspaces",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "retentionInDays": 30,
+    "sku": {
+      "name": "PerGB2018"
+    },
+    "provisioningState": "Succeeded"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "id": "/subscriptions/22222222-aaaa-bbbb-cccc-000000000002/resourceGroups/rg-dev/providers/Microsoft.Network/virtualNetworks/vnet-dev",
+  "name": "vnet-dev",
+  "type": "Microsoft.Network/virtualNetworks",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "addressSpace": {
+      "addressPrefixes": [
+        "10.1.0.0/16"
+      ]
+    },
+    "dhcpOptions": {
+      "dnsServers": []
+    },
+    "subnets": [
+      {
+        "id": "/subscriptions/22222222-aaaa-bbbb-cccc-000000000002/resourceGroups/rg-dev/providers/Microsoft.Network/virtualNetworks/vnet-dev/subnets/snet-default",
+        "name": "snet-default",
+        "properties": {
+          "addressPrefix": "10.1.0.0/24"
+        }
+      }
+    ],
+    "provisioningState": "Succeeded"
+  }
+}

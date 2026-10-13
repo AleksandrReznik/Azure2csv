@@ -1,0 +1,218 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {},
+  "variables": {},
+  "resources": [
+    {
+      "type": "microsoft.network/virtualnetworks",
+      "apiVersion": "2024-05-01",
+      "name": "vnet-hub",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.network/virtualnetworks",
+      "apiVersion": "2024-05-01",
+      "name": "vnet-spoke",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.network/networksecuritygroups",
+      "apiVersion": "2024-05-01",
+      "name": "nsg-app",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.network/networksecuritygroups",
+      "apiVersion": "2024-05-01",
+      "name": "nsg-unused",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.network/routetables",
+      "apiVersion": "2024-05-01",
+      "name": "rt-app",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.network/routetables",
+      "apiVersion": "2024-05-01",
+      "name": "rt-unused",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.network/applicationsecuritygroups",
+      "apiVersion": "2024-05-01",
+      "name": "asg-web",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.network/networkinterfaces",
+      "apiVersion": "2024-05-01",
+      "name": "nic-app01",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.network/networkinterfaces",
+      "apiVersion": "2024-05-01",
+      "name": "nic-orphan",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.network/natgateways",
+      "apiVersion": "2024-05-01",
+      "name": "ng-unused",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.network/privatednszones",
+      "apiVersion": "2024-05-01",
+      "name": "privatelink.blob.core.windows.net",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.network/privatednszones/virtualnetworklinks",
+      "apiVersion": "2024-05-01",
+      "name": "link-hub",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.network/privatednszones",
+      "apiVersion": "2024-05-01",
+      "name": "privatelink.vaultcore.azure.net",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.network/privateendpoints",
+      "apiVersion": "2024-05-01",
+      "name": "pe-stcontosodata",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.resources/templatespecs",
+      "apiVersion": "2024-05-01",
+      "name": "ts-network",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    }
+  ]
+}

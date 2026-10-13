@@ -1,0 +1,32 @@
+{
+  "id": "/providers/Microsoft.Management/managementGroups/mg-contoso/providers/Microsoft.Authorization/policyAssignments/alz-baseline",
+  "name": "alz-baseline",
+  "location": "westeurope",
+  "identity": {
+    "type": "SystemAssigned",
+    "principalId": "eeeeeeee-0000-0000-0000-0000000000aa"
+  },
+  "properties": {
+    "displayName": "Contoso baseline",
+    "scope": "/providers/Microsoft.Management/managementGroups/mg-contoso",
+    "policyDefinitionId": "/providers/Microsoft.Management/managementGroups/mg-contoso/providers/Microsoft.Authorization/policySetDefinitions/contoso-baseline",
+    "enforcementMode": "Default",
+    "parameters": {
+      "allowedLocations": {
+        "value": [
+          "westeurope",
+          "northeurope"
+        ]
+      }
+    },
+    "nonComplianceMessages": [
+      {
+        "message": "Contact the platform team"
+      }
+    ],
+    "metadata": {
+      "createdOn": "2023-01-01T00:00:00Z",
+      "createdBy": "0a000000-0000-0000-0000-0000000000a1"
+    }
+  }
+}

@@ -1,0 +1,2 @@
+﻿"SubscriptionName","ResourceGroup","Name","Location","Kind","Enabled","Severity","Description","Scopes","Frequency","Window","TargetType","Criteria","ActionGroups","AutoMitigate","Id"
+"sub-461d69c4ad","rg-dbd6ad73c0","res-c8959ec00f","westeurope","Log search alert","True","2","","","","","","{""allOf"":[{""query"":""AppExceptions | summarize count() by bin(TimeGenerated, 5m)"",""timeAggregation"":""Count""}]}","","","/subscriptions/3342e47d-f7ee-45fa-9302-3715225561a0/resourceGroups/rg-dbd6ad73c0/providers/Microsoft.Insights/scheduledQueryRules/res-c8959ec00f"

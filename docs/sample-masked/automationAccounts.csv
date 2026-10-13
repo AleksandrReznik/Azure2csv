@@ -1,0 +1,2 @@
+﻿"SubscriptionName","SubscriptionId","ResourceGroup","Name","Location","Sku","State","PublicNetworkAccess","IdentityType","Runbooks","Tags","Id"
+"sub-461d69c4ad","3342e47d-f7ee-45fa-9302-3715225561a0","rg-dbd6ad73c0","aa-a0fb4b0ef4","westeurope","Basic","Ok","True","","2","","/subscriptions/3342e47d-f7ee-45fa-9302-3715225561a0/resourceGroups/rg-dbd6ad73c0/providers/Microsoft.Automation/automationAccounts/aa-a0fb4b0ef4"

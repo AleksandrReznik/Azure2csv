@@ -1,0 +1,11 @@
+{
+  "id": "/providers/Microsoft.Management/managementGroups/aaaaaaaa-1111-2222-3333-444444444444",
+  "name": "aaaaaaaa-1111-2222-3333-444444444444",
+  "type": "Microsoft.Management/managementGroups",
+  "properties": {
+    "displayName": "Tenant Root Group",
+    "details": {
+      "parent": null
+    }
+  }
+}

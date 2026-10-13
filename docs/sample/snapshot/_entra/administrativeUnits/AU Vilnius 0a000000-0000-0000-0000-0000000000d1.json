@@ -1,0 +1,8 @@
+{
+  "id": "0a000000-0000-0000-0000-0000000000d1",
+  "displayName": "AU Vilnius",
+  "description": "Vilnius office",
+  "visibility": null,
+  "membershipType": "Dynamic",
+  "membershipRule": "(user.country -eq \"LT\")"
+}

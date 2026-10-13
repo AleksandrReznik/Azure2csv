@@ -1,0 +1,2 @@
+﻿"SubscriptionName","SubscriptionId","ResourceGroup","Name","Location","Sku","State","PublicNetworkAccess","IdentityType","Runbooks","Tags","Id"
+"Contoso Production","11111111-aaaa-bbbb-cccc-000000000001","rg-app","aa-contoso","westeurope","Basic","Ok","True","","2","","/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Automation/automationAccounts/aa-contoso"

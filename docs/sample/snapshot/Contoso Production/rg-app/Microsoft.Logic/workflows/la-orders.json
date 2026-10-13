@@ -1,0 +1,11 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Logic/workflows/la-orders",
+  "name": "la-orders",
+  "type": "Microsoft.Logic/workflows",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "state": "Enabled",
+    "provisioningState": "Succeeded"
+  }
+}

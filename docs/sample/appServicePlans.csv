@@ -1,0 +1,3 @@
+﻿"SubscriptionName","SubscriptionId","ResourceGroup","Name","Location","Kind","Sku","Tier","Workers","OS","Apps","ZoneRedundant","Tags","Id"
+"Contoso Production","11111111-aaaa-bbbb-cccc-000000000001","rg-app","asp-empty","westeurope","app","P1v3","PremiumV3","1","Windows","0","False","","/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Web/serverFarms/asp-empty"
+"Contoso Production","11111111-aaaa-bbbb-cccc-000000000001","rg-app","asp-web","westeurope","linux","S1","Standard","2","Linux","1","False","","/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Web/serverFarms/asp-web"

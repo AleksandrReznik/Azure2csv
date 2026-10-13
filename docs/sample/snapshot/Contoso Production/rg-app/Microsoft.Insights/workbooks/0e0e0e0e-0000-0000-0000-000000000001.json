@@ -1,0 +1,11 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Insights/workbooks/0e0e0e0e-0000-0000-0000-000000000001",
+  "name": "0e0e0e0e-0000-0000-0000-000000000001",
+  "type": "Microsoft.Insights/workbooks",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "displayName": "Ops workbook",
+    "provisioningState": "Succeeded"
+  }
+}

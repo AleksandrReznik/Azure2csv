@@ -1,0 +1,24 @@
+{
+  "id": "aaaaaaaa-1111-2222-3333-444444444444",
+  "displayName": "Contoso",
+  "countryLetterCode": "LT",
+  "tenantType": "AAD",
+  "createdDateTime": "2015-05-05T00:00:00Z",
+  "onPremisesSyncEnabled": true,
+  "onPremisesLastSyncDateTime": "2026-09-28T23:30:00Z",
+  "technicalNotificationMails": [
+    "it@contoso.com"
+  ],
+  "verifiedDomains": [
+    {
+      "name": "contoso.com",
+      "isDefault": true,
+      "isInitial": false
+    },
+    {
+      "name": "contoso.onmicrosoft.com",
+      "isDefault": false,
+      "isInitial": true
+    }
+  ]
+}

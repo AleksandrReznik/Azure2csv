@@ -1,0 +1,5 @@
+﻿"Level","ManagementGroup","DisplayName","Parent","Path","DirectSubscriptions","TotalSubscriptions","Subscriptions","Source","Id"
+"0","aaaaaaaa-1111-2222-3333-444444444444","Tenant Root Group","","Tenant Root Group","0","2","","ResourceGraph","/providers/Microsoft.Management/managementGroups/aaaaaaaa-1111-2222-3333-444444444444"
+"1","mg-contoso","Contoso","aaaaaaaa-1111-2222-3333-444444444444","Tenant Root Group / Contoso","0","2","","ResourceGraph","/providers/Microsoft.Management/managementGroups/mg-contoso"
+"2","mg-landingzones","Landing Zones","mg-contoso","Tenant Root Group / Contoso / Landing Zones","1","1","Contoso Production","ResourceGraph","/providers/Microsoft.Management/managementGroups/mg-landingzones"
+"2","mg-sandbox","Sandbox","mg-contoso","Tenant Root Group / Contoso / Sandbox","1","1","Contoso Development","ResourceGraph","/providers/Microsoft.Management/managementGroups/mg-sandbox"

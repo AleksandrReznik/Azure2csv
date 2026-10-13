@@ -1,0 +1,14 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Automation/automationAccounts/aa-contoso/runbooks/Start-VMs",
+  "name": "Start-VMs",
+  "type": "Microsoft.Automation/automationAccounts/runbooks",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "runbookType": "PowerShell72",
+    "state": "Published",
+    "lastModifiedTime": "2024-03-01T09:00:00Z",
+    "description": "Starts VMs",
+    "provisioningState": "Succeeded"
+  }
+}

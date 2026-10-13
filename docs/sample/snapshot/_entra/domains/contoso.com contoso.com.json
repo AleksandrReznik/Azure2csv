@@ -1,0 +1,12 @@
+{
+  "id": "contoso.com",
+  "authenticationType": "Federated",
+  "isDefault": true,
+  "isInitial": false,
+  "isVerified": true,
+  "isRoot": true,
+  "supportedServices": [
+    "Email",
+    "OfficeCommunicationsOnline"
+  ]
+}

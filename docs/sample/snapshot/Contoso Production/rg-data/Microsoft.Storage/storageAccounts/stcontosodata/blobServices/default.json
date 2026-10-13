@@ -1,0 +1,15 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-data/providers/Microsoft.Storage/storageAccounts/stcontosodata/blobServices/default",
+  "name": "default",
+  "type": "Microsoft.Storage/storageAccounts/blobServices",
+  "properties": {
+    "isVersioningEnabled": true,
+    "deleteRetentionPolicy": {
+      "enabled": true,
+      "days": 14
+    },
+    "cors": {
+      "corsRules": []
+    }
+  }
+}

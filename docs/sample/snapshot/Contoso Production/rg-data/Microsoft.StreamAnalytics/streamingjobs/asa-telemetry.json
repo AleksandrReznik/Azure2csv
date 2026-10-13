@@ -1,0 +1,11 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-data/providers/Microsoft.StreamAnalytics/streamingjobs/asa-telemetry",
+  "name": "asa-telemetry",
+  "type": "Microsoft.StreamAnalytics/streamingjobs",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "jobState": "Running",
+    "provisioningState": "Succeeded"
+  }
+}

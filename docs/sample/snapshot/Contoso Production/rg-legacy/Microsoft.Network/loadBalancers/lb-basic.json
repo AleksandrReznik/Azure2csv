@@ -1,0 +1,17 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-legacy/providers/Microsoft.Network/loadBalancers/lb-basic",
+  "name": "lb-basic",
+  "type": "Microsoft.Network/loadBalancers",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "sku": {
+    "name": "Basic",
+    "tier": "Regional"
+  },
+  "properties": {
+    "backendAddressPools": [],
+    "inboundNatRules": [],
+    "frontendIPConfigurations": [],
+    "provisioningState": "Succeeded"
+  }
+}

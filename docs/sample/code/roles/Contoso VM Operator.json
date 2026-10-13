@@ -1,0 +1,16 @@
+{
+  "Name": "Contoso VM Operator",
+  "Id": "c0c0c0c0-1111-2222-3333-444444444444",
+  "IsCustom": true,
+  "Description": "Contoso VM Operator role",
+  "Actions": [
+    "Microsoft.Compute/virtualMachines/*",
+    "Microsoft.Compute/virtualMachines/start/action"
+  ],
+  "NotActions": [],
+  "DataActions": [],
+  "NotDataActions": [],
+  "AssignableScopes": [
+    "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001"
+  ]
+}

@@ -1,0 +1,6 @@
+trigger:
+- main
+pool:
+  vmImage: ubuntu-latest
+steps:
+- script: dotnet build

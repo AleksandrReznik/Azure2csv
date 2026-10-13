@@ -1,0 +1,22 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-data/providers/Microsoft.Sql/servers/sql-contoso",
+  "name": "sql-contoso",
+  "type": "Microsoft.Sql/servers",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "kind": "v12.0",
+  "properties": {
+    "version": "12.0",
+    "fullyQualifiedDomainName": "sql-contoso.database.windows.net",
+    "publicNetworkAccess": "Enabled",
+    "minimalTlsVersion": "1.0",
+    "state": "Ready",
+    "administrators": {
+      "administratorType": "ActiveDirectory",
+      "login": "sql-admins",
+      "azureADOnlyAuthentication": false,
+      "tenantId": "aaaaaaaa-1111-2222-3333-444444444444"
+    },
+    "provisioningState": "Succeeded"
+  }
+}

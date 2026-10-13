@@ -1,0 +1,2 @@
+﻿"SubscriptionName","ResourceGroup","StorageAccount","Name","QuotaGB","AccessTier","Protocols","RootSquash","LeaseState","LastModified","Id"
+"sub-461d69c4ad","rg-217c043767","st-670d9b78fe","x-cc8b14dab5","100","TransactionOptimized","SMB","","","","/subscriptions/3342e47d-f7ee-45fa-9302-3715225561a0/resourceGroups/rg-217c043767/providers/Microsoft.Storage/storageAccounts/st-670d9b78fe/fileServices/default/shares/x-cc8b14dab5"

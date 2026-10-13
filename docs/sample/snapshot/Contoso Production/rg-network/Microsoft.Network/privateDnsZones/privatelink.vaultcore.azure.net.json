@@ -1,0 +1,12 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/privateDnsZones/privatelink.vaultcore.azure.net",
+  "name": "privatelink.vaultcore.azure.net",
+  "type": "Microsoft.Network/privateDnsZones",
+  "apiVersion": "2024-05-01",
+  "location": "global",
+  "properties": {
+    "numberOfRecordSets": 1,
+    "numberOfVirtualNetworkLinks": 0,
+    "provisioningState": "Succeeded"
+  }
+}

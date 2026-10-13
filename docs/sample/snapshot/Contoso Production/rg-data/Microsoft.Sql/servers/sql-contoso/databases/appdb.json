@@ -1,0 +1,23 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-data/providers/Microsoft.Sql/servers/sql-contoso/databases/appdb",
+  "name": "appdb",
+  "type": "Microsoft.Sql/servers/databases",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "kind": "v12.0,user,vcore",
+  "sku": {
+    "name": "GP_Gen5",
+    "tier": "GeneralPurpose",
+    "capacity": 2,
+    "family": "Gen5"
+  },
+  "properties": {
+    "maxSizeBytes": 34359738368,
+    "zoneRedundant": false,
+    "licenseType": "LicenseIncluded",
+    "currentBackupStorageRedundancy": "Geo",
+    "status": "Online",
+    "creationDate": "2022-02-01T00:00:00Z",
+    "provisioningState": "Succeeded"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/providers/Microsoft.Authorization/policyDefinitions/require-app-tag",
+  "name": "require-app-tag",
+  "type": "Microsoft.Authorization/policyDefinitions",
+  "properties": {
+    "displayName": "Require app tag on resources",
+    "policyType": "Custom",
+    "mode": "Indexed",
+    "metadata": {
+      "category": "Tags"
+    },
+    "parameters": {
+      "effect": {
+        "type": "String",
+        "defaultValue": "Audit"
+      }
+    },
+    "policyRule": {
+      "if": {
+        "field": "tags.app",
+        "exists": "false"
+      },
+      "then": {
+        "effect": "[parameters('effect')]"
+      }
+    }
+  }
+}

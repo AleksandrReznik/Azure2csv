@@ -1,0 +1,11 @@
+{
+  "name": "asa-telemetry",
+  "properties": {
+    "transformation": {
+      "name": "main",
+      "properties": {
+        "query": "SELECT * INTO [out] FROM [in]"
+      }
+    }
+  }
+}

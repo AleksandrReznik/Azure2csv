@@ -1,0 +1,37 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Authorization/denyAssignments/da-0001",
+  "name": "da-0001",
+  "type": "Microsoft.Authorization/denyAssignments",
+  "properties": {
+    "denyAssignmentName": "Deny delete by managed application",
+    "description": "Created by Azure for a managed application",
+    "scope": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app",
+    "permissions": [
+      {
+        "actions": [
+          "*/delete"
+        ],
+        "notActions": [
+          "Microsoft.Storage/*/delete"
+        ],
+        "dataActions": [],
+        "notDataActions": []
+      }
+    ],
+    "principals": [
+      {
+        "id": "00000000-0000-0000-0000-000000000000",
+        "type": "SystemDefined"
+      }
+    ],
+    "excludePrincipals": [
+      {
+        "id": "0a000000-0000-0000-0000-0000000000c1",
+        "type": "ServicePrincipal"
+      }
+    ],
+    "doNotApplyToChildScopes": false,
+    "isSystemProtected": true,
+    "createdOn": "2024-02-01T00:00:00Z"
+  }
+}

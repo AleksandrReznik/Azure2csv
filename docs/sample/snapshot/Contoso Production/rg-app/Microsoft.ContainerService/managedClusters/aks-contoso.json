@@ -1,0 +1,53 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.ContainerService/managedClusters/aks-contoso",
+  "name": "aks-contoso",
+  "type": "Microsoft.ContainerService/managedClusters",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "sku": {
+    "name": "Base",
+    "tier": "Free"
+  },
+  "identity": {
+    "type": "SystemAssigned",
+    "principalId": "eeeeeeee-0000-0000-0000-000000000004",
+    "tenantId": "aaaaaaaa-1111-2222-3333-444444444444"
+  },
+  "properties": {
+    "kubernetesVersion": "1.27.3",
+    "currentKubernetesVersion": "1.27.3",
+    "agentPoolProfiles": [
+      {
+        "name": "system",
+        "count": 3,
+        "vmSize": "Standard_D4s_v5",
+        "osType": "Linux",
+        "mode": "System",
+        "orchestratorVersion": "1.27.3"
+      },
+      {
+        "name": "user",
+        "count": 2,
+        "vmSize": "Standard_D8s_v5",
+        "osType": "Linux",
+        "mode": "User"
+      }
+    ],
+    "networkProfile": {
+      "networkPlugin": "azure",
+      "networkPolicy": "calico"
+    },
+    "apiServerAccessProfile": {
+      "enablePrivateCluster": false
+    },
+    "aadProfile": {
+      "managed": true,
+      "enableAzureRBAC": true,
+      "tenantID": "aaaaaaaa-1111-2222-3333-444444444444"
+    },
+    "powerState": {
+      "code": "Running"
+    },
+    "provisioningState": "Succeeded"
+  }
+}

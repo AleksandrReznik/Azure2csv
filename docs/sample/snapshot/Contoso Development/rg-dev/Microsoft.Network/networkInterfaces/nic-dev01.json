@@ -1,0 +1,26 @@
+{
+  "id": "/subscriptions/22222222-aaaa-bbbb-cccc-000000000002/resourceGroups/rg-dev/providers/Microsoft.Network/networkInterfaces/nic-dev01",
+  "name": "nic-dev01",
+  "type": "Microsoft.Network/networkInterfaces",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "ipConfigurations": [
+      {
+        "id": "/subscriptions/22222222-aaaa-bbbb-cccc-000000000002/resourceGroups/rg-dev/providers/Microsoft.Network/networkInterfaces/nic-dev01/ipConfigurations/ipconfig1",
+        "name": "ipconfig1",
+        "properties": {
+          "privateIPAddress": "10.1.0.4",
+          "primary": true,
+          "subnet": {
+            "id": "/subscriptions/22222222-aaaa-bbbb-cccc-000000000002/resourceGroups/rg-dev/providers/Microsoft.Network/virtualNetworks/vnet-dev/subnets/snet-default"
+          }
+        }
+      }
+    ],
+    "virtualMachine": {
+      "id": "/subscriptions/22222222-aaaa-bbbb-cccc-000000000002/resourceGroups/rg-dev/providers/Microsoft.Compute/virtualMachines/vm-dev01"
+    },
+    "provisioningState": "Succeeded"
+  }
+}

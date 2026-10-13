@@ -1,0 +1,39 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-data/providers/Microsoft.Storage/storageAccounts/stcontosodata",
+  "name": "stcontosodata",
+  "type": "Microsoft.Storage/storageAccounts",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "kind": "StorageV2",
+  "sku": {
+    "name": "Standard_GRS",
+    "tier": "Standard"
+  },
+  "tags": {
+    "owner": "Vilniaus šaltinis",
+    "dept": "Ärzte",
+    "site": "東京"
+  },
+  "properties": {
+    "minimumTlsVersion": "TLS1_0",
+    "supportsHttpsTrafficOnly": true,
+    "networkAcls": {
+      "defaultAction": "Allow"
+    },
+    "encryption": {
+      "keySource": "Microsoft.Storage"
+    },
+    "isHnsEnabled": false,
+    "accessTier": "Hot",
+    "creationTime": "2022-01-10T08:00:00Z",
+    "primaryLocation": "westeurope",
+    "secondaryLocation": "northeurope",
+    "statusOfPrimary": "available",
+    "privateEndpointConnections": [
+      {
+        "id": "pec1"
+      }
+    ],
+    "provisioningState": "Succeeded"
+  }
+}

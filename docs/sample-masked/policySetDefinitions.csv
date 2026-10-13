@@ -1,0 +1,2 @@
+﻿"Name","DisplayName","PolicyType","Category","Version","Deprecated","Preview","PolicyCount","DefinedAt","AssignmentCount","Parameters","Description","Id"
+"pol-8374915951","Policy 23d24d4c97","Custom","General","","False","False","2","/providers/Microsoft.Management/managementGroups/mg-e4be21b8b3","1","allowedLocations","","/providers/Microsoft.Management/managementGroups/mg-e4be21b8b3/providers/Microsoft.Authorization/policySetDefinitions/pol-8374915951"

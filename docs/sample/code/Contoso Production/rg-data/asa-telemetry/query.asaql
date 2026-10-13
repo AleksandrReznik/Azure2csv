@@ -1,0 +1,1 @@
+SELECT * INTO [out] FROM [in]

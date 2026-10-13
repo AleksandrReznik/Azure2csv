@@ -1,0 +1,4 @@
+﻿"DisplayName","AppId","ObjectId","Type","Publisher","PublisherName","Enabled","AppRoleAssignmentRequired","SsoMode","Secrets","Certificates","NextCredentialExpiry","HasAzureRBAC","HighRiskPermissions","Tags"
+"Contoso Web App","aa000000-0000-0000-0000-000000000001","0a000000-0000-0000-0000-00000000d001","Application","This tenant","","True","","","0","0","","False","2","WindowsAzureActiveDirectoryIntegratedApp"
+"Microsoft Graph","00000003-0000-0000-c000-000000000000","0a000000-0000-0000-0000-00000000f001","Application","Microsoft","Microsoft Services","True","","","0","0","","False","0",""
+"sp-monitoring","abababab-0000-0000-0000-0000000000c1","0a000000-0000-0000-0000-0000000000c1","Application","Third party","Monitoring Vendor","True","","","0","0","","True","1",""

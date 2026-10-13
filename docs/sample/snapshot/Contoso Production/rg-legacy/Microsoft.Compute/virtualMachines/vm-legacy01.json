@@ -1,0 +1,44 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-legacy/providers/Microsoft.Compute/virtualMachines/vm-legacy01",
+  "name": "vm-legacy01",
+  "type": "Microsoft.Compute/virtualMachines",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "hardwareProfile": {
+      "vmSize": "Standard_DS2_v2"
+    },
+    "storageProfile": {
+      "osDisk": {
+        "osType": "Linux",
+        "name": "vm-legacy01-os",
+        "vhd": {
+          "uri": "https://stlegacyvhds.blob.core.windows.net/vhds/vm-legacy01.vhd"
+        },
+        "diskSizeGB": 30
+      },
+      "dataDisks": [],
+      "imageReference": {
+        "publisher": "Canonical",
+        "offer": "UbuntuServer",
+        "sku": "16.04-LTS",
+        "version": "latest"
+      }
+    },
+    "networkProfile": {
+      "networkInterfaces": [
+        {
+          "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-legacy/providers/Microsoft.Network/networkInterfaces/nic-legacy01"
+        }
+      ]
+    },
+    "extended": {
+      "instanceView": {
+        "powerState": {
+          "code": "PowerState/stopped"
+        }
+      }
+    },
+    "provisioningState": "Succeeded"
+  }
+}

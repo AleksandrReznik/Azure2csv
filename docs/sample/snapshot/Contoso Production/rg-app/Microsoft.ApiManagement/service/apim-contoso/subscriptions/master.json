@@ -1,0 +1,12 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.ApiManagement/service/apim-contoso/subscriptions/master",
+  "name": "master",
+  "type": "Microsoft.ApiManagement/service/subscriptions",
+  "properties": {
+    "scope": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.ApiManagement/service/apim-contoso/",
+    "state": "active",
+    "displayName": "Built-in all-access subscription",
+    "primaryKey": "(not exported)",
+    "secondaryKey": "(not exported)"
+  }
+}

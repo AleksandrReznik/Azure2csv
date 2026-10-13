@@ -1,0 +1,134 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {},
+  "variables": {},
+  "resources": [
+    {
+      "type": "microsoft.network/networkinterfaces",
+      "apiVersion": "2024-05-01",
+      "name": "nic-legacy01",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.network/publicipaddresses",
+      "apiVersion": "2024-05-01",
+      "name": "pip-basic",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.network/loadbalancers",
+      "apiVersion": "2024-05-01",
+      "name": "lb-basic",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.network/applicationgateways",
+      "apiVersion": "2024-05-01",
+      "name": "agw-v1",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.compute/virtualmachines",
+      "apiVersion": "2024-05-01",
+      "name": "vm-legacy01",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.compute/virtualmachines/extensions",
+      "apiVersion": "2024-05-01",
+      "name": "OmsAgentForLinux",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.compute/availabilitysets",
+      "apiVersion": "2024-05-01",
+      "name": "avset-empty",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.storage/storageaccounts",
+      "apiVersion": "2024-05-01",
+      "name": "stlegacyvhds",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    },
+    {
+      "type": "microsoft.sqlvirtualmachine/sqlvirtualmachines",
+      "apiVersion": "2024-05-01",
+      "name": "vm-legacy01",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    }
+  ]
+}

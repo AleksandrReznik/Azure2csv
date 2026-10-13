@@ -1,0 +1,3 @@
+﻿"Organization","Process","Type","Parent","IsDefault","Enabled","Projects","ProjectNames"
+"contoso-ado","Agile","system","","False","True","1","Legacy App"
+"contoso-ado","Contoso Agile","inherited","Agile","True","True","1","Web Shop"

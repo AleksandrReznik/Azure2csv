@@ -1,0 +1,19 @@
+{
+  "id": "/subscriptions/22222222-aaaa-bbbb-cccc-000000000002/providers/Microsoft.ManagedServices/registrationDefinitions/1d000000-0000-0000-0000-000000000001",
+  "name": "1d000000-0000-0000-0000-000000000001",
+  "type": "Microsoft.ManagedServices/registrationDefinitions",
+  "properties": {
+    "registrationDefinitionName": "Fabrikam Managed Services",
+    "description": "Operations 24x7",
+    "managedByTenantId": "bbbbbbbb-9999-8888-7777-666666666666",
+    "managedByTenantName": "Fabrikam",
+    "authorizations": [
+      {
+        "principalId": "0b000000-0000-0000-0000-0000000000a1",
+        "principalIdDisplayName": "Fabrikam Operators",
+        "roleDefinitionId": "b24988ac-6180-42a0-ab88-20f7382dd24c"
+      }
+    ],
+    "eligibleAuthorizations": []
+  }
+}

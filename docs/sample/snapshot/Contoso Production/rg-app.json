@@ -1,0 +1,13 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app",
+  "name": "rg-app",
+  "type": "microsoft.resources/subscriptions/resourcegroups",
+  "location": "westeurope",
+  "tags": {
+    "app": "contoso-web",
+    "owner": "Vilniaus šaltinis"
+  },
+  "properties": {
+    "provisioningState": "Succeeded"
+  }
+}

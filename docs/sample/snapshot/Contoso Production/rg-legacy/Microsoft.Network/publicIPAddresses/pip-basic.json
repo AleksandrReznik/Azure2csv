@@ -1,0 +1,16 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-legacy/providers/Microsoft.Network/publicIPAddresses/pip-basic",
+  "name": "pip-basic",
+  "type": "Microsoft.Network/publicIPAddresses",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "sku": {
+    "name": "Basic",
+    "tier": "Regional"
+  },
+  "properties": {
+    "publicIPAllocationMethod": "Dynamic",
+    "publicIPAddressVersion": "IPv4",
+    "provisioningState": "Succeeded"
+  }
+}

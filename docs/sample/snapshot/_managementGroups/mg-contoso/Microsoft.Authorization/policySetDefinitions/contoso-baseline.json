@@ -1,0 +1,35 @@
+{
+  "id": "/providers/Microsoft.Management/managementGroups/mg-contoso/providers/Microsoft.Authorization/policySetDefinitions/contoso-baseline",
+  "name": "contoso-baseline",
+  "type": "Microsoft.Authorization/policySetDefinitions",
+  "properties": {
+    "displayName": "Contoso baseline initiative",
+    "policyType": "Custom",
+    "metadata": {
+      "category": "General"
+    },
+    "parameters": {
+      "allowedLocations": {
+        "type": "Array",
+        "defaultValue": [
+          "westeurope"
+        ]
+      }
+    },
+    "policyDefinitions": [
+      {
+        "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/e56962a6-4747-49cd-b67b-bf8b01975c4c",
+        "policyDefinitionReferenceId": "allowed-locations",
+        "parameters": {
+          "listOfAllowedLocations": {
+            "value": "[parameters('allowedLocations')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionId": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/providers/Microsoft.Authorization/policyDefinitions/require-app-tag",
+        "policyDefinitionReferenceId": "require-tag"
+      }
+    ]
+  }
+}

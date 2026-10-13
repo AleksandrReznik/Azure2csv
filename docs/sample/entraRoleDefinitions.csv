@@ -1,0 +1,2 @@
+﻿"DisplayName","Description","IsEnabled","Permissions","AssignableScopes","Assignments","TemplateId","Id"
+"Helpdesk Lite","Reset passwords only","True","microsoft.directory/users/password/update; microsoft.directory/users/basic/update","/","0","c7000000-0000-0000-0000-000000000001","c7000000-0000-0000-0000-000000000001"

@@ -1,0 +1,19 @@
+{
+  "id": "c7000000-0000-0000-0000-000000000001",
+  "displayName": "Helpdesk Lite",
+  "description": "Reset passwords only",
+  "isBuiltIn": false,
+  "isEnabled": true,
+  "templateId": "c7000000-0000-0000-0000-000000000001",
+  "resourceScopes": [
+    "/"
+  ],
+  "rolePermissions": [
+    {
+      "allowedResourceActions": [
+        "microsoft.directory/users/password/update",
+        "microsoft.directory/users/basic/update"
+      ]
+    }
+  ]
+}

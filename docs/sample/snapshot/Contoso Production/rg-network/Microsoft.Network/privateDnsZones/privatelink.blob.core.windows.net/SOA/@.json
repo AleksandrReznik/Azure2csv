@@ -1,0 +1,16 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net/SOA/@",
+  "name": "@",
+  "type": "Microsoft.Network/privateDnsZones/SOA",
+  "location": "westeurope",
+  "properties": {
+    "fqdn": "privatelink.blob.core.windows.net.",
+    "ttl": 3600,
+    "records": [
+      {
+        "host": "azureprivatedns.net",
+        "email": "azureprivatedns-host.microsoft.com"
+      }
+    ]
+  }
+}

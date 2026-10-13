@@ -1,0 +1,2 @@
+﻿"SubscriptionName","ResourceGroup","Name","Location","Sku","CapacityReservationGB","RetentionDays","DailyQuotaGB","PublicIngestion","PublicQuery","CustomerId","DisableLocalAuth","ResourcePermissions","Cluster","DefaultDataCollectionRule","Id"
+"Contoso Production","rg-data","law-contoso","westeurope","PerGB2018","","30","","","","","","","","","/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-data/providers/Microsoft.OperationalInsights/workspaces/law-contoso"

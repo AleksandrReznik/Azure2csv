@@ -1,0 +1,19 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-data/providers/Microsoft.Compute/disks/disk-orphan",
+  "name": "disk-orphan",
+  "type": "Microsoft.Compute/disks",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "sku": {
+    "name": "Standard_LRS",
+    "tier": "Standard"
+  },
+  "properties": {
+    "diskSizeGB": 256,
+    "diskState": "Unattached",
+    "encryption": {
+      "type": "EncryptionAtRestWithPlatformKey"
+    },
+    "provisioningState": "Succeeded"
+  }
+}

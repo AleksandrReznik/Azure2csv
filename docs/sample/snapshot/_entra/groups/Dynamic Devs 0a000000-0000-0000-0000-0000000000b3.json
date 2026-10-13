@@ -1,0 +1,10 @@
+{
+  "id": "0a000000-0000-0000-0000-0000000000b3",
+  "displayName": "Dynamic Devs",
+  "securityEnabled": true,
+  "mailEnabled": false,
+  "groupTypes": [
+    "DynamicMembership"
+  ],
+  "membershipRule": "(user.department -eq \"Dev\")"
+}

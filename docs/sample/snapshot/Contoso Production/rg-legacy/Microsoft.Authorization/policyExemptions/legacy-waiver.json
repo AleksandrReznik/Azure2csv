@@ -1,0 +1,13 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-legacy/providers/Microsoft.Authorization/policyExemptions/legacy-waiver",
+  "name": "legacy-waiver",
+  "properties": {
+    "displayName": "Legacy waiver",
+    "policyAssignmentId": "/providers/Microsoft.Management/managementGroups/mg-contoso/providers/Microsoft.Authorization/policyAssignments/alz-baseline",
+    "exemptionCategory": "Waiver",
+    "expiresOn": "2026-01-01T00:00:00Z",
+    "policyDefinitionReferenceIds": [
+      "allowed-locations"
+    ]
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "id": "/subscriptions/22222222-aaaa-bbbb-cccc-000000000002/resourceGroups/rg-dev/providers/Microsoft.Compute/virtualMachines/vm-dev01",
+  "name": "vm-dev01",
+  "type": "Microsoft.Compute/virtualMachines",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "hardwareProfile": {
+      "vmSize": "Standard_B2s"
+    },
+    "storageProfile": {
+      "osDisk": {
+        "osType": "Linux",
+        "name": "vm-dev01_OsDisk",
+        "managedDisk": {
+          "id": "/subscriptions/22222222-aaaa-bbbb-cccc-000000000002/resourceGroups/rg-dev/providers/Microsoft.Compute/disks/vm-dev01_OsDisk"
+        },
+        "diskSizeGB": 30
+      },
+      "dataDisks": [],
+      "imageReference": {
+        "publisher": "Canonical",
+        "offer": "0001-com-ubuntu-server-jammy",
+        "sku": "22_04-lts-gen2",
+        "version": "latest"
+      }
+    },
+    "networkProfile": {
+      "networkInterfaces": [
+        {
+          "id": "/subscriptions/22222222-aaaa-bbbb-cccc-000000000002/resourceGroups/rg-dev/providers/Microsoft.Network/networkInterfaces/nic-dev01"
+        }
+      ]
+    },
+    "extended": {
+      "instanceView": {
+        "powerState": {
+          "code": "PowerState/deallocated"
+        }
+      }
+    },
+    "provisioningState": "Succeeded"
+  }
+}

@@ -1,0 +1,2 @@
+﻿"SubscriptionName","SubscriptionId","ResourceGroup","RouteTable","Route","AddressPrefix","NextHopType","NextHopIp"
+"Contoso Production","11111111-aaaa-bbbb-cccc-000000000001","rg-network","rt-app","default-to-fw","0.0.0.0/0","VirtualAppliance","10.0.0.4"

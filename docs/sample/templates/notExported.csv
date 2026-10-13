@@ -1,0 +1,2 @@
+﻿"SubscriptionName","ResourceGroup","Target","Code","Message"
+"Contoso Production","rg-app","Microsoft.Web/sites/config","ExportTemplateProviderError","Could not get resources of the type 'Microsoft.Web/sites/config'. Resources of this type will not be exported."

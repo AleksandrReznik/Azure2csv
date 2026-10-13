@@ -1,0 +1,15 @@
+{
+  "id": "0a000000-0000-0000-0000-0000000000d2",
+  "displayName": "Group.Unified",
+  "templateId": "62375ab9-6b52-47ed-826b-58e47e0e304b",
+  "values": [
+    {
+      "name": "EnableGroupCreation",
+      "value": "false"
+    },
+    {
+      "name": "PrefixSuffixNamingRequirement",
+      "value": "GRP-[GroupName]"
+    }
+  ]
+}

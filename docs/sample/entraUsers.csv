@@ -1,0 +1,6 @@
+﻿"DisplayName","UserPrincipalName","Mail","UserType","AccountEnabled","CreatedDateTime","CreationType","ExternalUserState","OnPremisesSync","Department","JobTitle","CompanyName","UsageLocation","Licenses","LastSignIn","LastNonInteractiveSignIn","DaysSinceLastSignIn","SignInDataAvailable","HasDirectoryRole","HasAzureRBAC","Id"
+"Alex Admin","alex.admin@contoso.onmicrosoft.com","alex@contoso.com","Member","True","2020-01-01T00:00:00Z","","","False","","","","LT","2","","","","False","True","True","0a000000-0000-0000-0000-0000000000a1"
+"Former Employee","former@contoso.com","","Member","False","2019-01-01T00:00:00Z","","","False","","","","","1","","","","False","False","False","0a000000-0000-0000-0000-0000000000a4"
+"Vilniaus šaltinis","jonas@contoso.com","","Member","True","2021-03-01T00:00:00Z","","","True","Finance","","","","1","","","","False","False","False","0a000000-0000-0000-0000-0000000000a3"
+"Pat Partner","pat_fabrikam.com#EXT#@contoso.onmicrosoft.com","pat@fabrikam.com","Guest","True","2025-01-01T00:00:00Z","Invitation","PendingAcceptance","False","","","","","0","","","","False","True","True","0a000000-0000-0000-0000-0000000000a2"
+"svc-backup","svc-backup@contoso.com","","Member","True","2022-01-01T00:00:00Z","","","False","","","","","0","","","","False","False","False","0a000000-0000-0000-0000-0000000000a5"

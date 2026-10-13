@@ -1,0 +1,2 @@
+﻿"SubscriptionName","SubscriptionId","ResourceGroup","RouteTable","Route","AddressPrefix","NextHopType","NextHopIp"
+"sub-461d69c4ad","3342e47d-f7ee-45fa-9302-3715225561a0","rg-84a71829d8","rt-87b6155a08","route-00e4c2dbb6","0.0.0.0/0","VirtualAppliance","10.0.0.4"

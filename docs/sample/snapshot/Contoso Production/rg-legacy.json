@@ -1,0 +1,12 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-legacy",
+  "name": "rg-legacy",
+  "type": "microsoft.resources/subscriptions/resourcegroups",
+  "location": "westeurope",
+  "tags": {
+    "owner": "Ärzte"
+  },
+  "properties": {
+    "provisioningState": "Succeeded"
+  }
+}

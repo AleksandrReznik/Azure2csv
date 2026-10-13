@@ -1,0 +1,2 @@
+﻿"TenantId","DisplayName","DefaultDomain","InitialDomain","Country","CreatedDateTime","TenantType","OnPremisesSyncEnabled","LastDirectorySync","VerifiedDomains","TechnicalNotificationMails"
+"500ccfff-8253-4d98-85a7-0a6ccdf95ae6","MG 8bb705ea44","d-5917d960d8","MG 8bb705ea44.onmicrosoft.com","LT","2015-05-05T00:00:00Z","AAD","True","2026-09-28T23:30:00Z","2","u-5980e54bd5@d-5917d960d8"

@@ -1,0 +1,5 @@
+﻿"Organization","Project","Scope","Feed","FeedId","Identity","IdentityScope","Role","Inherited","IdentityId"
+"contoso-ado","","Organization","contoso-packages","f1f1f1f1-0000-0000-0000-000000000001","Project Collection Administrators","contoso-ado","administrator","False","c9c9c9c9-0000-0000-0000-000000000001"
+"contoso-ado","","Organization","contoso-packages","f1f1f1f1-0000-0000-0000-000000000001","Project Collection Build Service (contoso-ado)","","contributor","False","c9c9c9c9-0000-0000-0000-000000000002"
+"contoso-ado","","Organization","contoso-packages","f1f1f1f1-0000-0000-0000-000000000001","Pat Partner","","reader","True","c9c9c9c9-0000-0000-0000-000000000003"
+"contoso-ado","","Organization","contoso-packages","f1f1f1f1-0000-0000-0000-000000000001","S-1-9-1551374245-4","","collaborator","False","c9c9c9c9-0000-0000-0000-000000000004"

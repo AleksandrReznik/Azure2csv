@@ -1,0 +1,4 @@
+﻿"Application","AppId","PrincipalName","PrincipalType","AppRole","AssignedOn","PrincipalId","ApplicationObjectId"
+"Contoso Web App","aa000000-0000-0000-0000-000000000001","Alex Admin","User","Default access","2024-03-01T00:00:00Z","0a000000-0000-0000-0000-0000000000a1","0a000000-0000-0000-0000-00000000d001"
+"Contoso Web App","aa000000-0000-0000-0000-000000000001","g-app-admins","Group","Orders administrator","2024-03-02T00:00:00Z","0a000000-0000-0000-0000-0000000000b1","0a000000-0000-0000-0000-00000000d001"
+"Contoso Web App","aa000000-0000-0000-0000-000000000001","sp-monitoring","ServicePrincipal","Orders administrator","2024-03-03T00:00:00Z","0a000000-0000-0000-0000-0000000000c1","0a000000-0000-0000-0000-00000000d001"

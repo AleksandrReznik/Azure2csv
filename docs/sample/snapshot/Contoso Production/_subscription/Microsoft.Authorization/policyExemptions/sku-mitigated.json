@@ -1,0 +1,10 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/providers/Microsoft.Authorization/policyExemptions/sku-mitigated",
+  "name": "sku-mitigated",
+  "properties": {
+    "displayName": "SKU mitigated",
+    "policyAssignmentId": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/providers/Microsoft.Authorization/policyAssignments/allowed-vm-skus",
+    "exemptionCategory": "Mitigated",
+    "expiresOn": "2026-10-09T00:00:00Z"
+  }
+}

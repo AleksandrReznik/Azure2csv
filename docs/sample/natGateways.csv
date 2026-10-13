@@ -1,0 +1,2 @@
+﻿"SubscriptionName","ResourceGroup","Name","Location","Sku","IdleTimeoutMinutes","PublicIPs","PublicIPPrefixes","Subnets","Zones","Id"
+"Contoso Production","rg-network","ng-unused","westeurope","Standard","4","","","","","/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/natGateways/ng-unused"

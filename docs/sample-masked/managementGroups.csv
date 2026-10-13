@@ -1,0 +1,5 @@
+﻿"Level","ManagementGroup","DisplayName","Parent","Path","DirectSubscriptions","TotalSubscriptions","Subscriptions","Source","Id"
+"0","500ccfff-8253-4d98-85a7-0a6ccdf95ae6","MG e93aad1780","","MG e93aad1780","0","2","","ResourceGraph","/providers/Microsoft.Management/managementGroups/500ccfff-8253-4d98-85a7-0a6ccdf95ae6"
+"1","mg-e4be21b8b3","MG 8bb705ea44","500ccfff-8253-4d98-85a7-0a6ccdf95ae6","x-b75364246d","0","2","","ResourceGraph","/providers/Microsoft.Management/managementGroups/mg-e4be21b8b3"
+"2","mg-cc1aef1874","MG ac93fa36c6","mg-e4be21b8b3","x-b438918f90","1","1","sub-461d69c4ad","ResourceGraph","/providers/Microsoft.Management/managementGroups/mg-cc1aef1874"
+"2","mg-33a12c2cce","MG 50030a0995","mg-e4be21b8b3","x-cc99283684","1","1","sub-4defd4a49d","ResourceGraph","/providers/Microsoft.Management/managementGroups/mg-33a12c2cce"

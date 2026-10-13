@@ -1,0 +1,9 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network",
+  "name": "rg-network",
+  "type": "microsoft.resources/subscriptions/resourcegroups",
+  "location": "westeurope",
+  "properties": {
+    "provisioningState": "Succeeded"
+  }
+}

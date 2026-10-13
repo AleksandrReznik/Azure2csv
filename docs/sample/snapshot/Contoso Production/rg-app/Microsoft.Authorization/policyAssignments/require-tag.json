@@ -1,0 +1,10 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Authorization/policyAssignments/require-tag",
+  "name": "require-tag",
+  "properties": {
+    "displayName": "Require app tag",
+    "scope": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app",
+    "policyDefinitionId": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/providers/Microsoft.Authorization/policyDefinitions/require-app-tag",
+    "enforcementMode": "Default"
+  }
+}

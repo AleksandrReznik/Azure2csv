@@ -1,0 +1,9 @@
+{
+  "id": "0a000000-0000-0000-0000-0000000000c1",
+  "appId": "abababab-0000-0000-0000-0000000000c1",
+  "displayName": "sp-monitoring",
+  "servicePrincipalType": "Application",
+  "accountEnabled": true,
+  "appOwnerOrganizationId": "cccccccc-0000-0000-0000-000000000000",
+  "publisherName": "Monitoring Vendor"
+}

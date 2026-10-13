@@ -1,0 +1,16 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-data/providers/Microsoft.Storage/storageAccounts/stcontosodata/managementPolicies/default",
+  "name": "DefaultManagementPolicy",
+  "type": "Microsoft.Storage/storageAccounts/managementPolicies",
+  "properties": {
+    "policy": {
+      "rules": [
+        {
+          "name": "move-to-cool",
+          "enabled": true,
+          "type": "Lifecycle"
+        }
+      ]
+    }
+  }
+}

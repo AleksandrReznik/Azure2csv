@@ -1,0 +1,3 @@
+﻿"SkuPartNumber","SkuId","AppliesTo","CapabilityStatus","Enabled","Consumed","Available","Suspended","Warning"
+"AAD_PREMIUM_P2","eec0eb4f-6444-4f95-aba0-50c24d67f998","User","Enabled","25","20","5","0","0"
+"ENTERPRISEPACK","6fd2c87f-b296-42f0-b197-1e91e994b900","User","Enabled","100","87","13","0","0"

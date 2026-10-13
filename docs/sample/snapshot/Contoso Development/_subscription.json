@@ -1,0 +1,15 @@
+{
+  "id": "/subscriptions/22222222-aaaa-bbbb-cccc-000000000002",
+  "subscriptionId": "22222222-aaaa-bbbb-cccc-000000000002",
+  "displayName": "Contoso Development",
+  "state": "Enabled",
+  "tenantId": "aaaaaaaa-1111-2222-3333-444444444444",
+  "authorizationSource": "RoleBased",
+  "subscriptionPolicies": {
+    "quotaId": "MSDN_2014-09-01",
+    "spendingLimit": "On"
+  },
+  "tags": {
+    "env": "dev"
+  }
+}

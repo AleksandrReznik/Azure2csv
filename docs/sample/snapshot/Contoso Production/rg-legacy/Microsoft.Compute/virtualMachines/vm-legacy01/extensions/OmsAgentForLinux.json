@@ -1,0 +1,13 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-legacy/providers/Microsoft.Compute/virtualMachines/vm-legacy01/extensions/OmsAgentForLinux",
+  "name": "OmsAgentForLinux",
+  "type": "Microsoft.Compute/virtualMachines/extensions",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "publisher": "Microsoft.EnterpriseCloud.Monitoring",
+    "type": "OmsAgentForLinux",
+    "typeHandlerVersion": "1.14",
+    "provisioningState": "Succeeded"
+  }
+}

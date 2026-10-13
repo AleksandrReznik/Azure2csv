@@ -1,0 +1,20 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Insights/scheduledQueryRules/alert-errors",
+  "name": "alert-errors",
+  "type": "Microsoft.Insights/scheduledQueryRules",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "severity": 2,
+    "enabled": true,
+    "criteria": {
+      "allOf": [
+        {
+          "query": "AppExceptions | summarize count() by bin(TimeGenerated, 5m)",
+          "timeAggregation": "Count"
+        }
+      ]
+    },
+    "provisioningState": "Succeeded"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {},
+  "variables": {},
+  "resources": [
+    {
+      "type": "microsoft.network/networkwatchers",
+      "apiVersion": "2024-05-01",
+      "name": "NetworkWatcher_westeurope",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]"
+      ],
+      "properties": {
+        "createdOn": "2024-01-01T00:00:00.0000000Z",
+        "big": 12345678901234567890,
+        "ratio": 1.0
+      }
+    }
+  ]
+}

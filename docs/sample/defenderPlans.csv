@@ -1,0 +1,5 @@
+﻿"SubscriptionName","Plan","Tier","SubPlan","Extensions","EnabledOn","FreeTrialRemaining","Deprecated","ReplacedBy","Id"
+"Contoso Development","VirtualMachines","Free","","","2024-03-01T00:00:00Z","","","","/subscriptions/22222222-aaaa-bbbb-cccc-000000000002/providers/Microsoft.Security/pricings/VirtualMachines"
+"Contoso Production","KeyVaults","Free","","","2024-03-01T00:00:00Z","","","","/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/providers/Microsoft.Security/pricings/KeyVaults"
+"Contoso Production","StorageAccounts","Standard","DefenderForStorageV2","OnUploadMalwareScanning, SensitiveDataDiscovery","2024-03-01T00:00:00Z","","","","/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/providers/Microsoft.Security/pricings/StorageAccounts"
+"Contoso Production","VirtualMachines","Standard","P2","AgentlessVmScanning","2024-03-01T00:00:00Z","","","","/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/providers/Microsoft.Security/pricings/VirtualMachines"

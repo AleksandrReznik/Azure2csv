@@ -1,0 +1,11 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-data/providers/Microsoft.DataFactory/factories/adf-contoso",
+  "name": "adf-contoso",
+  "type": "Microsoft.DataFactory/factories",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "publicNetworkAccess": "Enabled",
+    "provisioningState": "Succeeded"
+  }
+}

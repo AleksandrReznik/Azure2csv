@@ -1,0 +1,51 @@
+{
+  "id": "0a000000-0000-0000-0000-00000000e001",
+  "appId": "aa000000-0000-0000-0000-000000000001",
+  "displayName": "Contoso Web App",
+  "signInAudience": "AzureADMyOrg",
+  "createdDateTime": "2023-02-01T00:00:00Z",
+  "passwordCredentials": [
+    {
+      "displayName": "prod-secret",
+      "keyId": "11110000-0000-0000-0000-000000000001",
+      "startDateTime": "2025-10-09T00:00:00Z",
+      "endDateTime": "2026-10-09T00:00:00Z"
+    }
+  ],
+  "keyCredentials": [
+    {
+      "displayName": "CN=old-cert",
+      "keyId": "11110000-0000-0000-0000-000000000002",
+      "startDateTime": "2024-01-01T00:00:00Z",
+      "endDateTime": "2026-01-01T00:00:00Z"
+    }
+  ],
+  "requiredResourceAccess": [
+    {
+      "resourceAppId": "00000003-0000-0000-c000-000000000000",
+      "resourceAccess": [
+        {
+          "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+          "type": "Scope"
+        },
+        {
+          "id": "19dbc75e-c2e2-444c-a770-ec69d8559fc7",
+          "type": "Role"
+        }
+      ]
+    }
+  ],
+  "web": {
+    "redirectUris": [
+      "https://app.contoso.com/signin-oidc"
+    ]
+  },
+  "owners": [
+    {
+      "@odata.type": "#microsoft.graph.user",
+      "id": "0a000000-0000-0000-0000-0000000000a1",
+      "displayName": "Alex Admin",
+      "userPrincipalName": "alex.admin@contoso.onmicrosoft.com"
+    }
+  ]
+}

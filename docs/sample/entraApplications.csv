@@ -1,0 +1,3 @@
+﻿"DisplayName","AppId","ObjectId","CreatedDateTime","SignInAudience","MultiTenant","PublisherDomain","Owners","OwnerCount","Secrets","Certificates","NextCredentialExpiry","CredentialStatus","RequiredApiPermissions","RedirectUris","IdentifierUris","Notes"
+"Contoso Web App","aa000000-0000-0000-0000-000000000001","0a000000-0000-0000-0000-00000000e001","2023-02-01T00:00:00Z","AzureADMyOrg","False","","alex.admin@contoso.onmicrosoft.com","1","1","1","2026-10-09T00:00:00Z","Expires within 30 days","2","1","",""
+"Legacy Integration","aa000000-0000-0000-0000-000000000002","0a000000-0000-0000-0000-00000000e002","2018-02-01T00:00:00Z","AzureADMultipleOrgs","True","","","0","1","0","2027-01-01T00:00:00Z","OK","0","0","","Owned by the former integration team"

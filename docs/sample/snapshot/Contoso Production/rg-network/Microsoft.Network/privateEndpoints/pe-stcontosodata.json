@@ -1,0 +1,35 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/privateEndpoints/pe-stcontosodata",
+  "name": "pe-stcontosodata",
+  "type": "Microsoft.Network/privateEndpoints",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "subnet": {
+      "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/virtualNetworks/vnet-hub/subnets/snet-app"
+    },
+    "privateLinkServiceConnections": [
+      {
+        "name": "pe-conn",
+        "properties": {
+          "privateLinkServiceId": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-data/providers/Microsoft.Storage/storageAccounts/stcontosodata",
+          "groupIds": [
+            "blob"
+          ],
+          "privateLinkServiceConnectionState": {
+            "status": "Approved"
+          }
+        }
+      }
+    ],
+    "customDnsConfigs": [
+      {
+        "fqdn": "stcontosodata.blob.core.windows.net",
+        "ipAddresses": [
+          "10.0.1.10"
+        ]
+      }
+    ],
+    "provisioningState": "Succeeded"
+  }
+}

@@ -1,0 +1,2 @@
+﻿"SubscriptionName","SubscriptionId","ResourceGroup","Name","Location","Version","Fqdn","State","PublicNetworkAccess","MinimalTlsVersion","EntraAdmin","EntraOnlyAuth","IdentityType","Databases","ElasticPools","PrivateEndpoints","Tags","Id"
+"Contoso Production","11111111-aaaa-bbbb-cccc-000000000001","rg-data","sql-contoso","westeurope","12.0","sql-contoso.database.windows.net","Ready","Enabled","1.0","sql-admins","False","","1","0","0","","/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-data/providers/Microsoft.Sql/servers/sql-contoso"

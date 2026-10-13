@@ -1,0 +1,26 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/routeTables/rt-app",
+  "name": "rt-app",
+  "type": "Microsoft.Network/routeTables",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "disableBgpRoutePropagation": true,
+    "routes": [
+      {
+        "name": "default-to-fw",
+        "properties": {
+          "addressPrefix": "0.0.0.0/0",
+          "nextHopType": "VirtualAppliance",
+          "nextHopIpAddress": "10.0.0.4"
+        }
+      }
+    ],
+    "subnets": [
+      {
+        "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/virtualNetworks/vnet-hub/subnets/snet-app"
+      }
+    ],
+    "provisioningState": "Succeeded"
+  }
+}

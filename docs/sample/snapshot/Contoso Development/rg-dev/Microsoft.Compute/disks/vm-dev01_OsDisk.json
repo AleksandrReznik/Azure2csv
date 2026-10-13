@@ -1,0 +1,17 @@
+{
+  "id": "/subscriptions/22222222-aaaa-bbbb-cccc-000000000002/resourceGroups/rg-dev/providers/Microsoft.Compute/disks/vm-dev01_OsDisk",
+  "name": "vm-dev01_OsDisk",
+  "type": "Microsoft.Compute/disks",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "managedBy": "/subscriptions/22222222-aaaa-bbbb-cccc-000000000002/resourceGroups/rg-dev/providers/Microsoft.Compute/virtualMachines/vm-dev01",
+  "sku": {
+    "name": "StandardSSD_LRS",
+    "tier": "Standard"
+  },
+  "properties": {
+    "diskSizeGB": 30,
+    "diskState": "Reserved",
+    "provisioningState": "Succeeded"
+  }
+}

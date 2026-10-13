@@ -1,0 +1,1 @@
+AppExceptions | summarize count() by bin(TimeGenerated, 5m)

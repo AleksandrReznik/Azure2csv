@@ -1,0 +1,19 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Web/serverFarms/asp-web",
+  "name": "asp-web",
+  "type": "Microsoft.Web/serverFarms",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "kind": "linux",
+  "sku": {
+    "name": "S1",
+    "tier": "Standard",
+    "capacity": 2
+  },
+  "properties": {
+    "numberOfSites": 1,
+    "reserved": true,
+    "zoneRedundant": false,
+    "provisioningState": "Succeeded"
+  }
+}

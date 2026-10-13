@@ -1,0 +1,10 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-data/providers/Microsoft.Storage/storageAccounts/stcontosodata/fileServices/default/shares/profiles",
+  "name": "profiles",
+  "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+  "properties": {
+    "shareQuota": 100,
+    "accessTier": "TransactionOptimized",
+    "enabledProtocols": "SMB"
+  }
+}

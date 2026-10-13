@@ -1,0 +1,15 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.ApiManagement/service/apim-contoso",
+  "name": "apim-contoso",
+  "type": "Microsoft.ApiManagement/service",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "sku": {
+    "name": "Developer",
+    "capacity": 1
+  },
+  "properties": {
+    "gatewayUrl": "https://apim-contoso.azure-api.net",
+    "provisioningState": "Succeeded"
+  }
+}

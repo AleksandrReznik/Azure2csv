@@ -1,0 +1,8 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Authorization/locks/lock-network",
+  "name": "lock-network",
+  "properties": {
+    "level": "CanNotDelete",
+    "notes": "Hub network - do not delete"
+  }
+}

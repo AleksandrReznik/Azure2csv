@@ -1,0 +1,5 @@
+﻿"DisplayName","Description","Mail","GroupType","Dynamic","MembershipRule","SecurityEnabled","MailEnabled","RoleAssignable","OnPremisesSync","Visibility","CreatedDateTime","Members","UsedInAzureRBAC","Id","Owners","OwnerCount"
+"Group c7c1221abf","","u-fe5fb5213a@d-5917d960d8","Microsoft 365","False","","False","True","False","False","Private","","0","False","77a3f89c-2c57-4f5a-8e53-593355db1a81","","0"
+"Group b461d9c9dc","","","Security","True","[masked]","True","False","False","False","","","0","False","7ef45c21-e9e9-400c-922c-91d06c691b5f","","0"
+"Group c94ab5597c","","","Security","False","","True","False","False","False","","2021-01-01T00:00:00Z","2","True","afefd4b8-1021-43ab-aa49-0c692ec72d3d","u-bea8387201@MG 8bb705ea44.onmicrosoft.com","1"
+"Group 9955a17524","","","Security","False","","True","False","True","True","","","0","False","c28ef053-15c4-49f0-a575-cbd3ea0ece84","","0"

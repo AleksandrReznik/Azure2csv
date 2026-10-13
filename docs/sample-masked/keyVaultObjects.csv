@@ -1,0 +1,2 @@
+﻿"SubscriptionName","ResourceGroup","KeyVault","Name","Type","Enabled","Expires","NotBefore","Created","Updated","ContentType","KeyType","KeySize","Managed","Id"
+"sub-461d69c4ad","rg-217c043767","kv-6bf36ba3de","x-c20a370ad1","Microsoft.KeyVault/vaults/secrets","True","1798761600","","","","text/plain","","","","/subscriptions/3342e47d-f7ee-45fa-9302-3715225561a0/resourceGroups/rg-217c043767/providers/Microsoft.KeyVault/vaults/kv-6bf36ba3de/secrets/x-c20a370ad1"

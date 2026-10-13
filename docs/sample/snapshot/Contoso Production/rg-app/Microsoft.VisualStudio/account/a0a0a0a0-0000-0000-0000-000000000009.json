@@ -1,0 +1,11 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.VisualStudio/account/a0a0a0a0-0000-0000-0000-000000000009",
+  "name": "a0a0a0a0-0000-0000-0000-000000000009",
+  "type": "Microsoft.VisualStudio/account",
+  "apiVersion": "2024-05-01",
+  "location": "global",
+  "properties": {
+    "AccountURL": "",
+    "provisioningState": "Succeeded"
+  }
+}

@@ -1,0 +1,2 @@
+﻿"SubscriptionName","ResourceGroup","Name","Location","Sku","Tier","Frontends","PrivateIPs","PublicIPs","Subnets","BackendPools","Rules","InboundNatRules","OutboundRules","Probes","Zones","Id"
+"Contoso Production","rg-legacy","lb-basic","westeurope","Basic","Regional","0","","","","","0","0","0","","","/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-legacy/providers/Microsoft.Network/loadBalancers/lb-basic"

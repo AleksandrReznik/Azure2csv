@@ -1,0 +1,10 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-data/providers/Microsoft.Storage/storageAccounts/stcontosodata/blobServices/default/containers/backups",
+  "name": "backups",
+  "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+  "properties": {
+    "publicAccess": "None",
+    "hasImmutabilityPolicy": false,
+    "leaseState": "Available"
+  }
+}

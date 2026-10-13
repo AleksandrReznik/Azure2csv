@@ -1,0 +1,2 @@
+﻿"TenantId","DisplayName","DefaultDomain","InitialDomain","Country","CreatedDateTime","TenantType","OnPremisesSyncEnabled","LastDirectorySync","VerifiedDomains","TechnicalNotificationMails"
+"aaaaaaaa-1111-2222-3333-444444444444","Contoso","contoso.com","contoso.onmicrosoft.com","LT","2015-05-05T00:00:00Z","AAD","True","2026-09-28T23:30:00Z","2","it@contoso.com"

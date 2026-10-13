@@ -1,0 +1,14 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/natGateways/ng-unused",
+  "name": "ng-unused",
+  "type": "Microsoft.Network/natGateways",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "sku": {
+    "name": "Standard"
+  },
+  "properties": {
+    "idleTimeoutInMinutes": 4,
+    "provisioningState": "Succeeded"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net",
+  "name": "privatelink.blob.core.windows.net",
+  "type": "Microsoft.Network/privateDnsZones",
+  "apiVersion": "2024-05-01",
+  "location": "global",
+  "properties": {
+    "numberOfRecordSets": 3,
+    "numberOfVirtualNetworkLinks": 1,
+    "numberOfVirtualNetworkLinksWithRegistration": 0,
+    "provisioningState": "Succeeded"
+  }
+}

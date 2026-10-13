@@ -1,0 +1,26 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-data/providers/Microsoft.RecoveryServices/vaults/rsv-contoso/backupPolicies/DailyPolicy",
+  "name": "DailyPolicy",
+  "type": "Microsoft.RecoveryServices/vaults/backupPolicies",
+  "location": "westeurope",
+  "properties": {
+    "backupManagementType": "AzureIaasVM",
+    "instantRpRetentionRangeInDays": 2,
+    "schedulePolicy": {
+      "schedulePolicyType": "SimpleSchedulePolicy",
+      "scheduleRunFrequency": "Daily",
+      "scheduleRunTimes": [
+        "2026-01-01T22:00:00Z"
+      ]
+    },
+    "retentionPolicy": {
+      "retentionPolicyType": "LongTermRetentionPolicy",
+      "dailySchedule": {
+        "retentionDuration": {
+          "count": 30,
+          "durationType": "Days"
+        }
+      }
+    }
+  }
+}

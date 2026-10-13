@@ -1,0 +1,26 @@
+{
+  "id": 11,
+  "name": "webshop-ci",
+  "path": "\\",
+  "queueStatus": "enabled",
+  "process": {
+    "type": 2,
+    "yamlFilename": "/azure-pipelines.yml"
+  },
+  "repository": {
+    "type": "TfsGit",
+    "name": "webshop",
+    "id": "c1c1c1c1-0000-0000-0000-000000000001",
+    "defaultBranch": "refs/heads/main"
+  },
+  "queue": {
+    "name": "Azure Pipelines",
+    "pool": {
+      "name": "Azure Pipelines"
+    }
+  },
+  "createdDate": "2024-01-10T00:00:00Z",
+  "authoredBy": {
+    "displayName": "Alex Admin"
+  }
+}

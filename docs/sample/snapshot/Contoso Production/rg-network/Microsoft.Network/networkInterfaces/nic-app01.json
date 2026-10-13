@@ -1,0 +1,39 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/networkInterfaces/nic-app01",
+  "name": "nic-app01",
+  "type": "Microsoft.Network/networkInterfaces",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "ipConfigurations": [
+      {
+        "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/networkInterfaces/nic-app01/ipConfigurations/ipconfig1",
+        "name": "ipconfig1",
+        "properties": {
+          "privateIPAddress": "10.0.1.4",
+          "primary": true,
+          "subnet": {
+            "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/virtualNetworks/vnet-hub/subnets/snet-app"
+          },
+          "publicIPAddress": {
+            "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-data/providers/Microsoft.Network/publicIPAddresses/pip-app01"
+          },
+          "applicationSecurityGroups": [
+            {
+              "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/applicationSecurityGroups/asg-web"
+            }
+          ]
+        }
+      }
+    ],
+    "dnsSettings": {
+      "dnsServers": [
+        "1.1.1.1"
+      ]
+    },
+    "virtualMachine": {
+      "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01"
+    },
+    "provisioningState": "Succeeded"
+  }
+}

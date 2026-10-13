@@ -1,0 +1,11 @@
+{
+  "name": "CopySales",
+  "properties": {
+    "activities": [
+      {
+        "name": "Copy",
+        "type": "Copy"
+      }
+    ]
+  }
+}

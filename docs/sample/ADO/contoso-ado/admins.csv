@@ -1,0 +1,5 @@
+﻿"Organization","Group","Scope","Project","Member","MemberUpn","MemberType","Origin"
+"contoso-ado","Project Collection Administrators","Organization","","Alex Admin","alex.admin@contoso.onmicrosoft.com","User","Entra ID"
+"contoso-ado","Project Collection Administrators","Organization","","g-app-admins","","Group","Entra ID"
+"contoso-ado","Project Administrators","Project","Web Shop","Alex Admin","alex.admin@contoso.onmicrosoft.com","User","Entra ID"
+"contoso-ado","Project Administrators","Project","Web Shop","","","Service principal",""

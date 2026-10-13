@@ -1,0 +1,11 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/providers/Microsoft.Authorization/roleAssignmentScheduleInstances/pa-0003",
+  "name": "pa-0003",
+  "properties": {
+    "scope": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001",
+    "originRoleAssignmentId": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/providers/Microsoft.Authorization/roleAssignments/ra-0003",
+    "assignmentType": "Activated",
+    "memberType": "Direct",
+    "endDateTime": "2026-09-29T08:00:00Z"
+  }
+}

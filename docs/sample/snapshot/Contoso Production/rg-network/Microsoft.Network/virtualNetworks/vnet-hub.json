@@ -1,0 +1,95 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/virtualNetworks/vnet-hub",
+  "name": "vnet-hub",
+  "type": "Microsoft.Network/virtualNetworks",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "addressSpace": {
+      "addressPrefixes": [
+        "10.0.0.0/16"
+      ]
+    },
+    "dhcpOptions": {
+      "dnsServers": [
+        "10.0.0.4",
+        "10.0.0.5"
+      ]
+    },
+    "enableDdosProtection": false,
+    "subnets": [
+      {
+        "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/virtualNetworks/vnet-hub/subnets/snet-app",
+        "name": "snet-app",
+        "properties": {
+          "addressPrefix": "10.0.1.0/24",
+          "networkSecurityGroup": {
+            "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/networkSecurityGroups/nsg-app"
+          },
+          "routeTable": {
+            "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/routeTables/rt-app"
+          },
+          "serviceEndpoints": [
+            {
+              "service": "Microsoft.Storage",
+              "locations": [
+                "westeurope"
+              ]
+            }
+          ],
+          "ipConfigurations": [
+            {
+              "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/networkInterfaces/nic-app01/ipConfigurations/ipconfig1"
+            }
+          ],
+          "privateEndpointNetworkPolicies": "Disabled"
+        }
+      },
+      {
+        "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/virtualNetworks/vnet-hub/subnets/snet-data",
+        "name": "snet-data",
+        "properties": {
+          "addressPrefix": "10.0.2.0/24",
+          "delegations": [
+            {
+              "name": "sqlmi",
+              "properties": {
+                "serviceName": "Microsoft.Sql/managedInstances"
+              }
+            }
+          ],
+          "defaultOutboundAccess": false
+        }
+      },
+      {
+        "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/virtualNetworks/vnet-hub/subnets/GatewaySubnet",
+        "name": "GatewaySubnet",
+        "properties": {
+          "addressPrefix": "10.0.255.0/27"
+        }
+      }
+    ],
+    "virtualNetworkPeerings": [
+      {
+        "name": "hub-to-spoke",
+        "properties": {
+          "remoteVirtualNetwork": {
+            "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/virtualNetworks/vnet-spoke"
+          },
+          "peeringState": "Connected",
+          "peeringSyncLevel": "FullyInSync",
+          "allowVirtualNetworkAccess": true,
+          "allowForwardedTraffic": true,
+          "allowGatewayTransit": true,
+          "useRemoteGateways": false,
+          "remoteAddressSpace": {
+            "addressPrefixes": [
+              "10.1.0.0/16"
+            ]
+          }
+        }
+      }
+    ],
+    "provisioningState": "Succeeded"
+  }
+}

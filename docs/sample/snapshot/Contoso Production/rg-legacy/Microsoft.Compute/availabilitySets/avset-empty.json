@@ -1,0 +1,15 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-legacy/providers/Microsoft.Compute/availabilitySets/avset-empty",
+  "name": "avset-empty",
+  "type": "Microsoft.Compute/availabilitySets",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "sku": {
+    "name": "Aligned"
+  },
+  "properties": {
+    "virtualMachines": [],
+    "platformFaultDomainCount": 2,
+    "provisioningState": "Succeeded"
+  }
+}

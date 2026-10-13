@@ -1,0 +1,48 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/virtualNetworks/vnet-spoke",
+  "name": "vnet-spoke",
+  "type": "Microsoft.Network/virtualNetworks",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "addressSpace": {
+      "addressPrefixes": [
+        "10.1.0.0/16"
+      ]
+    },
+    "dhcpOptions": {
+      "dnsServers": []
+    },
+    "subnets": [
+      {
+        "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/virtualNetworks/vnet-spoke/subnets/snet-web",
+        "name": "snet-web",
+        "properties": {
+          "addressPrefix": "10.1.1.0/24"
+        }
+      }
+    ],
+    "virtualNetworkPeerings": [
+      {
+        "name": "spoke-to-hub",
+        "properties": {
+          "remoteVirtualNetwork": {
+            "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/virtualNetworks/vnet-hub"
+          },
+          "peeringState": "Connected",
+          "peeringSyncLevel": "FullyInSync",
+          "allowVirtualNetworkAccess": true,
+          "allowForwardedTraffic": false,
+          "allowGatewayTransit": false,
+          "useRemoteGateways": true,
+          "remoteAddressSpace": {
+            "addressPrefixes": [
+              "10.0.0.0/16"
+            ]
+          }
+        }
+      }
+    ],
+    "provisioningState": "Succeeded"
+  }
+}

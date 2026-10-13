@@ -1,0 +1,8 @@
+{
+  "id": "ara-0003",
+  "principalId": "0a000000-0000-0000-0000-0000000000c1",
+  "principalDisplayName": "sp-monitoring",
+  "principalType": "ServicePrincipal",
+  "appRoleId": "ad000000-0000-0000-0000-000000000001",
+  "createdDateTime": "2024-03-03T00:00:00Z"
+}

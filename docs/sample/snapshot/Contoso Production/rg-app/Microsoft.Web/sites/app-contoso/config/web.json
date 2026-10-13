@@ -1,0 +1,13 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Web/sites/app-contoso/config/web",
+  "name": "web",
+  "type": "Microsoft.Web/sites/config",
+  "location": "westeurope",
+  "properties": {
+    "LinuxFxVersion": "NODE|18-lts",
+    "MinTlsVersion": "1.2",
+    "FtpsState": "AllAllowed",
+    "AlwaysOn": false,
+    "HealthCheckPath": "/health"
+  }
+}

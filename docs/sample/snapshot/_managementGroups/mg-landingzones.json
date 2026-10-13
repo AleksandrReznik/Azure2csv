@@ -1,0 +1,14 @@
+{
+  "id": "/providers/Microsoft.Management/managementGroups/mg-landingzones",
+  "name": "mg-landingzones",
+  "type": "Microsoft.Management/managementGroups",
+  "properties": {
+    "displayName": "Landing Zones",
+    "details": {
+      "parent": {
+        "id": "/providers/Microsoft.Management/managementGroups/mg-contoso",
+        "name": "mg-contoso"
+      }
+    }
+  }
+}

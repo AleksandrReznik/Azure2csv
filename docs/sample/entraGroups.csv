@@ -1,0 +1,5 @@
+﻿"DisplayName","Description","Mail","GroupType","Dynamic","MembershipRule","SecurityEnabled","MailEnabled","RoleAssignable","OnPremisesSync","Visibility","CreatedDateTime","Members","UsedInAzureRBAC","Id","Owners","OwnerCount"
+"All Staff","","allstaff@contoso.com","Microsoft 365","False","","False","True","False","False","Private","","0","False","0a000000-0000-0000-0000-0000000000b2","","0"
+"Dynamic Devs","","","Security","True","(user.department -eq ""Dev"")","True","False","False","False","","","0","False","0a000000-0000-0000-0000-0000000000b3","","0"
+"g-app-admins","","","Security","False","","True","False","False","False","","2021-01-01T00:00:00Z","2","True","0a000000-0000-0000-0000-0000000000b1","alex.admin@contoso.onmicrosoft.com","1"
+"Tier0 Admins","","","Security","False","","True","False","True","True","","","0","False","0a000000-0000-0000-0000-0000000000b4","","0"

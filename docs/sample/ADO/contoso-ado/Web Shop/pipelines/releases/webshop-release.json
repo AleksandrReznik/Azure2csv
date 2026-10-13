@@ -1,0 +1,26 @@
+{
+  "id": 5,
+  "name": "webshop-release",
+  "path": "\\",
+  "environments": [
+    {
+      "name": "Dev",
+      "rank": 1
+    },
+    {
+      "name": "Prod",
+      "rank": 2
+    }
+  ],
+  "artifacts": [
+    {
+      "alias": "_webshop-ci",
+      "type": "Build"
+    }
+  ],
+  "variables": {
+    "Region": {
+      "value": "westeurope"
+    }
+  }
+}

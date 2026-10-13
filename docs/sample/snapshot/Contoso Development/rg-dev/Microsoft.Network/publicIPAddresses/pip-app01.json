@@ -1,0 +1,16 @@
+{
+  "id": "/subscriptions/22222222-aaaa-bbbb-cccc-000000000002/resourceGroups/rg-dev/providers/Microsoft.Network/publicIPAddresses/pip-app01",
+  "name": "pip-app01",
+  "type": "Microsoft.Network/publicIPAddresses",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "sku": {
+    "name": "Standard",
+    "tier": "Regional"
+  },
+  "properties": {
+    "ipAddress": "52.1.1.99",
+    "publicIPAllocationMethod": "Static",
+    "provisioningState": "Succeeded"
+  }
+}

@@ -1,0 +1,2 @@
+﻿"SubscriptionName","SubscriptionId","ResourceGroup","Name","VirtualMachine","SqlVersion","SqlEdition","SqlImageOffer","SqlImageSku","LicenseType","Management","SupportStatus","Tags","Id"
+"Contoso Production","11111111-aaaa-bbbb-cccc-000000000001","rg-legacy","vm-legacy01","vm-legacy01","SQL Server 2014","Standard","SQL2014SP3-WS2012R2","Standard","PAYG","LightWeight","Out of extended support since 2024-07-09","","/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-legacy/providers/Microsoft.SqlVirtualMachine/sqlVirtualMachines/vm-legacy01"

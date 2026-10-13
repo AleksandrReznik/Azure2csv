@@ -1,0 +1,15 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net/virtualNetworkLinks/link-hub",
+  "name": "link-hub",
+  "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+  "apiVersion": "2024-05-01",
+  "location": "global",
+  "properties": {
+    "virtualNetwork": {
+      "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/virtualNetworks/vnet-hub"
+    },
+    "registrationEnabled": false,
+    "virtualNetworkLinkState": "Completed",
+    "provisioningState": "Succeeded"
+  }
+}

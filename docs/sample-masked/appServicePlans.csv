@@ -1,0 +1,3 @@
+﻿"SubscriptionName","SubscriptionId","ResourceGroup","Name","Location","Kind","Sku","Tier","Workers","OS","Apps","ZoneRedundant","Tags","Id"
+"sub-461d69c4ad","3342e47d-f7ee-45fa-9302-3715225561a0","rg-dbd6ad73c0","plan-bacae9ebe9","westeurope","app","P1v3","PremiumV3","1","Windows","0","False","","/subscriptions/3342e47d-f7ee-45fa-9302-3715225561a0/resourceGroups/rg-dbd6ad73c0/providers/Microsoft.Web/serverFarms/plan-bacae9ebe9"
+"sub-461d69c4ad","3342e47d-f7ee-45fa-9302-3715225561a0","rg-dbd6ad73c0","plan-f4432d9f58","westeurope","linux","S1","Standard","2","Linux","1","False","","/subscriptions/3342e47d-f7ee-45fa-9302-3715225561a0/resourceGroups/rg-dbd6ad73c0/providers/Microsoft.Web/serverFarms/plan-f4432d9f58"

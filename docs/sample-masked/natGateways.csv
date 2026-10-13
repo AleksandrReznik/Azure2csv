@@ -1,0 +1,2 @@
+﻿"SubscriptionName","ResourceGroup","Name","Location","Sku","IdleTimeoutMinutes","PublicIPs","PublicIPPrefixes","Subnets","Zones","Id"
+"sub-461d69c4ad","rg-84a71829d8","ng-e45d823d1a","westeurope","Standard","4","","","","","/subscriptions/3342e47d-f7ee-45fa-9302-3715225561a0/resourceGroups/rg-84a71829d8/providers/Microsoft.Network/natGateways/ng-e45d823d1a"

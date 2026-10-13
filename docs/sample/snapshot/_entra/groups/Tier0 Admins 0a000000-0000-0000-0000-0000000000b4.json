@@ -1,0 +1,9 @@
+{
+  "id": "0a000000-0000-0000-0000-0000000000b4",
+  "displayName": "Tier0 Admins",
+  "securityEnabled": true,
+  "mailEnabled": false,
+  "groupTypes": [],
+  "isAssignableToRole": true,
+  "onPremisesSyncEnabled": true
+}

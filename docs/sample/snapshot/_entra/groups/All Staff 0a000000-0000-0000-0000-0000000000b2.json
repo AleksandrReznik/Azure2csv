@@ -1,0 +1,11 @@
+{
+  "id": "0a000000-0000-0000-0000-0000000000b2",
+  "displayName": "All Staff",
+  "mail": "allstaff@contoso.com",
+  "securityEnabled": false,
+  "mailEnabled": true,
+  "groupTypes": [
+    "Unified"
+  ],
+  "visibility": "Private"
+}

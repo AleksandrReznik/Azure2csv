@@ -1,0 +1,14 @@
+{
+  "id": "/providers/Microsoft.Management/managementGroups/mg-contoso",
+  "name": "mg-contoso",
+  "type": "Microsoft.Management/managementGroups",
+  "properties": {
+    "displayName": "Contoso",
+    "details": {
+      "parent": {
+        "id": "/providers/Microsoft.Management/managementGroups/aaaaaaaa-1111-2222-3333-444444444444",
+        "name": "aaaaaaaa-1111-2222-3333-444444444444"
+      }
+    }
+  }
+}

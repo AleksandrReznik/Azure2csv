@@ -1,0 +1,11 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/providers/Microsoft.Security/pricings/KeyVaults",
+  "name": "KeyVaults",
+  "type": "Microsoft.Security/pricings",
+  "properties": {
+    "pricingTier": "Free",
+    "subPlan": null,
+    "enablementTime": "2024-03-01T00:00:00Z",
+    "extensions": []
+  }
+}

@@ -1,0 +1,2 @@
+﻿"Name","DisplayName","PolicyType","Category","Version","Deprecated","Preview","PolicyCount","DefinedAt","AssignmentCount","Parameters","Description","Id"
+"contoso-baseline","Contoso baseline initiative","Custom","General","","False","False","2","/providers/Microsoft.Management/managementGroups/mg-contoso","1","allowedLocations","","/providers/Microsoft.Management/managementGroups/mg-contoso/providers/Microsoft.Authorization/policySetDefinitions/contoso-baseline"

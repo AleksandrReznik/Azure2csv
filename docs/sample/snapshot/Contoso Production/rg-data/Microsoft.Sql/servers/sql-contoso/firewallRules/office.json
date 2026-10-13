@@ -1,0 +1,9 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-data/providers/Microsoft.Sql/servers/sql-contoso/firewallRules/office",
+  "name": "office",
+  "type": "Microsoft.Sql/servers/firewallRules",
+  "properties": {
+    "startIpAddress": "203.0.113.10",
+    "endIpAddress": "203.0.113.20"
+  }
+}

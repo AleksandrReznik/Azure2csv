@@ -1,0 +1,22 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Web/sites/app-contoso",
+  "name": "app-contoso",
+  "type": "Microsoft.Web/sites",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "kind": "app,linux",
+  "identity": {
+    "type": "SystemAssigned",
+    "principalId": "eeeeeeee-0000-0000-0000-000000000003",
+    "tenantId": "aaaaaaaa-1111-2222-3333-444444444444"
+  },
+  "properties": {
+    "serverFarmId": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Web/serverFarms/asp-web",
+    "state": "Running",
+    "defaultHostName": "app-contoso.azurewebsites.net",
+    "httpsOnly": false,
+    "publicNetworkAccess": "Enabled",
+    "virtualNetworkSubnetId": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-old/providers/Microsoft.Network/virtualNetworks/vnet-old/subnets/snet-integration",
+    "provisioningState": "Succeeded"
+  }
+}

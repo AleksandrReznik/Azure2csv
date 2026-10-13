@@ -1,0 +1,7 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-data/providers/Microsoft.KeyVault/vaults/kv-contoso/providers/Microsoft.Authorization/locks/kv-readonly",
+  "name": "kv-readonly",
+  "properties": {
+    "level": "ReadOnly"
+  }
+}

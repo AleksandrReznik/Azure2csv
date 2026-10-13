@@ -1,0 +1,15 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-legacy/providers/Microsoft.Network/applicationGateways/agw-v1",
+  "name": "agw-v1",
+  "type": "Microsoft.Network/applicationGateways",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "sku": {
+      "name": "Standard_Medium",
+      "tier": "Standard",
+      "capacity": 2
+    },
+    "provisioningState": "Succeeded"
+  }
+}

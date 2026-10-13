@@ -1,0 +1,27 @@
+{
+  "id": 13,
+  "name": "legacy-build",
+  "path": "\\",
+  "queueStatus": "enabled",
+  "process": {
+    "type": 1
+  },
+  "repository": {
+    "type": "TfsVersionControl",
+    "name": "Legacy App",
+    "defaultBranch": "$/Legacy App/Trunk/Main",
+    "properties": {
+      "tfvcMapping": "{\"mappings\":[{\"serverPath\":\"$/Legacy App/Trunk/Main\",\"mappingType\":\"map\",\"localPath\":\"\\\\\"},{\"serverPath\":\"$/Legacy App/Trunk/Main/docs\",\"mappingType\":\"cloak\",\"localPath\":\"\\\\docs\"}]}"
+    }
+  },
+  "queue": {
+    "name": "Default",
+    "pool": {
+      "name": "Default"
+    }
+  },
+  "createdDate": "2018-01-01T00:00:00Z",
+  "authoredBy": {
+    "displayName": "Former Dev"
+  }
+}

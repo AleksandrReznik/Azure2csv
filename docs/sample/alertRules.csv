@@ -1,0 +1,2 @@
+﻿"SubscriptionName","ResourceGroup","Name","Location","Kind","Enabled","Severity","Description","Scopes","Frequency","Window","TargetType","Criteria","ActionGroups","AutoMitigate","Id"
+"Contoso Production","rg-app","alert-errors","westeurope","Log search alert","True","2","","","","","","{""allOf"":[{""query"":""AppExceptions | summarize count() by bin(TimeGenerated, 5m)"",""timeAggregation"":""Count""}]}","","","/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Insights/scheduledQueryRules/alert-errors"

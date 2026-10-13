@@ -1,0 +1,2 @@
+﻿"Organization","Project","DeploymentGroup","Machine","AgentStatus","AgentVersion","Tags","AzureVmId"
+"contoso-ado","Web Shop","dg-web","vm-app01","online","3.236.1","web","/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01"

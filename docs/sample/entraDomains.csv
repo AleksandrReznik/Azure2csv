@@ -1,0 +1,3 @@
+﻿"Domain","AuthenticationType","IsDefault","IsInitial","IsVerified","IsRoot","SupportedServices","PasswordValidityDays"
+"contoso.com","Federated","True","False","True","True","Email, OfficeCommunicationsOnline",""
+"contoso.onmicrosoft.com","Managed","False","True","True","True","Email",""

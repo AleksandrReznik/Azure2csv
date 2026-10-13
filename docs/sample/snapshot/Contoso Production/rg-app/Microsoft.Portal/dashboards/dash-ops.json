@@ -1,0 +1,14 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Portal/dashboards/dash-ops",
+  "name": "dash-ops",
+  "type": "Microsoft.Portal/dashboards",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "tags": {
+    "hidden-title": "Operations"
+  },
+  "properties": {
+    "lenses": [],
+    "provisioningState": "Succeeded"
+  }
+}

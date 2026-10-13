@@ -1,0 +1,16 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-network/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net/A/stcontosodata",
+  "name": "stcontosodata",
+  "type": "Microsoft.Network/privateDnsZones/A",
+  "location": "westeurope",
+  "properties": {
+    "fqdn": "stcontosodata.privatelink.blob.core.windows.net.",
+    "ttl": 10,
+    "records": [
+      {
+        "ipv4Address": "10.0.2.5"
+      }
+    ],
+    "isAutoRegistered": false
+  }
+}

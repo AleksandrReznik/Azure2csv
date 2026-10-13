@@ -1,0 +1,10 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.ApiManagement/service/apim-contoso/backends/orders-backend",
+  "name": "orders-backend",
+  "type": "Microsoft.ApiManagement/service/backends",
+  "properties": {
+    "url": "https://orders.internal.contoso.com",
+    "protocol": "http",
+    "credentials": "(not exported)"
+  }
+}

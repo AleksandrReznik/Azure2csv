@@ -1,0 +1,24 @@
+{
+  "id": "/subscriptions/{0}/providers/Microsoft.Authorization/roleDefinitions/c0c0c0c0-1111-2222-3333-444444444444",
+  "name": "c0c0c0c0-1111-2222-3333-444444444444",
+  "type": "Microsoft.Authorization/roleDefinitions",
+  "properties": {
+    "roleName": "Contoso VM Operator",
+    "type": "CustomRole",
+    "description": "Contoso VM Operator role",
+    "assignableScopes": [
+      "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001"
+    ],
+    "permissions": [
+      {
+        "actions": [
+          "Microsoft.Compute/virtualMachines/*",
+          "Microsoft.Compute/virtualMachines/start/action"
+        ],
+        "notActions": [],
+        "dataActions": [],
+        "notDataActions": []
+      }
+    ]
+  }
+}

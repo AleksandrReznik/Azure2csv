@@ -1,0 +1,13 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/providers/Microsoft.Authorization/roleAssignments/ra-0004",
+  "name": "ra-0004",
+  "type": "Microsoft.Authorization/roleAssignments",
+  "properties": {
+    "roleDefinitionId": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/providers/Microsoft.Authorization/roleDefinitions/18d7d88d-d35e-4fb5-a5c3-7773c20a72d9",
+    "principalId": "0a000000-0000-0000-0000-0000000000ff",
+    "principalType": "User",
+    "scope": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001",
+    "createdOn": "2024-01-15T10:00:00Z",
+    "createdBy": "0a000000-0000-0000-0000-0000000000a1"
+  }
+}

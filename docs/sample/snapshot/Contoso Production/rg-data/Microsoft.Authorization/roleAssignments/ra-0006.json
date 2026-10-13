@@ -1,0 +1,13 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-data/providers/Microsoft.Authorization/roleAssignments/ra-0006",
+  "name": "ra-0006",
+  "type": "Microsoft.Authorization/roleAssignments",
+  "properties": {
+    "roleDefinitionId": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c",
+    "principalId": "eeeeeeee-0000-0000-0000-000000000001",
+    "principalType": "ServicePrincipal",
+    "scope": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-data",
+    "createdOn": "2024-01-15T10:00:00Z",
+    "createdBy": "0a000000-0000-0000-0000-0000000000a1"
+  }
+}
