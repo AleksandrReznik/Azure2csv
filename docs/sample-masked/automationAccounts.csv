@@ -1,2 +1,2 @@
 ﻿"SubscriptionName","SubscriptionId","ResourceGroup","Name","Location","Sku","State","PublicNetworkAccess","IdentityType","Runbooks","Tags","Id"
-"sub-20113722a2","29e2b342-4a4e-4619-b67a-aab075938750","rg-94af354d2a","aa-a0bb245eec","westeurope","Basic","Ok","True","","2","","/subscriptions/29e2b342-4a4e-4619-b67a-aab075938750/resourceGroups/rg-94af354d2a/providers/Microsoft.Automation/automationAccounts/aa-a0bb245eec"
+"sub-f1f4ed23fe","3a4139cb-af94-4ac3-a783-d292866430b9","rg-3a56bbf5e4","aa-e7f8a1b36c","westeurope","Basic","Ok","True","","2","","/subscriptions/3a4139cb-af94-4ac3-a783-d292866430b9/resourceGroups/rg-3a56bbf5e4/providers/Microsoft.Automation/automationAccounts/aa-e7f8a1b36c"

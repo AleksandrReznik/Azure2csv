@@ -1,2 +1,2 @@
 ﻿"SubscriptionName","ResourceGroup","StorageAccount","Name","QuotaGB","AccessTier","Protocols","RootSquash","LeaseState","LastModified","Id"
-"sub-20113722a2","rg-410a4ef86f","st-38290a5439","x-e6a8be5377","100","TransactionOptimized","SMB","","","","/subscriptions/29e2b342-4a4e-4619-b67a-aab075938750/resourceGroups/rg-410a4ef86f/providers/Microsoft.Storage/storageAccounts/st-38290a5439/fileServices/default/shares/x-e6a8be5377"
+"sub-f1f4ed23fe","rg-a6878d2645","st-97100f1029","x-e8c29c701d","100","TransactionOptimized","SMB","","","","/subscriptions/3a4139cb-af94-4ac3-a783-d292866430b9/resourceGroups/rg-a6878d2645/providers/Microsoft.Storage/storageAccounts/st-97100f1029/fileServices/default/shares/x-e8c29c701d"

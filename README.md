@@ -16,6 +16,9 @@ That is a documented starting point for rebuilding an environment, not a backup
 - **Shareable.** `-Mask` pseudonymizes names, IDs, UPNs and public IPs, so you can send the results to a colleague
   or consultant.
 
+> **Experimental, provided as is.** Findings and recommendations are suggestions that you have to verify manually.
+> See the [disclaimer](#disclaimer).
+
 ![azure2csv summary report](docs/images/summary-overview.png)
 
 > Sample reports built from a fictional tenant are in [`docs/sample`](docs/sample) and
@@ -505,6 +508,17 @@ Yellow "No response ... retry" lines mean the computer cannot reach `management.
 line, so the error is in the log inside the newest `azure2csv_...` folder. A run that stops before its folder is
 created leaves that log in the output folder instead. When you start the script from
 Explorer ("Run with PowerShell"), it waits for Enter before the window closes.
+
+## Disclaimer
+
+azure2csv is experimental. It is published as is, without warranty of any kind (see the [MIT license](LICENSE)), and
+I take no responsibility for its results or for any decision or change made based on them.
+
+Everything the reports conclude is a suggestion, not a verdict: findings, recommendations, risk flags, move support,
+retirement dates, orphaned resources, tenant-transfer impact, exported templates. Verify it manually, in the Azure
+portal and in Microsoft's documentation, before you act on it. The script only reads from Azure and Entra ID, but
+what you do with its output is your decision. Every run prints this disclaimer at the start and puts it at the top of
+`summary.html` and of the Excel workbook.
 
 ## Need help with an Azure migration?
 

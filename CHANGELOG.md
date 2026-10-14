@@ -17,6 +17,8 @@ reports but plan to publish them later") is kept: there are now 61 reports.
 - Each run writes `yyyyMMdd-HHmmss__general_log.txt` line by line, so the log is complete even when the window
   closes or the run stops. Started from Explorer ("Run with PowerShell"), the script waits for Enter before closing.
 - Every collector reports its status in `coverage.csv` and the HTML report. One failing report never stops the run.
+- Every run starts with a disclaimer (experimental, provided as is, findings are suggestions to verify manually). It
+  is also at the top of `summary.html`, on the first sheet of the Excel workbook and in the run information file.
 
 ### Choosing reports
 - `-Profile Quick | Standard | Full | Migration | Security | Governance` (default: Standard).

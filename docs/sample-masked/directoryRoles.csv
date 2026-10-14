@@ -1,4 +1,4 @@
 ﻿"RoleName","IsBuiltIn","IsPrivilegedRole","PrincipalName","PrincipalType","PrincipalUPN","PrincipalAppId","PrincipalId","IsGuest","Scope","AssignmentType","Source"
-"Global Administrator","True","True","User 224467689c","user","u-aa222842f9@MG c9d3fd3baa.onmicrosoft.com","","623598c7-0061-4e59-a539-863294f4f1e3","False","/","Active","roleManagement"
-"Global Administrator","True","True","User 190c2fe0ff","user","u-3c2dcbfae8#EXT#@MG c9d3fd3baa.onmicrosoft.com","","8b5c2b82-9bd7-4348-a14f-3765a6470568","True","/","Active","roleManagement"
-"Security Reader","True","False","App 736c12b25a","servicePrincipal","","e1dfd2ec-5a56-4460-9f86-688a77f01ec9","bd680b7e-70ce-41e3-a86a-e4dab9d8c3ce","False","/","Active","roleManagement"
+"Global Administrator","True","True","User 11af7dee19","user","u-1300b44cdd@MG 1b56b1273d.onmicrosoft.com","","04bdc45d-9cdc-4456-9acd-fee608fe3824","False","/","Active","roleManagement"
+"Global Administrator","True","True","User 988f694fb2","user","u-251979983d#EXT#@MG 1b56b1273d.onmicrosoft.com","","f510bf13-1835-4112-aa9c-002171a4328b","True","/","Active","roleManagement"
+"Security Reader","True","False","App 31d9da5d99","servicePrincipal","","12fed8f3-93c8-4ebf-a108-e204d2c3e820","4133da55-1566-415f-aa8d-6d8c6cb39d45","False","/","Active","roleManagement"

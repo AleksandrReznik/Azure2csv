@@ -1,4 +1,4 @@
 ﻿"DisplayName","AppId","ObjectId","Type","Publisher","PublisherName","Enabled","AppRoleAssignmentRequired","SsoMode","Secrets","Certificates","NextCredentialExpiry","HasAzureRBAC","HighRiskPermissions","Tags"
-"App afc9abd5df","d4a43e34-ed85-4b77-859d-f46304e8d002","373d86e5-3f02-4880-bfe7-a5f8c3a62b79","Application","This tenant","","True","","","0","0","","False","2","WindowsAzureActiveDirectoryIntegratedApp"
-"Microsoft Graph","00000003-0000-0000-c000-000000000000","fa55ea59-8845-4065-80a2-d1373bf3d2a9","Application","Microsoft","Microsoft Services","True","","","0","0","","False","0",""
-"App 736c12b25a","e1dfd2ec-5a56-4460-9f86-688a77f01ec9","bd680b7e-70ce-41e3-a86a-e4dab9d8c3ce","Application","Third party","Publisher 82f724c71c","True","","","0","0","","True","1",""
+"App dd8ac8755c","bf8f0622-9568-4a30-b42e-ea59ee4df29b","6921b9a8-ce5f-430d-bda6-ba215d7a1aeb","Application","This tenant","","True","","","0","0","","False","2","WindowsAzureActiveDirectoryIntegratedApp"
+"Microsoft Graph","00000003-0000-0000-c000-000000000000","350b6014-939e-43d2-bb23-470f3351d829","Application","Microsoft","Microsoft Services","True","","","0","0","","False","0",""
+"App 31d9da5d99","12fed8f3-93c8-4ebf-a108-e204d2c3e820","4133da55-1566-415f-aa8d-6d8c6cb39d45","Application","Third party","Publisher 29d4a4647a","True","","","0","0","","True","1",""

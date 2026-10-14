@@ -45,6 +45,10 @@
 
     The script only READS from Azure and Entra ID. It never changes anything.
 
+    DISCLAIMER: experimental software, provided "as is" without warranty of any kind (MIT license). The author takes no
+    responsibility for its results or for decisions based on them. Findings and recommendations are suggestions only:
+    verify them manually before you act on them.
+
     Required permissions: Reader on the subscriptions (Reader on the root management group for full coverage).
     Entra ID reports use your sign-in: a normal member user can read users, groups and applications; the
     Global Reader role gives full coverage (sign-in activity also needs Entra ID P1 and Reports Reader).
@@ -348,6 +352,8 @@ $script:A2CBrand = [ordered]@{
     Repo    = 'https://github.com/AleksandrReznik/Azure2csv'
     Post    = 'https://it4it.solutions/2021/10/15/inventory-all-azure-resources-to-csv-file/'
     Tagline = 'Need help with an Azure migration, a tenant-to-tenant move or a landing zone? Get in touch.'
+    # shown at the start of every run, in summary.html, the Excel workbook and the run information file
+    Disclaimer = 'Experimental software, provided "as is" without warranty of any kind. The author takes no responsibility for its results or for decisions based on them. Findings and recommendations are suggestions only: verify them manually before you act on them.'
 }
 
 $script:A2CApi = @{
@@ -9515,6 +9521,7 @@ function Save-A2CRunInfo {
     $info = [ordered]@{
         tool          = 'azure2csv'
         version       = $script:A2CVersion
+        disclaimer    = $script:A2CBrand.Disclaimer
         startedUtc    = Format-A2CDate $script:A2C.StartedUtc
         finishedUtc   = Format-A2CDate $fin
         durationSec   = [math]::Round(($fin - $script:A2C.StartedUtc).TotalSeconds, 1)
@@ -10062,7 +10069,12 @@ function Export-A2CExcel {
     foreach ($f in @($script:A2C.Out.Keys | Where-Object { $_ -like '*.csv' -and $_ -ne 'findings.csv' -and $_ -ne 'coverage.csv' } |
                 Sort-Object @{ Expression = { $_ -like 'ADO/*' } }, @{ Expression = { $_ } })) { $order.Add($f) }
     $order.Add('coverage.csv')
-    $pkg = $null
+    # the first sheet says what the workbook is, with the disclaimer
+    $about = @(
+        [pscustomobject]@{ Item = 'Tool'; Value = ('azure2csv {0} - {1}' -f $script:A2CVersion, $script:A2CBrand.Repo) }
+        [pscustomobject]@{ Item = 'Generated'; Value = [DateTime]::Now.ToString('yyyy-MM-dd HH:mm') }
+        [pscustomobject]@{ Item = 'Disclaimer'; Value = $script:A2CBrand.Disclaimer })
+    $pkg = $about | Export-Excel -Path $path -WorksheetName 'Read me' -AutoSize -BoldTopRow -NoNumberConversion '*' -PassThru
     $max = [int]$script:A2C.Options.PropertiesMaxChars
     $used = @{}
     foreach ($file in $order) {
@@ -10206,6 +10218,7 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .bars .track{background:var(--track);border-radius:4px;height:12px;display:block}.bars .fill{background:var(--fill);border-radius:4px;height:12px;display:block}
 .muted{color:var(--muted);font-size:12px}.filter{margin:0 0 8px;padding:6px 8px;width:260px;max-width:100%;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--text)}
 .banner{background:#fff4ce;color:#5c4400;border:1px solid #f1d27a;border-radius:8px;padding:8px 12px;margin:12px 0}
+.disclaimer{color:var(--muted);font-size:12px;border-left:3px solid var(--border);padding:4px 10px;margin:12px 0 0}
 .tree div{padding:2px 0}.tree .mg{font-weight:600}.pill{display:inline-block;border:1px solid var(--border);border-radius:10px;padding:0 8px;font-size:12px;color:var(--muted);margin-left:6px}
 button#themeToggle{border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:6px;padding:6px 10px;cursor:pointer}
 footer{max-width:1320px;margin:0 auto;padding:16px 24px 40px;color:var(--muted);font-size:13px;border-top:1px solid var(--border)}
@@ -10445,6 +10458,7 @@ function New-A2CHtmlReport {
     $when = [DateTime]::Now.ToString('yyyy-MM-dd HH:mm')
     [void]$sb.AppendFormat('<header><div class="top"><div><h1>{0}</h1><div class="meta">Tenant {1} &middot; {2} subscription(s) &middot; generated {3} &middot; profile {4} &middot; azure2csv {5}</div></div><button id="themeToggle" type="button">Light / dark</button></div>',
         (ConvertTo-A2CHtmlText $title), (ConvertTo-A2CHtmlText $tenantId), @($run.Data['Subscriptions']).Count, $when, (ConvertTo-A2CHtmlText $(if (@($run.Options.Reports).Count) { 'custom' } else { $run.Options.Profile })), $script:A2CVersion)
+    [void]$sb.AppendFormat('<div class="disclaimer"><strong>Disclaimer:</strong> {0}</div>', (ConvertTo-A2CHtmlText $script:A2CBrand.Disclaimer))
     if ($mask) { [void]$sb.Append('<div class="banner">Masked report: names, IDs, IPs and tag values are pseudonymized. Only the owner of the report holds the mapping.</div>') }
     [void]$sb.Append('</header><nav>')
     foreach ($s in $sections) { [void]$sb.AppendFormat('<a href="#{0}">{1}</a>', $s.Id, (ConvertTo-A2CHtmlText $s.Title)) }
@@ -10659,6 +10673,7 @@ function Show-A2CReportList {
     param($Options)
     Write-Host ''
     Write-Host ('azure2csv {0} - report catalog' -f $script:A2CVersion) -ForegroundColor Cyan
+    Write-Host ('Disclaimer: ' + $script:A2CBrand.Disclaimer) -ForegroundColor DarkYellow
     $profiles = @($script:A2CProfiles.Keys)
     $selected = @()
     if ($Options.SelectionSpecified) { $selected = Resolve-A2CSelection $Options }
@@ -10785,8 +10800,10 @@ function Invoke-A2CRun {
     $reports = 'Reports ({0}): {1}' -f @($run.Selected).Count, [string]::Join(', ', $run.Selected)
     Write-Host ''
     Write-Host $banner -ForegroundColor Cyan
+    Write-Host ('Disclaimer: ' + $script:A2CBrand.Disclaimer) -ForegroundColor DarkYellow
     Write-Host $reports -ForegroundColor DarkGray
     Add-A2CLogLine -Level Info $banner
+    Add-A2CLogLine -Level Info ('Disclaimer: ' + $script:A2CBrand.Disclaimer)
     Add-A2CLogLine -Level Info $reports
 
     $run.Env = Get-A2CHostInfo

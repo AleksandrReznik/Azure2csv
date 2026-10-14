@@ -1,2 +1,2 @@
 ﻿"SubscriptionName","ResourceGroup","Name","Location","Sku","CapacityReservationGB","RetentionDays","DailyQuotaGB","PublicIngestion","PublicQuery","CustomerId","DisableLocalAuth","ResourcePermissions","Cluster","DefaultDataCollectionRule","Id"
-"sub-20113722a2","rg-410a4ef86f","law-04981f1969","westeurope","PerGB2018","","30","","","","","","","","","/subscriptions/29e2b342-4a4e-4619-b67a-aab075938750/resourceGroups/rg-410a4ef86f/providers/Microsoft.OperationalInsights/workspaces/law-04981f1969"
+"sub-f1f4ed23fe","rg-a6878d2645","law-668cf71064","westeurope","PerGB2018","","30","","","","","","","","","/subscriptions/3a4139cb-af94-4ac3-a783-d292866430b9/resourceGroups/rg-a6878d2645/providers/Microsoft.OperationalInsights/workspaces/law-668cf71064"

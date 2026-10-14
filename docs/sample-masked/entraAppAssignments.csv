@@ -1,4 +1,4 @@
 ﻿"Application","AppId","PrincipalName","PrincipalType","AppRole","AssignedOn","PrincipalId","ApplicationObjectId"
-"App afc9abd5df","d4a43e34-ed85-4b77-859d-f46304e8d002","User 224467689c","User","Default access","2024-03-01T00:00:00Z","623598c7-0061-4e59-a539-863294f4f1e3","373d86e5-3f02-4880-bfe7-a5f8c3a62b79"
-"App afc9abd5df","d4a43e34-ed85-4b77-859d-f46304e8d002","Group 73f37a6a5e","Group","Orders administrator","2024-03-02T00:00:00Z","93614f6e-c199-4296-8e9c-acfdbb976584","373d86e5-3f02-4880-bfe7-a5f8c3a62b79"
-"App afc9abd5df","d4a43e34-ed85-4b77-859d-f46304e8d002","App 736c12b25a","ServicePrincipal","Orders administrator","2024-03-03T00:00:00Z","bd680b7e-70ce-41e3-a86a-e4dab9d8c3ce","373d86e5-3f02-4880-bfe7-a5f8c3a62b79"
+"App dd8ac8755c","bf8f0622-9568-4a30-b42e-ea59ee4df29b","User 11af7dee19","User","Default access","2024-03-01T00:00:00Z","04bdc45d-9cdc-4456-9acd-fee608fe3824","6921b9a8-ce5f-430d-bda6-ba215d7a1aeb"
+"App dd8ac8755c","bf8f0622-9568-4a30-b42e-ea59ee4df29b","Group 3197ea9d95","Group","Orders administrator","2024-03-02T00:00:00Z","3d2b5c80-8868-4d13-b22c-806e9f8e88a4","6921b9a8-ce5f-430d-bda6-ba215d7a1aeb"
+"App dd8ac8755c","bf8f0622-9568-4a30-b42e-ea59ee4df29b","App 31d9da5d99","ServicePrincipal","Orders administrator","2024-03-03T00:00:00Z","4133da55-1566-415f-aa8d-6d8c6cb39d45","6921b9a8-ce5f-430d-bda6-ba215d7a1aeb"

@@ -1,2 +1,2 @@
 ﻿"TenantId","DisplayName","DefaultDomain","InitialDomain","Country","CreatedDateTime","TenantType","OnPremisesSyncEnabled","LastDirectorySync","VerifiedDomains","TechnicalNotificationMails"
-"78496e83-9641-4692-8154-0aa819859d8c","MG c9d3fd3baa","d-299d07c4aa","MG c9d3fd3baa.onmicrosoft.com","LT","2015-05-05T00:00:00Z","AAD","True","2026-09-28T23:30:00Z","2","u-838b4900cb@d-299d07c4aa"
+"8ece279f-a6b7-424d-b8e7-f330d41db4d2","MG 1b56b1273d","d-4b7c917d3d","MG 1b56b1273d.onmicrosoft.com","LT","2015-05-05T00:00:00Z","AAD","True","2026-09-28T23:30:00Z","2","u-a8fc6d7ca1@d-4b7c917d3d"

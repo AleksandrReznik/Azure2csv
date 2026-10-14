@@ -54,4 +54,4 @@
 "Report AppCode","NotSelected","","code\<subscription>\<resource group>\<app>\wwwroot\ (+ code\index.csv)"
 "Report AzureDevOpsRepos","NotSelected","","ADO\<organization>\<project>\repos\ folder (+ ExportedTo columns)"
 "Report AzureDevOpsPackages","NotSelected","","ADO\<organization>\<project>\feeds\ folder (+ ExportedTo column in packages.csv)"
-"Excel workbook","Collected","","azure2csv_20261013-230256_aaaaaaaa.xlsx"
+"Excel workbook","Collected","","azure2csv_20261014-172219_aaaaaaaa.xlsx"

@@ -1,0 +1,4 @@
+﻿"Organization","Project","Repository","RepositoryId","SizeMB","DefaultBranch","LastCommit","DaysSinceLastCommit","Disabled","Fork","BranchPolicies","MinReviewers","BuildValidation","ExportedTo"
+"res-d216fc4eaa","Project 37770064cc","repo-5cffa81e29","984e1aa6-70ed-4910-9cf6-4f792a7a25ef","50","main","2026-09-20T00:00:00Z","9","False","False","2","2","True",""
+"res-d216fc4eaa","Project 37770064cc","repo-d2315d5c5a","36e372a9-363b-4d45-9c9a-6c9e7665911a","1","main","2025-08-01T00:00:00Z","424","False","False","1","","True",""
+"res-d216fc4eaa","Project cf9aa0b00f","repo-ec7d6dfcf1","ee1e9c3c-78d1-493a-a88b-39567a68fe91","0","master","","","True","False","0","","False",""

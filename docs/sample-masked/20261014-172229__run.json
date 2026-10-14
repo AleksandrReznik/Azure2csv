@@ -1,20 +1,21 @@
 {
   "tool": "azure2csv",
   "version": "2.0.0",
-  "startedUtc": "2026-10-13T20:02:56Z",
-  "finishedUtc": "2026-10-13T20:03:03Z",
-  "durationSec": 6.9,
+  "disclaimer": "Experimental software, provided \"as is\" without warranty of any kind. The author takes no responsibility for its results or for decisions based on them. Findings and recommendations are suggestions only: verify them manually before you act on them.",
+  "startedUtc": "2026-10-14T14:22:29Z",
+  "finishedUtc": "2026-10-14T14:22:32Z",
+  "durationSec": 2.9,
   "host": {
-    "OutputBase": "C:\\azure2csv",
-    "CloudShell": false,
-    "AzAccounts": "9.9.9-test",
-    "ClouddriveExists": false,
     "PSVersion": "7.4.13",
+    "CloudShell": false,
     "OS": "Windows",
-    "PSEdition": "Core"
+    "AzAccounts": "9.9.9-test",
+    "OutputBase": "C:\\azure2csv",
+    "PSEdition": "Core",
+    "ClouddriveExists": false
   },
-  "tenantId": "aaaaaaaa-1111-2222-3333-444444444444",
-  "account": "alex.admin@contoso.onmicrosoft.com",
+  "tenantId": "8ece279f-a6b7-424d-b8e7-f330d41db4d2",
+  "account": "[masked]",
   "options": {
     "profile": "Full",
     "reports": [],
@@ -125,8 +126,8 @@
       "EntraPolicies"
     ],
     "costDays": 30,
-    "mask": false,
-    "zip": false,
+    "mask": true,
+    "zip": true,
     "noExcel": false,
     "noHtml": false,
     "subscriptionFilter": 0,
@@ -136,12 +137,12 @@
     "inScope": 2,
     "skipped": [
       {
-        "id": "33333333-aaaa-bbbb-cccc-000000000003",
+        "id": "f2dacf02-367c-415f-a957-3b9bfc80f513",
         "reason": "Subscription state Disabled"
       },
       {
-        "id": "44444444-aaaa-bbbb-cccc-000000000004",
-        "reason": "Belongs to another tenant (bbbbbbbb-9999-8888-7777-666666666666), e.g. Azure Lighthouse"
+        "id": "da209d61-c3f0-40ec-895d-539f4eafa73e",
+        "reason": "Belongs to another tenant (d8a64bba-9dbc-4fa3-b796-2e46ae58d1d4), e.g. Azure Lighthouse"
       }
     ]
   },
@@ -149,7 +150,7 @@
     {
       "Stage": "Dataset:Subscriptions",
       "Status": "Collected",
-      "DurationSec": 0.1,
+      "DurationSec": 0.0,
       "Note": ""
     },
     {
@@ -167,7 +168,7 @@
     {
       "Stage": "Dataset:Resources",
       "Status": "Collected",
-      "DurationSec": 0.1,
+      "DurationSec": 0.0,
       "Note": ""
     },
     {
@@ -191,7 +192,7 @@
     {
       "Stage": "Dataset:Diagnostics",
       "Status": "Collected",
-      "DurationSec": 0.1,
+      "DurationSec": 0.0,
       "Note": "Types without diagnostic settings (learned): microsoft.network/natgateways"
     },
     {
@@ -292,21 +293,21 @@
     },
     {
       "Stage": "Dataset:RunbookContent",
-      "Status": "Collected",
+      "Status": "Skipped",
       "DurationSec": 0.0,
-      "Note": ""
+      "Note": "Disabled with -Mask"
     },
     {
       "Stage": "Dataset:AzureCode",
-      "Status": "Partial",
-      "DurationSec": 0.1,
-      "Note": ""
+      "Status": "Skipped",
+      "DurationSec": 0.0,
+      "Note": "Disabled with -Mask"
     },
     {
       "Stage": "Dataset:ArmTemplates",
-      "Status": "Partial",
-      "DurationSec": 0.1,
-      "Note": "5 of 7 resource groups exported, 2 with gaps (templates\\notExported.csv lists what Azure did not export), 1 not exported (templates\\index.csv), 1 empty"
+      "Status": "Skipped",
+      "DurationSec": 0.0,
+      "Note": "Disabled with -Mask"
     },
     {
       "Stage": "Dataset:Providers",
@@ -317,26 +318,26 @@
     {
       "Stage": "Dataset:ChildResources",
       "Status": "Collected",
-      "DurationSec": 0.2,
+      "DurationSec": 0.0,
       "Note": "14 items of 10 types below 16 resources, 92 calls"
     },
     {
       "Stage": "Dataset:Cost",
       "Status": "Partial",
       "DurationSec": 0.0,
-      "Note": "2026-08-30 to 2026-09-28; Contoso Development: Unavailable: HTTP 400 BadRequest: Offer MS-AZR-0063P is not supported for this query."
+      "Note": "2026-08-30 to 2026-09-28; sub-e2d42e452a: Unavailable: HTTP 400 BadRequest: Offer MS-AZR-0063P is not supported for this query."
     },
     {
       "Stage": "Dataset:AzureDevOps",
       "Status": "Partial",
-      "DurationSec": 0.3,
+      "DurationSec": 0.1,
       "Note": ""
     },
     {
       "Stage": "Dataset:AzureDevOpsPipelines",
-      "Status": "Collected",
+      "Status": "Skipped",
       "DurationSec": 0.0,
-      "Note": ""
+      "Note": "Disabled with -Mask"
     },
     {
       "Stage": "Dataset:EntraTenant",
@@ -401,7 +402,7 @@
     {
       "Stage": "Report:Resources",
       "Status": "Built",
-      "DurationSec": 0.2,
+      "DurationSec": 0.0,
       "Note": ""
     },
     {
@@ -437,7 +438,7 @@
     {
       "Stage": "Report:Snapshot",
       "Status": "Built",
-      "DurationSec": 0.3,
+      "DurationSec": 0.0,
       "Note": ""
     },
     {
@@ -449,7 +450,7 @@
     {
       "Stage": "Report:ChildResources",
       "Status": "Built",
-      "DurationSec": 0.1,
+      "DurationSec": 0.0,
       "Note": ""
     },
     {
@@ -527,7 +528,7 @@
     {
       "Stage": "Report:VMs",
       "Status": "Built",
-      "DurationSec": 0.1,
+      "DurationSec": 0.0,
       "Note": ""
     },
     {
@@ -647,7 +648,7 @@
     {
       "Stage": "Report:AzureDevOps",
       "Status": "Built",
-      "DurationSec": 0.2,
+      "DurationSec": 0.0,
       "Note": ""
     },
     {
@@ -725,7 +726,7 @@
     {
       "Stage": "Report:EntraApps",
       "Status": "Built",
-      "DurationSec": 0.1,
+      "DurationSec": 0.0,
       "Note": ""
     },
     {
@@ -748,48 +749,48 @@
     }
   ],
   "apiCalls": {
-    "SecretsHidden": 2,
-    "web": 2,
+    "web": 1,
+    "Throttled": 1,
+    "SleepSec": 4.0,
     "arg": 33,
-    "ado": 75,
-    "kudu": 0,
-    "arm": 215,
-    "Retries": 1,
     "graph": 37,
-    "SleepSec": 24.0,
-    "Throttled": 1
+    "ado": 73,
+    "Retries": 1,
+    "kudu": 0,
+    "arm": 177,
+    "SecretsHidden": 2
   },
   "files": [
     {
-      "file": "ADO/contoso-ado/admins.csv",
+      "file": "ADO/res-d216fc4eaa/admins.csv",
       "rows": 4
     },
     {
-      "file": "ADO/contoso-ado/agentPools.csv",
+      "file": "ADO/res-d216fc4eaa/agentPools.csv",
       "rows": 4
     },
     {
-      "file": "ADO/contoso-ado/agents.csv",
+      "file": "ADO/res-d216fc4eaa/agents.csv",
       "rows": 2
     },
     {
-      "file": "ADO/contoso-ado/deploymentGroups.csv",
+      "file": "ADO/res-d216fc4eaa/deploymentGroups.csv",
       "rows": 1
     },
     {
-      "file": "ADO/contoso-ado/environments.csv",
+      "file": "ADO/res-d216fc4eaa/environments.csv",
       "rows": 1
     },
     {
-      "file": "ADO/contoso-ado/extensions.csv",
+      "file": "ADO/res-d216fc4eaa/extensions.csv",
       "rows": 2
     },
     {
-      "file": "ADO/contoso-ado/feedPermissions.csv",
+      "file": "ADO/res-d216fc4eaa/feedPermissions.csv",
       "rows": 4
     },
     {
-      "file": "ADO/contoso-ado/feeds.csv",
+      "file": "ADO/res-d216fc4eaa/feeds.csv",
       "rows": 2
     },
     {
@@ -797,55 +798,55 @@
       "rows": 4
     },
     {
-      "file": "ADO/contoso-ado/packages.csv",
+      "file": "ADO/res-d216fc4eaa/packages.csv",
       "rows": 9
     },
     {
-      "file": "ADO/contoso-ado/pipelines.csv",
+      "file": "ADO/res-d216fc4eaa/pipelines.csv",
       "rows": 3
     },
     {
-      "file": "ADO/contoso-ado/processes.csv",
+      "file": "ADO/res-d216fc4eaa/processes.csv",
       "rows": 2
     },
     {
-      "file": "ADO/contoso-ado/projects.csv",
+      "file": "ADO/res-d216fc4eaa/projects.csv",
       "rows": 2
     },
     {
-      "file": "ADO/contoso-ado/releasePipelines.csv",
+      "file": "ADO/res-d216fc4eaa/releasePipelines.csv",
       "rows": 1
     },
     {
-      "file": "ADO/contoso-ado/repositories.csv",
+      "file": "ADO/res-d216fc4eaa/repositories.csv",
       "rows": 3
     },
     {
-      "file": "ADO/contoso-ado/secureFiles.csv",
+      "file": "ADO/res-d216fc4eaa/secureFiles.csv",
       "rows": 1
     },
     {
-      "file": "ADO/contoso-ado/serviceConnections.csv",
+      "file": "ADO/res-d216fc4eaa/serviceConnections.csv",
       "rows": 3
     },
     {
-      "file": "ADO/contoso-ado/serviceHooks.csv",
+      "file": "ADO/res-d216fc4eaa/serviceHooks.csv",
       "rows": 1
     },
     {
-      "file": "ADO/contoso-ado/tfvc.csv",
+      "file": "ADO/res-d216fc4eaa/tfvc.csv",
       "rows": 2
     },
     {
-      "file": "ADO/contoso-ado/users.csv",
+      "file": "ADO/res-d216fc4eaa/users.csv",
       "rows": 4
     },
     {
-      "file": "ADO/contoso-ado/variableGroups.csv",
+      "file": "ADO/res-d216fc4eaa/variableGroups.csv",
       "rows": 2
     },
     {
-      "file": "ADO/contoso-ado/workItems.csv",
+      "file": "ADO/res-d216fc4eaa/workItems.csv",
       "rows": 3
     },
     {
@@ -895,10 +896,6 @@
     {
       "file": "childResourceTypes.csv",
       "rows": 80
-    },
-    {
-      "file": "code/index.csv",
-      "rows": 25
     },
     {
       "file": "cost.csv",
@@ -1118,7 +1115,7 @@
     },
     {
       "file": "retirements.csv",
-      "rows": 13
+      "rows": 12
     },
     {
       "file": "routes.csv",
@@ -1131,10 +1128,6 @@
     {
       "file": "runbooks.csv",
       "rows": 2
-    },
-    {
-      "file": "snapshot/index.csv",
-      "rows": 141
     },
     {
       "file": "sqlDatabases.csv",
@@ -1181,14 +1174,6 @@
       "rows": 9
     },
     {
-      "file": "templates/index.csv",
-      "rows": 7
-    },
-    {
-      "file": "templates/notExported.csv",
-      "rows": 1
-    },
-    {
       "file": "tenantTransferImpact.csv",
       "rows": 16
     },
@@ -1206,7 +1191,7 @@
     },
     {
       "file": "coverage.csv",
-      "rows": 56
+      "rows": 57
     },
     {
       "file": "tagList.json",
@@ -1217,8 +1202,8 @@
       "rows": 11
     },
     {
-      "file": "azure2csv_20261013-230256_aaaaaaaa.xlsx",
-      "rows": 108
+      "file": "azure2csv_20261014-172229_8ece279f.xlsx",
+      "rows": 104
     }
   ],
   "findings": {
@@ -1241,7 +1226,7 @@
       "Detail": ""
     },
     {
-      "Area": "Management groups (Resource Graph)",
+      "Area": "x-46d4f1c7ee groups (Resource Graph)",
       "Status": "Collected",
       "Items": 4,
       "Detail": ""
@@ -1268,7 +1253,7 @@
       "Area": "Move support data (Microsoft Learn)",
       "Status": "Collected",
       "Items": 16,
-      "Detail": "Source: https://raw.githubusercontent.com/MicrosoftDocs/azure-docs/main/articles/azure-resource-manager/management/move-support-resources.md (CC BY 4.0)"
+      "Detail": "Source: https://raw.githubusercontent.com/MicrosoftDocs/azure-docs/main/articles/azure-resource-manager/x-46d4f1c7ee/move-support-resources.md (CC BY 4.0)"
     },
     {
       "Area": "Diagnostic settings (ARM)",
@@ -1325,10 +1310,10 @@
       "Detail": ""
     },
     {
-      "Area": "Management groups without a subscription in scope (ARM)",
+      "Area": "x-46d4f1c7ee groups without a subscription in scope (ARM)",
       "Status": "Collected",
       "Items": 0,
-      "Detail": "Every management group has a subscription in scope below it"
+      "Detail": "Every x-46d4f1c7ee group has a subscription in scope below it"
     },
     {
       "Area": "RBAC principal names (Microsoft Graph)",
@@ -1380,21 +1365,21 @@
     },
     {
       "Area": "Runbook content export",
-      "Status": "Collected",
-      "Items": 2,
-      "Detail": "code\\ folder"
+      "Status": "Skipped",
+      "Items": null,
+      "Detail": "Disabled with -Mask (runbook code can contain names and secrets)"
     },
     {
       "Area": "Code export",
-      "Status": "Partial",
-      "Items": 24,
-      "Detail": "API Management (3), Data Factory (2), Deployment script (2), Log alert rule (2), Policy definition (2), Runbook (2), Sentinel analytics rule (2), Stream Analytics (2), Custom role (1), Dashboard (1), DSC configuration (1), Logic App (1), Policy initiative (1), Template spec (1), Workbook (1); 1 not exported (code\\index.csv)"
+      "Status": "Skipped",
+      "Items": null,
+      "Detail": "Disabled with -Mask (code and definitions contain names and settings)"
     },
     {
       "Area": "ARM template export",
-      "Status": "Partial",
-      "Items": 5,
-      "Detail": "5 of 7 resource groups exported, 2 with gaps (templates\\notExported.csv lists what Azure did not export), 1 not exported (templates\\index.csv), 1 empty"
+      "Status": "Skipped",
+      "Items": null,
+      "Detail": "Disabled with -Mask (complete resource definitions)"
     },
     {
       "Area": "Resource providers (ARM)",
@@ -1409,10 +1394,10 @@
       "Detail": "14 items of 10 types below 16 resources, 92 calls"
     },
     {
-      "Area": "Cost (Cost Management)",
+      "Area": "Cost (Cost x-46d4f1c7ee)",
       "Status": "Partial",
       "Items": 4,
-      "Detail": "2026-08-30 to 2026-09-28; Contoso Development: Unavailable: HTTP 400 BadRequest: Offer MS-AZR-0063P is not supported for this query."
+      "Detail": "2026-08-30 to 2026-09-28; sub-e2d42e452a: Unavailable: HTTP 400 BadRequest: Offer MS-AZR-0063P is not supported for this query."
     },
     {
       "Area": "Azure DevOps tenant organization list",
@@ -1421,28 +1406,28 @@
       "Detail": ""
     },
     {
-      "Area": "Azure DevOps contoso-ado",
+      "Area": "Azure DevOps MG 1b56b1273d-ado",
       "Status": "Partial",
       "Items": 2,
-      "Detail": "secure files of Legacy App: HTTP 403 Forbidden: VS800075: The project does not allow access to secure files.; feed permissions: not readable for 1 of 2 feed(s) with your feed role - feed owners can read them (webshop-feed)"
+      "Detail": "secure files of Project cf9aa0b00f: HTTP 403 Forbidden: VS800075: The project does not allow access to secure files.; feed permissions: not readable for 1 of 2 feed(s) with your feed role - feed owners can read them (feed-d7dbe091e7)"
     },
     {
-      "Area": "Azure DevOps fabrikam-old",
+      "Area": "Azure DevOps res-fb7b5c4ab8",
       "Status": "Skipped",
       "Items": null,
-      "Detail": "No access with this account: Connected to another Entra tenant (bbbbbbbb-9999-8888-7777-666666666666) - sign in to that tenant to inventory it"
+      "Detail": "No access with this account: Connected to another Entra tenant (d8a64bba-9dbc-4fa3-b796-2e46ae58d1d4) - sign in to that tenant to inventory it"
     },
     {
-      "Area": "Azure DevOps contoso-sandbox",
+      "Area": "Azure DevOps MG 1b56b1273d-MG 54c9231398",
       "Status": "Skipped",
       "Items": null,
-      "Detail": "No access with this account: HTTP 401 UnauthorizedRequestException: TF400813: The user 'alex.admin@contoso.onmicrosoft.com' is not authorized to access this resource."
+      "Detail": "No access with this account: HTTP 401 UnauthorizedRequestException: TF400813: The user 'u-1300b44cdd@MG 1b56b1273d.onmicrosoft.com' is not authorized to access this resource."
     },
     {
       "Area": "Azure DevOps pipeline export",
-      "Status": "Collected",
-      "Items": 4,
-      "Detail": ""
+      "Status": "Skipped",
+      "Items": null,
+      "Detail": "Disabled with -Mask (pipeline definitions contain names and settings)"
     },
     {
       "Area": "Entra tenant (organization)",
@@ -1530,9 +1515,9 @@
     },
     {
       "Area": "Configuration snapshot",
-      "Status": "Collected",
-      "Items": 141,
-      "Detail": "Resource Graph (74), ARM: child resources (14), ARM: roleAssignments (8), Microsoft Graph: groups (4), Resource Graph: securityresources (4), ARM: policyAssignments (3), ARM: policyDefinitions (3), Microsoft Graph: appRoleAssignments (3), ..."
+      "Status": "Skipped",
+      "Items": null,
+      "Detail": "Disabled with -Mask (complete resource definitions)"
     },
     {
       "Area": "Secret values",
@@ -1562,9 +1547,15 @@
       "Area": "Excel workbook",
       "Status": "Collected",
       "Items": null,
-      "Detail": "azure2csv_20261013-230256_aaaaaaaa.xlsx"
+      "Detail": "azure2csv_20261014-172229_8ece279f.xlsx"
+    },
+    {
+      "Area": "Mask self-check",
+      "Status": "Info",
+      "Items": 7,
+      "Detail": "7 remaining original names were replaced by the safety net"
     }
   ],
-  "warnings": 7,
+  "warnings": 8,
   "errors": []
 }

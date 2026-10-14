@@ -1,0 +1,5 @@
+﻿"Organization","Group","Scope","Project","Member","MemberUpn","MemberType","Origin"
+"res-d216fc4eaa","Project Collection Administrators","Organization","","User 11af7dee19","u-1300b44cdd@MG 1b56b1273d.onmicrosoft.com","User","Entra ID"
+"res-d216fc4eaa","Project Collection Administrators","Organization","","Group 3197ea9d95","","Group","Entra ID"
+"res-d216fc4eaa","Project Administrators","Project","Project 37770064cc","User 11af7dee19","u-1300b44cdd@MG 1b56b1273d.onmicrosoft.com","User","Entra ID"
+"res-d216fc4eaa","Project Administrators","Project","Project 37770064cc","","","Service principal",""
