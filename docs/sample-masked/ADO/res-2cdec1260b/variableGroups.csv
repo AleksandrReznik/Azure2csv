@@ -1,0 +1,4 @@
+﻿"Organization","Projects","VariableGroup","VariableGroupId","Type","KeyVault","ServiceConnection","Variables","SecretVariables","VariableNames","CreatedBy","ModifiedOn","OpenToAllPipelines","AuthorizedPipelines","PipelineNames"
+"res-2cdec1260b","Project 9b56ce3f09","Variables 192b65bd3a","1","Library","","","2","1","x-6b9b7c1e4c; x-5979a47810","User 3596ca7798","2026-08-01T00:00:00Z","False","1","Pipeline 15336a7a77"
+"res-2cdec1260b","Project 9b56ce3f09","Variables ffd4d244f9","2","Key Vault","kv-f0cb9f8b6a","Connection 48283fbef0","1","1","x-eb97bf9399","User 3596ca7798","2026-08-01T00:00:00Z","True","0",""
+"res-2cdec1260b","Project 9b56ce3f09","Variables 1d6f065431","3","Library","","","1","0","x-138b8fcdb7","User c40364d6dc","2022-01-01T00:00:00Z","False","0",""

@@ -18,6 +18,7 @@ New-Item -ItemType Directory -Path $global:TWOut -Force | Out-Null
 
 foreach ($variant in @(@{ Name = 'sample'; Mask = $false }, @{ Name = 'sample-masked'; Mask = $true })) {
     Reset-TWState
+    Add-TWGalleryFixtures   # gallery images and an Image Builder template (not in the base world of the tests)
     $global:TWImportExcel = [bool](Get-Module -ListAvailable ImportExcel)
     $run = Invoke-TWRun -Params @{ ReportProfile = 'Full'; NoHtml = $false; NoExcel = $false; Mask = $variant.Mask } -KeepWorld
     $target = Join-Path $DocsPath $variant.Name

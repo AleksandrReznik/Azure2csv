@@ -1,0 +1,38 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.VirtualMachineImages/imageTemplates/it-win2022",
+  "name": "it-win2022",
+  "type": "Microsoft.VirtualMachineImages/imageTemplates",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "identity": {
+    "type": "UserAssigned"
+  },
+  "properties": {
+    "source": {
+      "type": "PlatformImage",
+      "publisher": "MicrosoftWindowsServer",
+      "offer": "WindowsServer",
+      "sku": "2022-datacenter-azure-edition",
+      "version": "latest"
+    },
+    "distribute": [
+      {
+        "type": "SharedImage",
+        "runOutputName": "win2022-run",
+        "galleryImageId": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/galleries/gal_contoso/images/win2022-hardened"
+      }
+    ],
+    "vmProfile": {
+      "vmSize": "Standard_D2s_v5"
+    },
+    "buildTimeoutInMinutes": 120,
+    "lastRunStatus": {
+      "runState": "Failed",
+      "runSubState": "Customizing",
+      "startTime": "2026-09-20T01:00:00Z",
+      "endTime": "2026-09-20T01:40:00Z",
+      "message": "Customizer failed: exit code 1"
+    },
+    "provisioningState": "Succeeded"
+  }
+}

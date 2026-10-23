@@ -1,5 +1,59 @@
 # Changelog
 
+## 2.1.0 - 2026-10-23
+
+63 reports, about 60 findings.
+
+### Azure DevOps: who uses what
+- `pipelines.csv`, new columns:
+  - how each pipeline starts: CI, PR, schedule, pipeline completion, gated check-in or manual;
+  - runs, failures and average duration of the last 90 days, and who started the last run;
+  - the service connections, Azure subscriptions, environments, variable groups and secure files it uses;
+  - `RepositoryExists`, which flags pipelines whose Azure Repos repository is gone.
+- `releasePipelines.csv`: the service connections and Azure subscriptions of classic release pipelines.
+- `serviceConnections.csv`: last use, the pipelines that used it (from the last 100 uses), and whether it is open to
+  all pipelines.
+- `variableGroups.csv`, `secureFiles.csv`, `environments.csv`: the pipelines that may use them (pipeline permissions)
+  or whether they are open to all pipelines; for environments also the pipelines that deployed and when.
+- `branchPolicies.csv` (new): one row per branch policy and branch.
+- `pipelineSecrets.csv` (new), names and line numbers only:
+  - variables named like secrets but not marked secret;
+  - variables written into YAML files;
+  - lines of YAML files and classic steps that seem to contain a password or key.
+- `repositories.csv`: the pipelines that build each repository.
+- `users.csv`: domain and external users.
+- `processes.csv`: customized work item types, fields and states. Each customized process is exported to
+  `ADO\<organization>\processes\<process>.json` (not with `-Mask`).
+- Triggers, variables and secrets come from the main YAML file of each pipeline, read line by line; templates are not
+  followed.
+- New findings ADO-08 to ADO-16:
+  - repositories without pipelines;
+  - pipelines whose repository is gone;
+  - self-hosted pools without agents;
+  - pipelines not run for a year;
+  - resources open to all pipelines;
+  - variable groups and secure files that no pipeline uses;
+  - service connections not used for 90 days;
+  - plain-text secret variables;
+  - secrets in scripts.
+
+### Azure
+- `Deployments` report (new, in the Migration and Governance profiles):
+  - `deployments.csv`: the ARM deployment history of every resource group;
+  - `LastDeployment` and `LastDeploymentTime` in `allResources.csv`: the newest deployment of each resource and
+    resource group.
+
+  Parameters and outputs are not exported, and the query string of a template link is cut off.
+- `Galleries` report (new, Resource Graph):
+  - Compute Gallery image definitions and versions: latest version, publish and end-of-life dates, target regions,
+    source;
+  - VM Image Builder templates: last run.
+
+  Findings RET-04, SEC-20 and OPS-01.
+- `-RequiredTags`: `missingTags.csv`, the `MissingTags` column and finding GOV-08.
+- `-IacTagNames` and the `IacTags` column: the tags that tell how a resource was deployed.
+- `costByResourceGroup.csv`: cost per resource group (Cost report).
+
 ## 2.0.0 - 2026
 
 A complete rewrite of the 2021 script. The promise of the original blog post ("I have more than 10 additional

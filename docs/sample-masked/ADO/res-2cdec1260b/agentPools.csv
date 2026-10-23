@@ -1,0 +1,6 @@
+﻿"Organization","Pool","PoolId","Kind","PoolType","Agents","Online","AutoProvision","CreatedOn","Owner","AzureResourceId","MaxCapacity"
+"res-2cdec1260b","Azure Pipelines","1","Microsoft-hosted","automation","","","False","","","",""
+"res-2cdec1260b","Default","2","Self-hosted","automation","2","1","True","2019-01-01T00:00:00Z","User 3596ca7798","",""
+"res-2cdec1260b","Pool b3c33735af","3","Scale set (VMSS)","automation","0","0","False","2024-01-01T00:00:00Z","","/subscriptions/3069eea6-82ae-482b-a6de-fa6573c77b1f/resourceGroups/rg-3e0f448543/providers/Microsoft.Compute/virtualMachineScaleSets/x-24a98dee59","4"
+"res-2cdec1260b","Pool c841c40e2a","4","Deployment pool","deployment","1","0","False","","","",""
+"res-2cdec1260b","Pool 2ba55d1fc8","5","Self-hosted","automation","0","0","False","2018-01-01T00:00:00Z","","",""

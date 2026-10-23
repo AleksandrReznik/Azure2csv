@@ -1,0 +1,132 @@
+{
+  "process": {
+    "name": "Contoso Agile",
+    "typeId": "e0e0e0e0-0000-0000-0000-000000000001",
+    "parent": "Agile",
+    "customizationType": "inherited",
+    "description": "",
+    "isDefault": true,
+    "isEnabled": true
+  },
+  "workItemTypes": [
+    {
+      "name": "User Story",
+      "referenceName": "ContosoAgile.UserStory",
+      "customization": "inherited",
+      "inherits": "Microsoft.VSTS.WorkItemTypes.UserStory",
+      "isDisabled": false,
+      "color": "009CCC",
+      "icon": "",
+      "description": "",
+      "states": [
+        {
+          "name": "New",
+          "stateCategory": "Proposed",
+          "customizationType": "system",
+          "hidden": false,
+          "order": null,
+          "color": ""
+        },
+        {
+          "name": "Ready for QA",
+          "stateCategory": "InProgress",
+          "customizationType": "custom",
+          "hidden": false,
+          "order": null,
+          "color": ""
+        }
+      ],
+      "fields": [
+        {
+          "referenceName": "System.Title",
+          "name": "Title",
+          "type": "string",
+          "customization": "system",
+          "required": false,
+          "readOnly": false,
+          "defaultValue": null,
+          "allowedValues": null,
+          "isLocked": false
+        },
+        {
+          "referenceName": "Custom.CostCenter",
+          "name": "Cost Center",
+          "type": "string",
+          "customization": "custom",
+          "required": false,
+          "readOnly": false,
+          "defaultValue": null,
+          "allowedValues": null,
+          "isLocked": false
+        }
+      ]
+    },
+    {
+      "name": "Risk",
+      "referenceName": "ContosoAgile.Risk",
+      "customization": "custom",
+      "inherits": "",
+      "isDisabled": false,
+      "color": "CC293D",
+      "icon": "",
+      "description": "",
+      "states": [
+        {
+          "name": "Open",
+          "stateCategory": "Proposed",
+          "customizationType": "custom",
+          "hidden": false,
+          "order": null,
+          "color": ""
+        }
+      ],
+      "fields": [
+        {
+          "referenceName": "System.Title",
+          "name": "Title",
+          "type": "string",
+          "customization": "system",
+          "required": false,
+          "readOnly": false,
+          "defaultValue": null,
+          "allowedValues": null,
+          "isLocked": false
+        },
+        {
+          "referenceName": "Custom.CostCenter",
+          "name": "Cost Center",
+          "type": "string",
+          "customization": "custom",
+          "required": false,
+          "readOnly": false,
+          "defaultValue": null,
+          "allowedValues": null,
+          "isLocked": false
+        },
+        {
+          "referenceName": "Custom.Impact",
+          "name": "Impact",
+          "type": "integer",
+          "customization": "custom",
+          "required": true,
+          "readOnly": false,
+          "defaultValue": null,
+          "allowedValues": null,
+          "isLocked": false
+        }
+      ]
+    },
+    {
+      "name": "Bug",
+      "referenceName": "Microsoft.VSTS.WorkItemTypes.Bug",
+      "customization": "system",
+      "inherits": "",
+      "isDisabled": false,
+      "color": "",
+      "icon": "",
+      "description": "",
+      "states": [],
+      "fields": []
+    }
+  ]
+}

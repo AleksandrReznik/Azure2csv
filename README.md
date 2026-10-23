@@ -103,16 +103,21 @@ If you downloaded the file from the internet on Windows, run `Unblock-File .\azu
 
 | Profile | Contents |
 |---|---|
-| `Quick` | Every report based on Resource Graph: inventory, network, compute, data, monitoring, Defender plans, Lighthouse. Runs in minutes; good for Cloud Shell. |
-| `Standard` | Quick, plus diagnostic settings, RBAC (with PIM and deny assignments), locks, Azure Policy, resource providers, tenant transfer and Entra ID (without group members). |
+| `Quick` | Every report based on Resource Graph: inventory, network, compute (including Compute Gallery images and Image Builder), data, monitoring, Defender plans, Lighthouse. Runs in minutes; good for Cloud Shell. |
+| `Standard` | Quick, plus diagnostic settings, RBAC (with PIM and deny assignments), locks, Azure Policy, resource providers, tenant transfer, Entra ID (without group members) and Azure DevOps. |
 | `Full` | Everything, including the opt-in reports Snapshot, ArmTemplates, ChildResources, Cost, AzureCode, AzureDevOpsPipelines, EntraGroupMembers and EntraAppAssignments (not AzureDevOpsRepos, AzureDevOpsPackages and AppCode, which run only when named). |
-| `Migration` | Inventory, network, compute, data, monitoring, backup, move support, cross-references, locks, RBAC, Policy, resource providers, tenant transfer, managed identities, retirements, orphans. |
-| `Security` | RBAC, Defender plans, Lighthouse, Entra ID with Conditional Access (when readable), NSG rules, firewalls, application gateways, gateways, public IPs, private endpoints, storage, SQL, Key Vault, diagnostic settings, Policy, Advisor, locks, retirements. |
-| `Governance` | Management groups, Policy, RBAC, Defender plans, Lighthouse, resource providers, locks, tags, diagnostic settings, Advisor. |
+| `Migration` | Inventory, network, compute, data, monitoring, backup, move support, cross-references, locks, ARM deployment history, RBAC, Policy, resource providers, tenant transfer, managed identities, retirements, orphans, Azure DevOps. |
+| `Security` | RBAC, Defender plans, Lighthouse, Entra ID with Conditional Access (when readable), NSG rules, firewalls, application gateways, gateways, public IPs, private endpoints, storage, SQL, Key Vault, diagnostic settings, Policy, Advisor, locks, retirements, Azure DevOps. |
+| `Governance` | Management groups, Policy, RBAC, Defender plans, Lighthouse, resource providers, locks, ARM deployment history, tags, diagnostic settings, Advisor. |
 
 **Scope:** `-TenantId`, `-SubscriptionId` (array or comma list), `-ExcludeSubscriptionId`, `-ManagementGroupId`.
 
 **Output:** `-OutputPath`, `-Zip`, `-Mask`, `-NoExcel`, `-NoHtml`, `-Delimiter`.
+
+**Your conventions:** `-RequiredTags owner, environment, "Cost Center"` lists the resource groups and resources
+without one of these tags in `missingTags.csv` (and the `MissingTags` column). `-IacTagNames` names the tags that
+tell how a resource is deployed (default: `managed-by`, `deployed-by`, `iac`, `provisioner`, `created-by`,
+`terraform`, `bicep` and their spellings); matching tags appear in the `IacTags` column.
 
 ```powershell
 .\azure2csv.ps1 -Profile Quick                                        # fast first look
@@ -136,11 +141,12 @@ pwsh -File .\azure2csv.ps1 -Profile Full -AddReports AzureDevOpsRepos, AzureDevO
 | Group | Report | Files | Speed | In profiles | What it contains |
 |---|---|---|---|---|---|
 | Inventory | `Resources` | allResources.csv, subscriptions.csv, resourceTypes.csv | Fast | Quick, Standard, Full, Migration | Every resource plus subscription and resource-group rows (v1 allResources.csv columns first), VM IPs/VNet/DNS |
-| Inventory | `Tags` | tags.csv, tagList.json | Fast | Quick, Standard, Full, Migration, Governance | Tag names and values with usage counts (subscriptions, resource groups, resources) |
+| Inventory | `Tags` | tags.csv, tagList.json, missingTags.csv (with -RequiredTags) | Fast | Quick, Standard, Full, Migration, Governance | Tag names and values with usage counts (subscriptions, resource groups, resources); with -RequiredTags the resource groups and resources that lack one of them |
 | Inventory | `DiagnosticSettings` | diagnosticSettings.csv (+ DiagStatus/DiagnosticSettings columns) | Slow | Standard, Full, Security, Governance | Diagnostic settings of every resource and the subscription activity log |
 | Inventory | `MoveSupport` | moveSupport.csv (+ CanMoveTo* columns) | Fast | Quick, Standard, Full, Migration | Can each resource type move to another resource group / subscription / region (Microsoft Learn data) |
 | Inventory | `CrossReferences` | crossReferences.csv | Fast | Quick, Standard, Full, Migration | Resources that reference resources in another resource group or subscription (move blockers) |
 | Inventory | `Locks` | locks.csv | Medium | Standard, Full, Migration, Security, Governance | Management locks (CanNotDelete/ReadOnly) on subscriptions, resource groups and resources |
+| Inventory | `Deployments` | deployments.csv (+ LastDeployment columns in allResources.csv) | Medium | Full, Migration, Governance | ARM deployment history of every resource group (Bicep, ARM templates and tools that deploy templates) and the newest deployment of each resource; parameters and outputs are not exported |
 | Inventory | `Snapshot` \* | snapshot\ folder: one JSON file per resource and object, snapshot\index.csv | Medium | Full | Configuration snapshot: every resource as a JSON file with its properties uncut (a CSV cell is cut), firewall rules, DNS records, backup policies and other items of the other Resource Graph tables, plus the role, policy, lock, diagnostic, child resource and Entra objects the selected reports collected - opt-in, never with -Mask |
 | Inventory | `ArmTemplates` \* | templates\ folder: an ARM template (.json) and a Bicep file per resource group, templates\index.csv, templates\notExported.csv | Slow | Full | Azure's own template export of every resource group as ARM JSON and Bicep (-TemplateFormat), with the list of what Azure could not export. A starting point for infrastructure as code, not a tested deployment - opt-in, never with -Mask |
 | Inventory | `ChildResources` \* | childResources.csv, childResourceTypes.csv, storageContainers.csv, storageFileShares.csv, sqlFirewallRules.csv, keyVaultObjects.csv, serviceBusEntities.csv, eventHubs.csv, privateEndpointDnsZoneGroups.csv (+ the items as JSON in snapshot\ with the Snapshot report) | Slow | Full | What Resource Graph does not list: storage containers and file shares, SQL firewall rules and retention, Service Bus queues and topics, Event Hubs, Cosmos DB databases and containers, Automation schedules and variables, DNS records, private endpoint DNS zone groups, Key Vault key and secret names (never values) and more - several calls per resource, opt-in |
@@ -161,6 +167,7 @@ pwsh -File .\azure2csv.ps1 -Profile Full -AddReports AzureDevOpsRepos, AzureDevO
 | Compute | `AKS` | aks.csv | Fast | Quick, Standard, Full, Migration | AKS clusters: version, tier, node pools, network, Entra integration |
 | Compute | `AppService` | appServicePlans.csv, appServiceApps.csv | Fast | Quick, Standard, Full, Migration | App Service plans and web/function apps with runtime stacks and TLS settings |
 | Compute | `ScaleSets` | vmScaleSets.csv | Fast | Quick, Standard, Full, Migration | Virtual machine scale sets: size, capacity, image, disks, subnets, load balancer pools, upgrade and scale-in policy |
+| Compute | `Galleries` | galleryImages.csv, galleryImageVersions.csv, imageTemplates.csv | Fast | Quick, Standard, Full, Migration | Azure Compute Gallery image definitions and versions (publish and end-of-life dates, regions, source) and VM Image Builder templates (last run) |
 | Compute | `ContainerRegistries` | containerRegistries.csv | Fast | Quick, Standard, Full, Migration | Container registries: SKU, admin user, network rules, retention, encryption |
 | Compute | `ContainerApps` | containerApps.csv, containerAppEnvironments.csv, containerInstances.csv | Fast | Quick, Standard, Full, Migration | Container Apps with ingress, images, scale and secret names; their environments; container instances |
 | Data | `Storage` | storageAccounts.csv | Fast | Quick, Standard, Full, Migration, Security | Storage accounts: kind, SKU, TLS, public/shared-key access, network rules, encryption |
@@ -176,8 +183,8 @@ pwsh -File .\azure2csv.ps1 -Profile Full -AddReports AzureDevOpsRepos, AzureDevO
 | Operations | `Advisor` | advisor.csv | Fast | Quick, Standard, Full, Security, Governance | Azure Advisor recommendations (cost, security, reliability, performance, operations) |
 | Operations | `Retirements` | retirements.csv | Fast | Quick, Standard, Full, Migration, Security | Resources affected by Azure retirements (built-in rules + Advisor), with dates and actions |
 | Operations | `Orphans` | orphans.csv | Fast | Quick, Standard, Full, Migration | Orphaned/unused resources: unattached disks, unused public IPs, NICs, NSGs, empty resource groups... |
-| Operations | `Cost` \* | cost.csv (+ Cost column) | Slow | Full | Actual cost per resource for the last -CostDays days (Cost Management API) |
-| Operations | `AzureDevOps` | ADO\ folder: organizations, projects, repositories, pipelines, service connections, agents, users... | Slow | Standard, Full, Migration, Security | Azure DevOps organizations billed to the subscriptions or named with -AdoOrganization: projects, Git and TFVC repos, pipelines, service connections, agents, users, feeds and packages, integrations, work items |
+| Operations | `Cost` \* | cost.csv, costByResourceGroup.csv (+ Cost column) | Slow | Full | Actual cost per resource and per resource group for the last -CostDays days (Cost Management API) |
+| Operations | `AzureDevOps` | ADO\ folder: organizations, projects, repositories, branch policies, pipelines, service connections, pipeline secrets, agents, users, processes (JSON)... | Slow | Standard, Full, Migration, Security | Azure DevOps organizations billed to the subscriptions or named with -AdoOrganization: projects, Git and TFVC repos, branch policies, pipelines (triggers, runs, service connections, environments, variable groups they use), service connections (last use), plain-text secrets, agents, users, feeds and packages, integrations, work items, customized processes |
 | Operations | `AzureDevOpsPipelines` \* | ADO\<organization>\<project>\pipelines\ folder (+ ExportedFile columns) | Slow | Full | Export every Azure DevOps pipeline: YAML files from Azure Repos, pipeline and release definitions as JSON (settings included - opt-in, never with -Mask) |
 | Operations | `AzureDevOpsRepos` \*\* | ADO\<organization>\<project>\repos\ folder (+ ExportedTo columns) | Slow |  | Export the default branch of every Azure DevOps Git repository and every TFVC branch (files, no history; up to -AdoRepoMaxSizeMB each) - only when named, never with -Mask |
 | Operations | `AzureDevOpsPackages` \*\* | ADO\<organization>\<project>\feeds\ folder (+ ExportedTo column in packages.csv) | Slow |  | Download the packages published to Azure Artifacts feeds, Universal Packages with Microsoft ArtifactTool (latest versions, or all with -AdoPackageVersions All; up to -AdoPackagesMaxMB) - only when named, never with -Mask |
@@ -208,7 +215,7 @@ resource files) are written only when there is something to list: no ExpressRout
 
 **Every run also writes:**
 - `summary.html`
-- `findings.csv`: about 48 checks with severity, count, recommendation and a Microsoft Learn link.
+- `findings.csv`: about 60 checks with severity, count, recommendation and a Microsoft Learn link.
 - `coverage.csv`: what was collected, skipped (and why) or not selected.
 - `yyyyMMdd-HHmmss__run.json`: timings, API calls, versions.
 - `yyyyMMdd-HHmmss__general_log.txt` (same time as the folder name): everything the run reported, written line by
@@ -223,7 +230,10 @@ resource files) are written only when there is something to list: no ExpressRout
 | `PrivateIP`, `PublicIP`, `vnet`, `subnet`, `vnetDNS`, `vnicDNS`, `linkedPrivDNSzones`, `NicNSG`, `SubnetNSG`, `ASG`, `RouteTable` | Networking of VMs, NICs and VNets, joined by resource ID across resource groups and subscriptions. |
 | `DiagStatus` | `Configured`, `NotConfigured`, `NotSupported` or `Error`. |
 | `PolicyNonCompliant` | Number of non-compliant policy states of the resource. |
-| `Cost` | Actual cost for the last `-CostDays` days, when the Cost report is selected. |
+| `Cost` | Actual cost for the last `-CostDays` days, when the Cost report is selected (`costByResourceGroup.csv` adds them up per resource group). |
+| `LastDeployment`, `LastDeploymentTime` | The newest ARM deployment (Bicep, ARM template, or a tool that deploys templates) that created or updated the resource; for a resource group, the newest deployment in it. From the `Deployments` report, which also writes `deployments.csv`. An empty value proves nothing: Terraform, the CLI and most portal changes leave no deployment record, and Azure keeps at most 800 deployments per resource group. |
+| `IacTags` | Tags from `-IacTagNames`, for example `managed-by=terraform`. |
+| `MissingTags` | The `-RequiredTags` the resource or resource group does not have (its own tags; inherited ones do not count). |
 
 `crossReferences.csv` lists resources that point to resources in other resource groups or subscriptions. These must
 move together. `tenantTransferImpact.csv` lists what breaks when a subscription moves to another Microsoft Entra
@@ -295,22 +305,30 @@ ADO\
 | File (in `ADO\<organization>\`) | Content |
 |---|---|
 | `projects.csv` | Visibility (public projects are a finding), process, Git or TFVC, last update, counts |
-| `repositories.csv` | Git repositories: size, default branch, last commit, branch policies on the default branch |
+| `repositories.csv` | Git repositories: size, default branch, last commit, branch policies on the default branch, the pipelines that build it |
+| `branchPolicies.csv` | One row per branch policy and branch: reviewers, build validation, comment resolution, merge types (numbers and flags only) |
 | `tfvc.csv` | TFVC branches (or the whole `$/<project>` when it has no branches): parent, owner, created, last changeset, files, size, pipelines that map them |
-| `pipelines.csv`, `releasePipelines.csv` | YAML or classic, repository source, agent pool, last run and result |
-| `serviceConnections.csv` | Type, authentication (workload identity federation or secret), Azure subscription, identity, secret expiry, Azure roles |
+| `pipelines.csv` | YAML or classic; how it starts (CI, PR, schedule, pipeline completion, manual); repository and whether it still exists; agent pool; last run; runs, failures, average duration and who started the last run in the last 90 days; the service connections, Azure subscriptions, environments, variable groups and secure files it uses |
+| `releasePipelines.csv` | Classic release pipelines: stages, last release, service connections and Azure subscriptions |
+| `serviceConnections.csv` | Type, authentication (workload identity federation or secret), Azure subscription, identity, secret expiry, Azure roles; last use and the pipelines that used it (from the last 100 uses); open to all pipelines or the number of pipelines allowed |
 | `agentPools.csv`, `agents.csv` | Microsoft-hosted, self-hosted, scale set and Managed DevOps Pools; agent version, status, last job, matching Azure VM |
-| `users.csv`, `admins.csv` | License, origin (Entra, Microsoft account), guest, last access; administrator group members |
-| `variableGroups.csv`, `secureFiles.csv` | Variable names and secret flags, Key Vault links, files to re-upload |
-| `environments.csv`, `deploymentGroups.csv` | Deployment targets, approvals and checks, target machines |
+| `users.csv`, `admins.csv` | License, origin (Entra, Microsoft account), guest, domain, external, last access; administrator group members |
+| `variableGroups.csv`, `secureFiles.csv` | Variable names and secret flags, Key Vault links, files to re-upload; the pipelines that may use them, or open to all pipelines |
+| `pipelineSecrets.csv` | Variables named like secrets (password, token, key...) but not marked secret, variables written into YAML files, and lines of YAML files and classic steps that seem to contain a password or key: names, line numbers and step names only |
+| `environments.csv`, `deploymentGroups.csv` | Deployment targets, approvals and checks, the pipelines that deployed and when; target machines |
 | `extensions.csv`, `serviceHooks.csv` | Marketplace extensions, integrations (target host only) |
 | `feeds.csv`, `feedPermissions.csv` | Azure Artifacts feeds: published and upstream-cached packages, protocols, last publish, upstream sources, views, retention; who has which feed role |
 | `packages.csv` | One row per package version: protocol, latest, listed, views, published or cached from an upstream source, publish date, downloads and last download of the package |
-| `workItems.csv`, `processes.csv` | Work item counts per project and type, custom processes |
+| `workItems.csv`, `processes.csv` | Work item counts per project and type; processes with their customized work item types, fields and states, and `processes\<process>.json` for each customized process (not with `-Mask`) |
 
-Secret values are never read. Variable groups list only variable names and whether they are secret. Service hooks keep
-only the target host, because hook URLs can carry tokens. Agent capabilities (the agent's environment variables) are
-not exported.
+Secret values are never read into a report. Variable groups and `pipelineSecrets.csv` list only names. Service hooks
+keep only the target host, because hook URLs can carry tokens. Agent capabilities (the agent's environment variables)
+are not exported.
+
+Triggers, variable groups and secrets in YAML files come from the main YAML file of each pipeline, read line by line:
+templates are not followed and runtime values are not known. Treat these columns as a good first look. Which
+pipelines may use a resource comes from Azure DevOps pipeline permissions (YAML pipelines); classic release pipelines
+are not checked.
 
 **Pipeline export (opt-in).** Add the `AzureDevOpsPipelines` report to also export every pipeline to
 `ADO\<organization>\<project>\pipelines\<pipeline folder>\`:
@@ -433,7 +451,8 @@ rights on the app (Website Contributor or more). With Reader each app is listed 
 | Child resources (`ChildResources`) | **Reader**. Lists that are refused or do not exist for a resource are counted in `childResourceTypes.csv`; a type that is refused three times is not asked again. |
 | Objects at management groups without subscriptions | Reader at those management groups (Reader on the root management group covers it). |
 | Cost | Cost Management Reader. Not available for some offer types; the report says so and continues. |
-| Azure DevOps | A member of the organization. Areas your account cannot read (for example users or secure files) are listed in `coverage.csv` and the organization row. |
+| Azure DevOps | A member of the organization. Areas your account cannot read (for example users, secure files, the uses of a service connection or pipeline permissions) are listed in `coverage.csv` and the organization row. |
+| ARM deployment history (`Deployments`) | **Reader**. One call per resource group; a resource group that is refused is named in `coverage.csv`. |
 | Azure Artifacts feeds | Reader on a feed lists its packages, download counts and settings, and downloads the packages. Feed permissions (`feedPermissions.csv`) are readable by feed owners; with a lower role the organization row says so. |
 | App code (`AppCode`) | Publish rights on the apps (Website Contributor or more). |
 

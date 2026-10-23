@@ -1,3 +1,4 @@
-﻿"Organization","Projects","VariableGroup","VariableGroupId","Type","KeyVault","ServiceConnection","Variables","SecretVariables","VariableNames","CreatedBy","ModifiedOn"
-"contoso-ado","Web Shop","webshop-settings","1","Library","","","2","1","ApiUrl; DbPassword","Alex Admin","2026-08-01T00:00:00Z"
-"contoso-ado","Web Shop","kv-secrets","2","Key Vault","kv-contoso","Contoso Prod (WIF)","1","1","sql-password","Alex Admin","2026-08-01T00:00:00Z"
+﻿"Organization","Projects","VariableGroup","VariableGroupId","Type","KeyVault","ServiceConnection","Variables","SecretVariables","VariableNames","CreatedBy","ModifiedOn","OpenToAllPipelines","AuthorizedPipelines","PipelineNames"
+"contoso-ado","Web Shop","webshop-settings","1","Library","","","2","1","ApiUrl; DbPassword","Alex Admin","2026-08-01T00:00:00Z","False","1","webshop-ci"
+"contoso-ado","Web Shop","kv-secrets","2","Key Vault","kv-contoso","Contoso Prod (WIF)","1","1","sql-password","Alex Admin","2026-08-01T00:00:00Z","True","0",""
+"contoso-ado","Web Shop","legacy-settings","3","Library","","","1","0","AdminPwd","Former Dev","2022-01-01T00:00:00Z","False","0",""

@@ -192,7 +192,7 @@ Test-Case 'general log yyyyMMdd-HHmmss__general_log.txt in the run folder has ev
     Assert-True ($bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) 'UTF-8 BOM'
     $text = [IO.File]::ReadAllText($path)
     Assert-Equal ([string]::Join("`r`n", $run.Log) + "`r`n") $text
-    Assert-Match $text 'INFO +azure2csv 2\.0\.0 '
+    Assert-Match $text ('INFO +azure2csv ' + [regex]::Escape($script:A2CVersion) + ' ')
     Assert-Match $text 'INFO +Reports \(2\): Resources, Tags'
     Assert-Match $text 'OK +Done in '
 }
@@ -285,7 +285,7 @@ Test-Case 'CSV formula-injection guard and cell truncation' {
 Test-Case 'yyyyMMdd-HHmmss__run.json is valid and lists files and API calls' {
     Assert-False (Test-Path ([IO.Path]::Combine($run.OutDir, 'run.json'))) 'old name run.json still written'
     $j = Get-Content -Raw -Encoding UTF8 ([IO.Path]::Combine($run.OutDir, $run.RunStamp + '__run.json')) | ConvertFrom-Json
-    Assert-Equal '2.0.0' $j.version
+    Assert-Equal $script:A2CVersion $j.version
     Assert-True ($j.apiCalls.arg -gt 0)
     Assert-True (@($j.files).Count -ge 5)
 }
@@ -733,7 +733,86 @@ Test-Case 'cost per resource: 429 retried, nextLink paging, unsupported offer is
     $cc = $cov | Where-Object { $_.Area -like 'Cost*' }
     Assert-Equal 'Partial' $cc.Status
     Assert-Match $cc.Detail 'Contoso Development'
+    # cost per resource group: the same total as cost.csv, costs not tied to a resource without a resource group
+    $byRg = @(Import-TWCsv $run4 'costByResourceGroup.csv')
+    Assert-Equal ([math]::Round((($c | Measure-Object -Property Cost -Sum).Sum), 2)) ([math]::Round((($byRg | Measure-Object -Property Cost -Sum).Sum), 2)) 'totals'
+    Assert-True ([double](($byRg | Where-Object ResourceGroup -eq 'rg-app').Cost) -ge 123.46) 'rg-app includes vm-app01'
+    Assert-Equal 1 @($byRg | Where-Object ResourceGroup -eq '(no resource group)').Count 'unassigned costs'
+    Assert-True ([double]$byRg[0].Cost -ge [double]$byRg[$byRg.Count - 1].Cost) 'highest cost first'
     Assert-True ($run4.Stats.Throttled -ge 1) 'throttle not recorded'
+}
+
+Test-Case 'Deployments: ARM deployment history per resource group and the newest deployment of each resource; no parameter values or SAS tokens' {
+    $r = Invoke-TWRun -Params @{ Reports = @('Resources', 'Deployments') }
+    Assert-Equal 0 $r.Errors.Count ($r.Errors -join ' | ')
+    $d = @(Import-TWCsv $r 'deployments.csv')
+    Assert-Equal 'main-20260901,vm-app01-20250101,network-20240301' (($d | ForEach-Object { $_.Deployment }) -join ',') 'newest first per resource group'
+    $main = $d | Where-Object Deployment -eq 'main-20260901'
+    Assert-Equal 'https://contosotemplates.blob.core.windows.net/t/main.json' $main.TemplateLink 'query string (SAS token) cut off'
+    Assert-Equal '91' $main.DurationSeconds; Assert-Equal '2' $main.Resources; Assert-Equal 'Succeeded' $main.State; Assert-Equal '2026-09-01T10:00:00Z' $main.Timestamp
+    Assert-Match ($d | Where-Object Deployment -eq 'vm-app01-20250101').Error '^DeploymentFailed: At least one resource'
+    Assert-Match ($d | Where-Object Deployment -eq 'network-20240301').TemplateSpec 'templateSpecs/network/versions/1\.0$'
+    $all = Import-TWCsv $r 'allResources.csv'
+    $vm = $all | Where-Object { $_.Name -eq 'vm-app01' -and $_.RowType -eq 'Resource' }
+    Assert-Equal 'main-20260901' $vm.LastDeployment; Assert-Equal '2026-09-01T10:00:00Z' $vm.LastDeploymentTime
+    Assert-Equal 'network-20240301' ($all | Where-Object { $_.Name -eq 'vnet-hub' -and $_.RowType -eq 'Resource' }).LastDeployment 'IDs compared without case'
+    Assert-Equal 'main-20260901' ($all | Where-Object { $_.Name -eq 'rg-app' -and $_.RowType -eq 'ResourceGroup' }).LastDeployment 'newest deployment in a resource group'
+    Assert-Equal '' ($all | Where-Object { $_.Name -eq 'rg-empty' -and $_.RowType -eq 'ResourceGroup' }).LastDeployment
+    foreach ($f in @(Get-ChildItem -LiteralPath $r.OutDir -Recurse -File)) {
+        $t = [IO.File]::ReadAllText($f.FullName)
+        foreach ($s in @('Example-Not-A-Secret', 'SASSIG99')) { Assert-True ($t.IndexOf($s) -lt 0) ('{0} in {1}' -f $s, $f.Name) }
+    }
+    Assert-Equal 7 @($global:TWRequests | Where-Object { $_.Uri -match '/providers/Microsoft\.Resources/deployments\?api-version=2025-04-01' }).Count 'one call per resource group'
+    Assert-Equal '3' ((Import-TWCsv $r 'coverage.csv') | Where-Object Area -eq 'ARM deployment history').Items
+}
+
+Test-Case 'Galleries: image definitions, versions (latest, end of life) and Image Builder templates; findings RET-04, SEC-20, OPS-01' {
+    Reset-TWState
+    Add-TWGalleryFixtures
+    $r = Invoke-TWRun -Params @{ Reports = @('Galleries') } -KeepWorld
+    Assert-Equal 0 $r.Errors.Count ($r.Errors -join ' | ')
+    $img = @(Import-TWCsv $r 'galleryImages.csv')
+    Assert-Equal 1 $img.Count
+    foreach ($k in @{ Gallery = 'gal_contoso'; Image = 'win2022-hardened'; OsType = 'Windows'; HyperVGeneration = 'V2'; Publisher = 'Contoso'; Sku = '2022-hardened'; Versions = '3'
+            LatestVersion = '1.1.0'; LatestPublished = '2026-02-01T00:00:00Z'; DaysSinceLatest = '240' }.GetEnumerator()) {
+        Assert-Equal $k.Value $img[0].($k.Key) ('image ' + $k.Key)
+    }
+    $v = Import-TWCsv $r 'galleryImageVersions.csv'
+    $v1 = $v | Where-Object Version -eq '1.0.0'
+    Assert-Equal '2026-06-30T00:00:00Z' $v1.EndOfLife; Assert-Equal 'West Europe (2); North Europe (1)' $v1.TargetRegions; Assert-Equal $global:TW.Ids.VmApp $v1.Source
+    Assert-Equal 'True' ($v | Where-Object Version -eq '2.0.0').ExcludeFromLatest 'excluded from latest'
+    $t = @(Import-TWCsv $r 'imageTemplates.csv')
+    foreach ($k in @{ SourceType = 'PlatformImage'; SourcePlatform = 'MicrosoftWindowsServer:WindowsServer:2022-datacenter-azure-edition:latest'; Distribute = 'SharedImage:win2022-run'
+            VmSize = 'Standard_D2s_v5'; BuildTimeoutMinutes = '120'; LastRunState = 'Failed'; LastRunSubState = 'Customizing'; LastRunMessage = 'Customizer failed: exit code 1'; IdentityType = 'UserAssigned' }.GetEnumerator()) {
+        Assert-Equal $k.Value $t[0].($k.Key) ('template ' + $k.Key)
+    }
+    $f = Import-TWCsv $r 'findings.csv'
+    foreach ($id in @('RET-04', 'SEC-20', 'OPS-01')) { Assert-Equal '1' ($f | Where-Object Id -eq $id).Count $id }
+}
+
+Test-Case '-RequiredTags: missingTags.csv, MissingTags column and GOV-08 (names without case); IacTags from -IacTagNames' {
+    Reset-TWState
+    foreach ($x in $global:TW.Arg['resources']) {
+        if ($x.name -eq 'vm-dev01') { $x.tags = [ordered]@{ 'Managed-By' = 'terraform'; owner = 'dev team' }; $x.tagsJson = ConvertTo-Json -Compress -InputObject $x.tags }
+    }
+    $r = Invoke-TWRun -Params @{ Reports = @('Resources', 'Tags'); RequiredTags = @('OWNER, Cost Center') } -KeepWorld
+    Assert-Equal 0 $r.Errors.Count ($r.Errors -join ' | ')
+    Assert-Equal 'OWNER|Cost Center' ($r.Options.RequiredTags -join '|') 'a comma list in one value'
+    $m = Import-TWCsv $r 'missingTags.csv'
+    Assert-Equal 'Cost Center' ($m | Where-Object { $_.Resource -eq 'rg-app' }).MissingTags 'owner counts for OWNER'
+    Assert-Equal 'OWNER; Cost Center' ($m | Where-Object { $_.Resource -eq 'rg-network' }).MissingTags
+    Assert-Equal 'Microsoft.Resources/resourceGroups' ($m | Where-Object { $_.Resource -eq 'rg-network' }).ResourceType
+    Assert-Equal 'Cost Center' ($m | Where-Object { $_.Resource -eq 'vm-dev01' }).MissingTags
+    $all = Import-TWCsv $r 'allResources.csv'
+    Assert-Equal 'Cost Center' ($all | Where-Object { $_.Name -eq 'rg-app' -and $_.RowType -eq 'ResourceGroup' }).MissingTags
+    $dev = $all | Where-Object { $_.Name -eq 'vm-dev01' -and $_.RowType -eq 'Resource' }
+    Assert-Equal 'Cost Center' $dev.MissingTags; Assert-Equal 'Managed-By=terraform' $dev.IacTags 'default IaC tag names, any case'
+    $f = (Import-TWCsv $r 'findings.csv') | Where-Object Id -eq 'GOV-08'
+    Assert-Equal ([string]@($m).Count) $f.Count
+    Assert-Match $f.Detail '^missing: Cost Center \('
+    $script:A2C.Options.IacTagNames = @('deployment-tool')
+    Assert-Equal 'Deployment-Tool=bicep' (Get-A2CIacTags ([pscustomobject]@{ 'Deployment-Tool' = 'bicep'; 'managed-by' = 'x' })) 'own tag names replace the defaults (shown as written on the resource)'
+    Assert-Equal 'owner|Cost Center' ((Split-A2CTagNameList @('owner', 'OWNER; Cost Center')) -join '|') 'duplicates in another case are dropped; names keep their spaces'
 }
 
 Test-Case 'runbook export writes files and flags Run As usage' {
@@ -1609,7 +1688,7 @@ Test-Case 'Azure DevOps: organizations from Azure billing and -AdoOrganization; 
     Assert-Equal 'Listed only' $arch.Status; Assert-Equal 'Connected to the tenant' $arch.Source; Assert-Equal 'former.dev@contoso.com' $arch.Owner
     Assert-Equal '' $arch.Projects
     Assert-Equal 0 @($global:TWRequests | Where-Object { $_.Uri -match 'contoso-archive' }).Count 'listed organizations are not queried'
-    foreach ($k in @{ Projects = 2; Repositories = 3; Pipelines = 3; ReleasePipelines = 1; ServiceConnections = 3; SelfHostedAgents = 2; Users = 4; PaidUsers = 3; Extensions = 2; Feeds = 2; WorkItems = 175 }.GetEnumerator()) {
+    foreach ($k in @{ Projects = 2; Repositories = 3; Pipelines = 4; ReleasePipelines = 1; ServiceConnections = 3; SelfHostedAgents = 2; Users = 4; PaidUsers = 3; Extensions = 2; Feeds = 2; WorkItems = 175 }.GetEnumerator()) {
         Assert-Equal $k.Value $c.($k.Key) $k.Key
     }
     Assert-Match $c.Detail 'secure files of Legacy App: HTTP 403'
@@ -1698,7 +1777,7 @@ Test-Case 'Azure DevOps: variable groups never hold values, hooks keep only the 
     Assert-Equal 'hooks.slack.com' $h[0].TargetHost; Assert-Equal 'Web Shop' $h[0].Project
     foreach ($f in @(Get-ChildItem -LiteralPath $run8.OutDir -Recurse -File)) {
         $t = [IO.File]::ReadAllText($f.FullName)
-        foreach ($secret in @('v1-secretish', 'SECRETTOKEN42', 'do-not-export')) { Assert-True ($t.IndexOf($secret) -lt 0) ('{0} in {1}' -f $secret, $f.Name) }
+        foreach ($secret in @('v1-secretish', 'SECRETTOKEN42', 'do-not-export', 'Example-Not-A-Secret', 'notreal-example')) { Assert-True ($t.IndexOf($secret) -lt 0) ('{0} in {1}' -f $secret, $f.Name) }
     }
 }
 
@@ -1767,22 +1846,133 @@ Test-Case 'Azure DevOps TFVC: every branch with files, size, last changeset and 
     Assert-Equal 0 @($global:TWRequests | Where-Object { $_.Uri -match '/b1b1b1b1-0000-0000-0000-000000000001/_apis/tfvc/' }).Count 'TFVC calls for the Git project'
 }
 
-Test-Case 'Azure DevOps findings ADO-01 to ADO-07' {
-    $f = Import-TWCsv $run8 'findings.csv'
-    foreach ($x in @(@('ADO-01', 1), @('ADO-02', 1), @('ADO-03', 1), @('ADO-04', 1), @('ADO-05', 3), @('ADO-06', 2), @('ADO-07', 1))) {
-        Assert-Equal $x[1] ($f | Where-Object Id -eq $x[0]).Count $x[0]
+Test-Case 'Azure DevOps pipelines: trigger, runs of 90 days, service connections and subscriptions, environments, variable groups, secure files' {
+    $pl = Import-TWCsv $run8 'ADO/contoso-ado/pipelines.csv'
+    $ci = $pl | Where-Object Pipeline -eq 'webshop-ci'
+    foreach ($k in @{ Trigger = 'CI; Schedule'; Runs90d = '3'; Failed90d = '1'; AvgDurationMin = '10'; LastRequestedBy = 'Alex Admin'; ServiceConnections = 'Contoso Prod (WIF)'
+            AzureSubscriptions = 'Contoso Production'; Environments = 'Production'; VariableGroups = 'webshop-settings'; SecureFiles = 'signing.pfx'; RepositoryExists = 'True' }.GetEnumerator()) {
+        Assert-Equal $k.Value $ci.($k.Key) ('webshop-ci ' + $k.Key)
     }
+    $cl = $pl | Where-Object Pipeline -eq 'webshop-classic'
+    Assert-Equal 'Schedule' $cl.Trigger; Assert-Equal 'contoso-github' $cl.ServiceConnections; Assert-Equal '0' $cl.Runs90d; Assert-Equal '' $cl.RepositoryExists 'GitHub repository: not checked'
+    $old = $pl | Where-Object Pipeline -eq 'webshop-old'
+    Assert-Equal 'False' $old.RepositoryExists; Assert-Equal 'YAML not read' $old.Trigger
+    Assert-Equal 'Manual' ($pl | Where-Object Pipeline -eq 'legacy-build').Trigger
+    $rel = @(Import-TWCsv $run8 'ADO/contoso-ado/releasePipelines.csv')
+    Assert-Equal 'Contoso Prod (WIF)' $rel[0].ServiceConnections; Assert-Equal 'Contoso Production' $rel[0].AzureSubscriptions
+    $calls = @($global:TWRequests | Where-Object { $_.Kind -eq 'ado' } | ForEach-Object { $_.Uri })
+    Assert-True (@($calls | Where-Object { $_ -match 'b1b1b1b1-0000-0000-0000-000000000001/_apis/build/builds\?minTime=2026-07-01T00%3A00%3A00Z&queryOrder=finishTimeDescending&\$top=1000&api-version=7\.1$' }).Count -eq 1) 'runs since 90 days before the run'
+    Assert-True (@($calls | Where-Object { $_ -match '_apis/build/builds\?.*continuationToken=page2' }).Count -eq 1) 'second page of runs from the x-ms-continuationtoken header'
+    Assert-Match ((Import-TWCsv $run8 'ADO/organizations.csv') | Where-Object Organization -eq 'contoso-ado').Detail 'YAML files: 1 of 2 not readable'
 }
 
-Test-Case 'Azure DevOps files: organizations.csv in ADO\, the other 21 in one folder per collected organization' {
+Test-Case 'Azure DevOps usage: service connections (last use), variable groups, secure files and environments (who may use them)' {
+    $s = Import-TWCsv $run8 'ADO/contoso-ado/serviceConnections.csv'
+    $wif = $s | Where-Object ServiceConnection -eq 'Contoso Prod (WIF)'
+    foreach ($k in @{ LastUsed = '2026-09-28T10:11:00Z'; DaysSinceLastUsed = '0'; RecentUses = '2'; UsedBy = 'webshop-ci; webshop-release'; OpenToAllPipelines = 'False'; AuthorizedPipelines = '2' }.GetEnumerator()) {
+        Assert-Equal $k.Value $wif.($k.Key) ('WIF ' + $k.Key)
+    }
+    $spn = $s | Where-Object ServiceConnection -eq 'Legacy SPN'
+    Assert-Equal '0' $spn.RecentUses 'read, no use recorded'; Assert-Equal '' $spn.LastUsed; Assert-Equal 'True' $spn.OpenToAllPipelines
+    Assert-Equal '577' ($s | Where-Object ServiceConnection -eq 'contoso-github').DaysSinceLastUsed
+    $vg = Import-TWCsv $run8 'ADO/contoso-ado/variableGroups.csv'
+    $ws = $vg | Where-Object VariableGroup -eq 'webshop-settings'
+    Assert-Equal 'False' $ws.OpenToAllPipelines; Assert-Equal '1' $ws.AuthorizedPipelines; Assert-Equal 'webshop-ci' $ws.PipelineNames
+    Assert-Equal 'True' ($vg | Where-Object VariableGroup -eq 'kv-secrets').OpenToAllPipelines
+    $ls = $vg | Where-Object VariableGroup -eq 'legacy-settings'
+    Assert-Equal 'False' $ls.OpenToAllPipelines; Assert-Equal '0' $ls.AuthorizedPipelines; Assert-Equal '' $ls.PipelineNames
+    $sf = @(Import-TWCsv $run8 'ADO/contoso-ado/secureFiles.csv')
+    Assert-Equal '0' $sf[0].AuthorizedPipelines; Assert-Equal 'webshop-ci' $sf[0].PipelineNames 'named in the YAML file'
+    $env = @(Import-TWCsv $run8 'ADO/contoso-ado/environments.csv')
+    Assert-Equal 'webshop-ci' $env[0].DeployedBy; Assert-Equal '2026-09-28T10:11:00Z' $env[0].LastDeployment; Assert-Equal '0' $env[0].DaysSinceLastDeployment
+    $perm = @($global:TWRequests | Where-Object { $_.Uri -match '_apis/pipelines/pipelinepermissions/' })
+    Assert-Equal 9 $perm.Count 'Web Shop: 3 variable groups, 1 secure file, 1 environment, 2 service connections; Legacy App: 2 service connections'
+    Assert-True (@($perm | Where-Object { $_.Uri -notmatch 'api-version=7\.1-preview\.1$' }).Count -eq 0) 'pipeline permissions exist only as preview'
+}
+
+Test-Case 'Azure DevOps pipelineSecrets.csv: variables named like secrets and literal secrets in scripts - names and lines only' {
+    $ps = @(Import-TWCsv $run8 'ADO/contoso-ado/pipelineSecrets.csv')
+    Assert-Equal 6 $ps.Count (($ps | ForEach-Object { $_.Source + ':' + $_.Variable + ':' + $_.Line }) -join ' | ')
+    Assert-Equal 'Pipeline variable' ($ps | Where-Object Variable -eq 'DeployToken').Source
+    $yv = $ps | Where-Object Variable -eq 'StoragePassword'
+    Assert-Equal 'YAML variable' $yv.Source; Assert-Equal '11' $yv.Line; Assert-Equal 'webshop-ci' $yv.Pipeline
+    $sec = $ps | Where-Object { $_.Source -eq 'YAML file' }
+    Assert-Equal '21' $sec.Line; Assert-Equal 'Plain-text value passed to ConvertTo-SecureString' $sec.Issue
+    $steps = @($ps | Where-Object Source -eq 'Classic step')
+    Assert-Equal 'Deploy web; Deploy web' (($steps | ForEach-Object { $_.Step }) -join '; ')
+    Assert-Equal 'Secret-like task input with a literal value' ($steps | Where-Object Variable -eq 'adminPassword').Issue
+    Assert-Equal 'az login with a password on the command line' ($steps | Where-Object Variable -eq 'script').Issue
+    $grp = $ps | Where-Object Source -eq 'Variable group'
+    Assert-Equal 'legacy-settings' $grp.VariableGroup; Assert-Equal 'AdminPwd' $grp.Variable
+    Assert-Equal 0 @($ps | Where-Object { $_.Variable -in @('ApiSecret', 'DbPassword', 'sql-password', 'Region') }).Count 'secret, Key Vault or harmless variables are not listed'
+}
+
+Test-Case 'Azure DevOps: branchPolicies.csv, pipelines per repository, external users, customized process (counts and JSON)' {
+    $bp = @(Import-TWCsv $run8 'ADO/contoso-ado/branchPolicies.csv')
+    Assert-Equal 2 $bp.Count
+    $min = $bp | Where-Object Policy -eq 'Minimum approval count'
+    Assert-Equal 'webshop' $min.Repository; Assert-Equal 'main' $min.Branch; Assert-Equal 'Exact' $min.MatchKind; Assert-Equal 'minimumApproverCount=2' $min.Settings; Assert-Equal 'True' $min.Blocking
+    $b = $bp | Where-Object Policy -eq 'Build'
+    Assert-Equal '(all repositories)' $b.Repository; Assert-Equal '(default branch)' $b.Branch
+    $r = Import-TWCsv $run8 'ADO/contoso-ado/repositories.csv'
+    Assert-Equal 'webshop-ci' ($r | Where-Object Repository -eq 'webshop').PipelineNames; Assert-Equal '0' ($r | Where-Object Repository -eq 'webshop-infra').Pipelines
+    $u = Import-TWCsv $run8 'ADO/contoso-ado/users.csv'
+    $pat = $u | Where-Object User -eq 'pat@fabrikam.com'
+    Assert-Equal 'fabrikam.com' $pat.Domain; Assert-Equal 'True' $pat.External 'guest (no Entra domains in this run)'
+    Assert-Equal 'True' ($u | Where-Object User -eq 'someone@example.org').External 'personal Microsoft account'
+    Assert-Equal 'False' ($u | Where-Object User -eq 'alex.admin@contoso.onmicrosoft.com').External
+    $pr = Import-TWCsv $run8 'ADO/contoso-ado/processes.csv'
+    $ca = $pr | Where-Object Process -eq 'Contoso Agile'
+    foreach ($k in @{ WorkItemTypes = '3'; CustomWorkItemTypes = '1'; CustomFields = '2'; CustomStates = '2'; ExportedFile = 'ADO/contoso-ado/processes/Contoso Agile.json' }.GetEnumerator()) {
+        Assert-Equal $k.Value $ca.($k.Key) ('Contoso Agile ' + $k.Key)
+    }
+    Assert-Equal '' ($pr | Where-Object Process -eq 'Agile').WorkItemTypes 'system processes are not read'
+    $doc = Get-Content -Raw -Encoding UTF8 ([IO.Path]::Combine($run8.OutDir, $ca.ExportedFile)) | ConvertFrom-Json
+    Assert-Equal 'Agile' $doc.process.parent
+    Assert-Equal 'Risk' @($doc.workItemTypes | Where-Object customization -eq 'custom')[0].name
+    Assert-Equal 'Custom.Impact' @(@($doc.workItemTypes | Where-Object name -eq 'Risk')[0].fields | Where-Object required)[0].referenceName
+    Assert-Equal 0 @($global:TWRequests | Where-Object { $_.Uri -match 'workItemTypes/Microsoft\.VSTS\.WorkItemTypes\.Bug/fields' }).Count 'fields only of changed work item types'
+}
+
+Test-Case 'Pipeline YAML reading: triggers, variables (list and mapping form), groups, secure files and literal secrets' {
+    $def = [pscustomobject]@{ triggers = @() }
+    Assert-Equal 'CI' (Get-A2CAdoTrigger $def "steps:`n- script: x" $true 'TfsGit') 'no trigger key: CI on every branch'
+    Assert-Equal 'Manual' (Get-A2CAdoTrigger $def "trigger: none`npr: none`nsteps: []" $true 'GitHub')
+    Assert-Equal 'CI; PR' (Get-A2CAdoTrigger $def "trigger:`n  branches:`n    include: [ main ]" $true 'GitHub') 'GitHub: pull requests start pipelines without a pr key'
+    Assert-Equal 'Manual' (Get-A2CAdoTrigger $def "trigger: none`nschedules: []" $true 'TfsGit') 'an empty schedule list'
+    Assert-Equal 'Pipeline completion' (Get-A2CAdoTrigger $def "trigger: none`nresources:`n  pipelines:`n  - pipeline: build`n    source: app-ci`n    trigger: true" $true 'TfsGit')
+    $over = [pscustomobject]@{ triggers = @([pscustomobject]@{ triggerType = 'continuousIntegration'; settingsSourceType = 1 }, [pscustomobject]@{ triggerType = 'pullRequest'; settingsSourceType = 2 }) }
+    Assert-Equal 'CI' (Get-A2CAdoTrigger $over "trigger: none`npr: none" $true 'GitHub') 'CI overridden in the pipeline settings, PR from the YAML file'
+    Assert-Equal 'YAML not read' (Get-A2CAdoTrigger $def '' $true 'TfsGit')
+    Assert-Equal 'Gated check-in; Pipeline completion' (Get-A2CAdoTrigger ([pscustomobject]@{ triggers = @([pscustomobject]@{ triggerType = 'gatedCheckIn' }, [pscustomobject]@{ triggerType = 'buildCompletion' }) }) '' $false 'TfsVersionControl')
+    $y = "variables:`n  Configuration: Release`n  ClientSecret: abc`nstages:`n- stage: Deploy`n  variables:`n  - group: prod-vars`n  - name: ApiKey`n    value: x`n  - template: vars.yml`n  jobs:`n  - job: A`n    steps:`n    - script: echo"
+    $v = Get-A2CYamlVariables $y
+    Assert-Equal 'Variable:Configuration:2 Variable:ClientSecret:3 Group:prod-vars:7 Variable:ApiKey:8' (($v | ForEach-Object { '{0}:{1}:{2}' -f $_.Kind, $_.Name, $_.Line }) -join ' ')
+    Assert-Equal 'signing.pfx' ((Get-A2CYamlSecureFiles "- task: DownloadSecureFile@1`n  inputs:`n    secureFile: 'signing.pfx'`n- task: DownloadSecureFile@1`n  inputs:`n    secureFile: `$(fileName)") -join ',')
+    $issues = (Get-A2CScriptSecretIssues "az login --service-principal -u app -p `$(secret)`naz login -u me -p Hunter2x`n`$k = ConvertTo-SecureString `$env:PWD -AsPlainText -Force`npassword: 'p4ssw0rd!'")
+    Assert-Equal '2:az login with a password on the command line 4:Possible secret written into a script or input' (($issues | ForEach-Object { '{0}:{1}' -f $_.Line, $_.Issue }) -join ' ')
+}
+
+Test-Case 'Azure DevOps findings ADO-01 to ADO-16' {
+    $f = Import-TWCsv $run8 'findings.csv'
+    foreach ($x in @(@('ADO-01', 1), @('ADO-02', 1), @('ADO-03', 1), @('ADO-04', 1), @('ADO-05', 3), @('ADO-06', 2), @('ADO-07', 1), @('ADO-08', 1), @('ADO-09', 1),
+            @('ADO-10', 1), @('ADO-11', 3), @('ADO-12', 2), @('ADO-13', 1), @('ADO-14', 2), @('ADO-15', 3), @('ADO-16', 3))) {
+        Assert-Equal $x[1] ($f | Where-Object Id -eq $x[0]).Count $x[0]
+    }
+    Assert-Equal '1 service connection(s), 1 variable group(s), 0 secure file(s)' ($f | Where-Object Id -eq 'ADO-12').Detail
+    Assert-Equal '1 variable group(s), 0 secure file(s)' ($f | Where-Object Id -eq 'ADO-13').Detail
+    Assert-Match ($f | Where-Object Id -eq 'ADO-08').Detail '^1 without a commit for a year'
+}
+
+Test-Case 'Azure DevOps files: organizations.csv in ADO\, the other 23 in one folder per collected organization' {
     $ado = [IO.Path]::Combine($run8.OutDir, 'ADO')
     Assert-True (Test-Path ([IO.Path]::Combine($ado, 'organizations.csv'))) 'ADO\organizations.csv'
     Assert-Equal 'contoso-ado' (@(Get-ChildItem -LiteralPath $ado -Directory | ForEach-Object { $_.Name }) -join ',') 'only collected organizations get a folder'
     $files = @(Get-ChildItem -LiteralPath ([IO.Path]::Combine($ado, 'contoso-ado')) -File -Filter *.csv)
-    Assert-Equal 21 $files.Count (($files | ForEach-Object { $_.Name }) -join ',')
+    Assert-Equal 23 $files.Count (($files | ForEach-Object { $_.Name }) -join ',')
     Assert-False (Test-Path ([IO.Path]::Combine($ado, 'projects.csv'))) 'combined files are not written'
-    Assert-Equal 0 @(Get-ChildItem -LiteralPath ([IO.Path]::Combine($ado, 'contoso-ado')) -Directory).Count 'project folders come only with the export reports'
-    Assert-True (@($run8.Log | Where-Object { $_ -match 'ADO/contoso-ado/ +\d+ rows in 21 files' }).Count -eq 1) 'one summary line per organization folder'
+    Assert-Equal 'processes' (@(Get-ChildItem -LiteralPath ([IO.Path]::Combine($ado, 'contoso-ado')) -Directory | ForEach-Object { $_.Name }) -join ',') 'project folders come only with the export reports; customized processes are exported'
+    Assert-True (@($run8.Log | Where-Object { $_ -match 'ADO/contoso-ado/ +\d+ rows in 23 files' }).Count -eq 1) 'one summary line per organization folder'
     $hint = 'Not exported in this run: pipelines \(add AzureDevOpsPipelines to -Reports\), Git and TFVC repositories \(add AzureDevOpsRepos to -Reports\), packages \(add AzureDevOpsPackages to -Reports\)'
     Assert-True (@($run8.Log | Where-Object { $_ -match $hint }).Count -eq 1) 'hint about the export reports'
 }
@@ -1802,7 +1992,8 @@ Test-Case 'AzureDevOpsPipelines exports YAML files and pipeline/release definiti
     Assert-Equal 'ADO/contoso-ado/Web Shop/pipelines/webshop-ci.yml' ($pl | Where-Object Pipeline -eq 'webshop-ci').ExportedFile
     Assert-Equal 'ADO/contoso-ado/Web Shop/pipelines/Legacy/webshop-classic.json' ($pl | Where-Object Pipeline -eq 'webshop-classic').ExportedFile
     Assert-Equal 'ADO/contoso-ado/Web Shop/pipelines/releases/webshop-release.json' @(Import-TWCsv $r 'ADO/contoso-ado/releasePipelines.csv')[0].ExportedFile
-    Assert-Equal '4' ((Import-TWCsv $r 'coverage.csv') | Where-Object Area -eq 'Azure DevOps pipeline export').Items
+    Assert-Equal '5' ((Import-TWCsv $r 'coverage.csv') | Where-Object Area -eq 'Azure DevOps pipeline export').Items
+    Assert-Equal 1 @($global:TWRequests | Where-Object { $_.Uri -match 'c1c1c1c1-0000-0000-0000-000000000001/items\?path=%2Fazure-pipelines\.yml' }).Count 'the YAML file read by the AzureDevOps report is not fetched again'
 }
 
 Test-Case 'AzureDevOpsRepos exports the default branch of each repository to <project>\repos\<repository>' {

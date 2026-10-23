@@ -1,2 +1,2 @@
 ﻿"SubscriptionName","ResourceGroup","Name","Location","Sku","Tier","Frontends","PrivateIPs","PublicIPs","Subnets","BackendPools","Rules","InboundNatRules","OutboundRules","Probes","Zones","Id"
-"sub-f1f4ed23fe","rg-225c940e1b","lb-a4837e4bcd","westeurope","Basic","Regional","0","","","","","0","0","0","","","/subscriptions/3a4139cb-af94-4ac3-a783-d292866430b9/resourceGroups/rg-225c940e1b/providers/Microsoft.Network/loadBalancers/lb-a4837e4bcd"
+"sub-4682304a9f","rg-0cf7984de1","lb-f70bd6316d","westeurope","Basic","Regional","0","","","","","0","0","0","","","/subscriptions/3069eea6-82ae-482b-a6de-fa6573c77b1f/resourceGroups/rg-0cf7984de1/providers/Microsoft.Network/loadBalancers/lb-f70bd6316d"

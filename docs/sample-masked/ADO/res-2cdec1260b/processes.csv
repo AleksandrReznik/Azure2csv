@@ -1,0 +1,3 @@
+﻿"Organization","Process","Type","Parent","IsDefault","Enabled","Projects","ProjectNames","WorkItemTypes","CustomWorkItemTypes","CustomFields","CustomStates","ExportedFile"
+"res-2cdec1260b","Agile","system","","False","True","1","Project 14f7621901","","","","",""
+"res-2cdec1260b","Process ae8ef6d21b","inherited","Agile","True","True","1","Project 9b56ce3f09","3","1","2","2",""

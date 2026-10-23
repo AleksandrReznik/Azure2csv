@@ -1,2 +1,2 @@
 ﻿"SubscriptionName","ResourceGroup","Name","Location","Sku","IdleTimeoutMinutes","PublicIPs","PublicIPPrefixes","Subnets","Zones","Id"
-"sub-f1f4ed23fe","rg-a3be6804c8","ng-a4d4ea83d7","westeurope","Standard","4","","","","","/subscriptions/3a4139cb-af94-4ac3-a783-d292866430b9/resourceGroups/rg-a3be6804c8/providers/Microsoft.Network/natGateways/ng-a4d4ea83d7"
+"sub-4682304a9f","rg-85ccff22f3","ng-e2fa321fc6","westeurope","Standard","4","","","","","/subscriptions/3069eea6-82ae-482b-a6de-fa6573c77b1f/resourceGroups/rg-85ccff22f3/providers/Microsoft.Network/natGateways/ng-e2fa321fc6"

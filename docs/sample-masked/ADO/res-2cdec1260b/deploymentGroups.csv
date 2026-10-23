@@ -1,0 +1,2 @@
+﻿"Organization","Project","DeploymentGroup","Machine","AgentStatus","AgentVersion","Tags","AzureVmId"
+"res-2cdec1260b","Project 9b56ce3f09","Deployment group abc7299a00","vm-8b2a8b938e","online","3.236.1","web","/subscriptions/3069eea6-82ae-482b-a6de-fa6573c77b1f/resourceGroups/rg-47a0f03401/providers/Microsoft.Compute/virtualMachines/vm-8b2a8b938e"

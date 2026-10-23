@@ -1,0 +1,5 @@
+﻿"SubscriptionName","SubscriptionId","ResourceGroup","Cost","Currency","Resources","From","To"
+"sub-4682304a9f","3069eea6-82ae-482b-a6de-fa6573c77b1f","rg-47a0f03401","123.46","EUR","1","2026-08-30","2026-09-28"
+"sub-4682304a9f","3069eea6-82ae-482b-a6de-fa6573c77b1f","rg-9d2043f292","40","EUR","1","2026-08-30","2026-09-28"
+"sub-4682304a9f","3069eea6-82ae-482b-a6de-fa6573c77b1f","rg-0cf7984de1","30.25","EUR","1","2026-08-30","2026-09-28"
+"sub-4682304a9f","3069eea6-82ae-482b-a6de-fa6573c77b1f","rg-9b92fccc0b","5","EUR","1","2026-08-30","2026-09-28"

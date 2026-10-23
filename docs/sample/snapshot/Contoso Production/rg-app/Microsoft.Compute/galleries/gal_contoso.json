@@ -1,0 +1,11 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/galleries/gal_contoso",
+  "name": "gal_contoso",
+  "type": "Microsoft.Compute/galleries",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "description": "Contoso images",
+    "provisioningState": "Succeeded"
+  }
+}

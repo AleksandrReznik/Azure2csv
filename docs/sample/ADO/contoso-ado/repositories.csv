@@ -1,4 +1,4 @@
-﻿"Organization","Project","Repository","RepositoryId","SizeMB","DefaultBranch","LastCommit","DaysSinceLastCommit","Disabled","Fork","BranchPolicies","MinReviewers","BuildValidation","ExportedTo"
-"contoso-ado","Web Shop","webshop","c1c1c1c1-0000-0000-0000-000000000001","50","main","2026-09-20T00:00:00Z","9","False","False","2","2","True",""
-"contoso-ado","Web Shop","webshop-infra","c1c1c1c1-0000-0000-0000-000000000002","1","main","2025-08-01T00:00:00Z","424","False","False","1","","True",""
-"contoso-ado","Legacy App","legacy-code","c1c1c1c1-0000-0000-0000-000000000003","0","master","","","True","False","0","","False",""
+﻿"Organization","Project","Repository","RepositoryId","SizeMB","DefaultBranch","LastCommit","DaysSinceLastCommit","Disabled","Fork","BranchPolicies","MinReviewers","BuildValidation","ExportedTo","Pipelines","PipelineNames"
+"contoso-ado","Web Shop","webshop","c1c1c1c1-0000-0000-0000-000000000001","50","main","2026-09-20T00:00:00Z","9","False","False","2","2","True","","1","webshop-ci"
+"contoso-ado","Web Shop","webshop-infra","c1c1c1c1-0000-0000-0000-000000000002","1","main","2025-08-01T00:00:00Z","424","False","False","1","","True","","0",""
+"contoso-ado","Legacy App","legacy-code","c1c1c1c1-0000-0000-0000-000000000003","0","master","","","True","False","0","","False","","0",""

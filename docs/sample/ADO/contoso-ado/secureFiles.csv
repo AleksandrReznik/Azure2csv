@@ -1,2 +1,2 @@
-﻿"Organization","Project","SecureFile","CreatedBy","CreatedOn","ModifiedOn"
-"contoso-ado","Web Shop","signing.pfx","Alex Admin","2025-01-01T00:00:00Z","2025-01-01T00:00:00Z"
+﻿"Organization","Project","SecureFile","CreatedBy","CreatedOn","ModifiedOn","OpenToAllPipelines","AuthorizedPipelines","PipelineNames"
+"contoso-ado","Web Shop","signing.pfx","Alex Admin","2025-01-01T00:00:00Z","2025-01-01T00:00:00Z","False","0","webshop-ci"

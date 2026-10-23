@@ -1,0 +1,5 @@
+﻿"Organization","Group","Scope","Project","Member","MemberUpn","MemberType","Origin"
+"res-2cdec1260b","Project Collection Administrators","Organization","","User 3596ca7798","u-3f02fda50f@MG ecb132e5c6.onmicrosoft.com","User","Entra ID"
+"res-2cdec1260b","Project Collection Administrators","Organization","","Group 042457580e","","Group","Entra ID"
+"res-2cdec1260b","Project Administrators","Project","Project 9b56ce3f09","User 3596ca7798","u-3f02fda50f@MG ecb132e5c6.onmicrosoft.com","User","Entra ID"
+"res-2cdec1260b","Project Administrators","Project","Project 9b56ce3f09","","","Service principal",""

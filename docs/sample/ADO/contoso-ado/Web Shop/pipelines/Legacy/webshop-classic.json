@@ -4,7 +4,45 @@
   "path": "\\Legacy",
   "queueStatus": "disabled",
   "process": {
-    "type": 1
+    "type": 1,
+    "phases": [
+      {
+        "name": "Agent job 1",
+        "steps": [
+          {
+            "displayName": "Deploy web",
+            "inputs": {
+              "ConnectedServiceName": "d1d1d1d1-0000-0000-0000-000000000003",
+              "adminPassword": "Example-Not-A-Secret-2",
+              "script": "az login -u deploy@contoso.com -p Example-Not-A-Secret-3"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "triggers": [
+    {
+      "triggerType": "schedule",
+      "schedules": [
+        {
+          "startHours": 3,
+          "daysToBuild": "all"
+        }
+      ]
+    }
+  ],
+  "variables": {
+    "DeployToken": {
+      "value": "Example-Not-A-Secret-5"
+    },
+    "Region": {
+      "value": "westeurope"
+    },
+    "ApiSecret": {
+      "isSecret": true,
+      "value": null
+    }
   },
   "repository": {
     "type": "GitHub",

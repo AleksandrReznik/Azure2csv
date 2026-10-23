@@ -1,0 +1,19 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/galleries/gal_contoso/images/win2022-hardened",
+  "name": "win2022-hardened",
+  "type": "Microsoft.Compute/galleries/images",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "osType": "Windows",
+    "osState": "Generalized",
+    "hyperVGeneration": "V2",
+    "architecture": "x64",
+    "identifier": {
+      "publisher": "Contoso",
+      "offer": "WindowsServer",
+      "sku": "2022-hardened"
+    },
+    "provisioningState": "Succeeded"
+  }
+}

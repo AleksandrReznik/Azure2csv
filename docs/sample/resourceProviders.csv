@@ -1,7 +1,7 @@
 ﻿"SubscriptionName","Namespace","RegistrationState","RegistrationPolicy","ResourceTypes","Resources"
 "Contoso Development","Microsoft.Compute","Registered","RegistrationRequired","1","2"
 "Contoso Development","Microsoft.Network","Registered","RegistrationRequired","2","4"
-"Contoso Production","Microsoft.Compute","Registered","RegistrationRequired","1","8"
+"Contoso Production","Microsoft.Compute","Registered","RegistrationRequired","1","13"
 "Contoso Production","Microsoft.KeyVault","Registering","RegistrationRequired","1","1"
 "Contoso Production","Microsoft.Network","Registered","RegistrationRequired","2","19"
 "Contoso Production","Microsoft.Sql","Registered","RegistrationRequired","2","3"

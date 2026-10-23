@@ -1,0 +1,3 @@
+﻿"Organization","Project","Repository","Branch","MatchKind","Policy","Enabled","Blocking","BuildPipeline","Settings","PolicyId"
+"contoso-ado","Web Shop","webshop","main","Exact","Minimum approval count","True","True","","minimumApproverCount=2",""
+"contoso-ado","Web Shop","(all repositories)","(default branch)","DefaultBranch","Build","True","True","","",""

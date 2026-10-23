@@ -380,6 +380,25 @@ function New-TWWorld {
     $w.Locks[$S2] = @()
     $w.ArmRoutes.Add(@{ Method = 'GET'; Pattern = '^/subscriptions/([^/]+)/providers/Microsoft\.Authorization/locks\?'; Handler = { param($path, $body, $m) [ordered]@{ value = @($global:TW.Locks[$m[1]]) } } })
 
+    # ---- deployment history per resource group (ARM); parameter and output values and the SAS token of a template
+    # link must never reach a report
+    $dep = { param($Rg, $Name, $Time, $State, $Out, $Extra)
+        $p = [ordered]@{ provisioningState = $State; timestamp = $Time; duration = 'PT1M31S'; mode = 'Incremental'; correlationId = 'c0c0c0c0-0000-0000-0000-00000000000' + $Name.Length % 10
+            templateHash = '1234567890'; outputResources = @($Out | ForEach-Object { [ordered]@{ id = $_ } })
+            parameters = [ordered]@{ adminUser = [ordered]@{ type = 'String'; value = 'Example-Not-A-Secret-6' }; adminPassword = [ordered]@{ type = 'SecureString' } }
+            outputs = [ordered]@{ connectionString = [ordered]@{ type = 'String'; value = 'Example-Not-A-Secret-7' } } }
+        if ($null -ne $Extra) { foreach ($k in $Extra.Keys) { $p[$k] = $Extra[$k] } }
+        [ordered]@{ id = ('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Resources/deployments/{2}' -f $S1, $Rg, $Name); name = $Name; type = 'Microsoft.Resources/deployments'; properties = $p } }
+    $w.Deployments = @{
+        'rg-app'     = @((& $dep 'rg-app' 'main-20260901' '2026-09-01T10:00:00Z' 'Succeeded' @($vmApp, $aspWeb) @{ templateLink = [ordered]@{ uri = 'https://contosotemplates.blob.core.windows.net/t/main.json?sv=2024-01-01&sig=SASSIG99'; contentVersion = '1.0.0.0' } }),
+            (& $dep 'rg-app' 'vm-app01-20250101' '2025-01-01T00:00:00Z' 'Failed' @($vmApp) @{ error = [ordered]@{ code = 'DeploymentFailed'; message = 'At least one resource deployment operation failed.' } }))
+        'rg-network' = @(& $dep 'rg-network' 'network-20240301' '2024-03-01T08:00:00Z' 'Succeeded' @($vnetHub.ToUpperInvariant()) @{ templateLink = [ordered]@{ id = ('/subscriptions/{0}/resourceGroups/rg-templates/providers/Microsoft.Resources/templateSpecs/network/versions/1.0' -f $S1) } })
+    }
+    $w.ArmRoutes.Add(@{ Method = 'GET'; Pattern = '^/subscriptions/([^/]+)/resourcegroups/([^/]+)/providers/Microsoft\.Resources/deployments\?api-version=2025-04-01'; Handler = {
+                param($path, $body, $m)
+                [ordered]@{ value = @($global:TW.Deployments[[uri]::UnescapeDataString($m[2]).ToLowerInvariant()] | Where-Object { $null -ne $_ }) }
+            } })
+
     # ---- RBAC (ARM) and directory objects (Graph) ------------------------------------------------------------
     $roleIds = @{ Owner = '8e3af657-a8ff-443c-a75c-2fe8c4bcb635'; Contributor = 'b24988ac-6180-42a0-ab88-20f7382dd24c'; Reader = 'acdd72a7-3385-48ef-bd42-f606fba81ae7'; UAA = '18d7d88d-d35e-4fb5-a5c3-7773c20a72d9'; Custom = 'c0c0c0c0-1111-2222-3333-444444444444' }
     $w.RoleIds = $roleIds
@@ -1027,9 +1046,51 @@ function Add-TWAdoFixtures {
                 repository = [ordered]@{ type = 'TfsGit'; name = 'webshop'; id = 'c1c1c1c1-0000-0000-0000-000000000001'; defaultBranch = 'refs/heads/main' }
                 queue = [ordered]@{ name = 'Azure Pipelines'; pool = [ordered]@{ name = 'Azure Pipelines' } }
                 latestCompletedBuild = [ordered]@{ finishTime = '2026-09-28T00:00:00Z'; result = 'succeeded' }; createdDate = '2024-01-10T00:00:00Z'; authoredBy = [ordered]@{ displayName = 'Alex Admin' } }
-            [ordered]@{ id = 12; name = 'webshop-classic'; path = '\Legacy'; queueStatus = 'disabled'; process = [ordered]@{ type = 1 }
+            # classic: a schedule trigger, a plain-text variable named like a secret, a step with a literal password and an
+            # "az login -p" (fake values that must never reach a report)
+            [ordered]@{ id = 12; name = 'webshop-classic'; path = '\Legacy'; queueStatus = 'disabled'
+                process = [ordered]@{ type = 1; phases = @([ordered]@{ name = 'Agent job 1'; steps = @([ordered]@{ displayName = 'Deploy web'
+                                    inputs = [ordered]@{ ConnectedServiceName = 'd1d1d1d1-0000-0000-0000-000000000003'; adminPassword = 'Example-Not-A-Secret-2'; script = 'az login -u deploy@contoso.com -p Example-Not-A-Secret-3' } }) }) }
+                triggers = @([ordered]@{ triggerType = 'schedule'; schedules = @([ordered]@{ startHours = 3; daysToBuild = 'all' }) })
+                variables = [ordered]@{ DeployToken = [ordered]@{ value = 'Example-Not-A-Secret-5' }; Region = [ordered]@{ value = 'westeurope' }; ApiSecret = [ordered]@{ isSecret = $true; value = $null } }
                 repository = [ordered]@{ type = 'GitHub'; name = 'contoso/webshop' }; queue = [ordered]@{ name = 'Default'; pool = [ordered]@{ name = 'Default' } }
-                latestBuild = [ordered]@{ finishTime = '2025-03-01T00:00:00Z'; result = 'failed' }; createdDate = '2020-05-01T00:00:00Z'; authoredBy = [ordered]@{ displayName = 'Former Dev' } }) }
+                latestBuild = [ordered]@{ finishTime = '2025-03-01T00:00:00Z'; result = 'failed' }; createdDate = '2020-05-01T00:00:00Z'; authoredBy = [ordered]@{ displayName = 'Former Dev' } }
+            # YAML pipeline whose repository was deleted: never ran, YAML not readable
+            [ordered]@{ id = 14; name = 'webshop-old'; path = '\'; queueStatus = 'disabled'; process = [ordered]@{ type = 2; yamlFilename = '/azure-pipelines.yml' }
+                repository = [ordered]@{ type = 'TfsGit'; name = 'webshop-old'; id = 'c1c1c1c1-0000-0000-0000-000000000009'; defaultBranch = 'refs/heads/main' }
+                queue = [ordered]@{ name = 'Azure Pipelines'; pool = [ordered]@{ name = 'Azure Pipelines' } }; createdDate = '2023-01-01T00:00:00Z'; authoredBy = [ordered]@{ displayName = 'Former Dev' } }) }
+    # the main YAML file of webshop-ci (line 11: a variable named like a secret; line 21: a literal ConvertTo-SecureString)
+    $a.MainYaml = "trigger:`n- main`nschedules:`n- cron: '0 3 * * *'`n  branches:`n    include: [ main ]`npool:`n  vmImage: ubuntu-latest`nvariables:`n" +
+        "- group: webshop-settings`n- name: StoragePassword`n  value: notreal-example`n- name: buildConfiguration`n  value: Release`nsteps:`n" +
+        "- task: DownloadSecureFile@1`n  inputs:`n    secureFile: signing.pfx`n- script: dotnet build`n- powershell: |`n" +
+        "    `$p = ConvertTo-SecureString 'Example-Not-A-Secret-1' -AsPlainText -Force`n  displayName: sign`n"
+    # runs of the last 90 days (two pages), uses of the service connections, deployments to Production
+    $run = { param($Id, $Def, $Name, $Result, $Start, $Finish, $By) [ordered]@{ id = $Id; definition = [ordered]@{ id = $Def; name = $Name }; result = $Result; status = 'completed'
+            startTime = $Start; finishTime = $Finish; requestedFor = [ordered]@{ displayName = $By } } }
+    $a.Builds = @{ $P1 = @((& $run 101 11 'webshop-ci' 'succeeded' '2026-09-28T10:00:00Z' '2026-09-28T10:12:00Z' 'Alex Admin'),
+            (& $run 100 11 'webshop-ci' 'failed' '2026-09-20T10:00:00Z' '2026-09-20T10:08:00Z' 'Alex Admin'),
+            (& $run 99 11 'webshop-ci' 'succeeded' '2026-08-01T10:00:00Z' '2026-08-01T10:10:00Z' 'Former Dev')) }
+    $use = { param($Id, $Plan, $Def, $Name, $Finish) [ordered]@{ id = $Id; planType = $Plan; definition = [ordered]@{ id = $Def; name = $Name }; owner = [ordered]@{ id = 1; name = 'run' }
+            startTime = $Finish; finishTime = $Finish; result = 'succeeded' } }
+    $a.EndpointHistory = @{ $E1 = @((& $use 501 'Build' 11 'webshop-ci' '2026-09-28T10:11:00Z'), (& $use 502 'Release' 5 'webshop-release' '2026-06-01T10:00:00Z'))
+        'd1d1d1d1-0000-0000-0000-000000000003' = @(& $use 503 'Build' 12 'webshop-classic' '2025-03-01T00:00:00Z'); 'd1d1d1d1-0000-0000-0000-000000000002' = @() }
+    $a.EnvDeployments = @{ '1' = @([ordered]@{ id = 801; definition = [ordered]@{ id = 11; name = 'webshop-ci' }; planType = 'Build'; result = 'succeeded'; stageName = 'Deploy'; jobName = 'DeployWeb'
+                finishTime = '2026-09-28T10:11:00Z' }) }
+    # pipeline permissions ("<type>|<project>|<id>"): kv-secrets and Legacy SPN are open to all pipelines; legacy-settings to none
+    $a.PipelinePermissions = @{ ('variablegroup|' + $P1 + '|1') = @{ Pipelines = @(11) }; ('variablegroup|' + $P1 + '|2') = @{ All = $true }
+        ('securefile|' + $P1 + '|s1') = @{}; ('environment|' + $P1 + '|1') = @{ Pipelines = @(11) }; ('endpoint|' + $P1 + '|' + $E1) = @{ Pipelines = @(11) }
+        ('endpoint|' + $P2 + '|' + $E1) = @{ Pipelines = @(13) }; ('endpoint|' + $P2 + '|d1d1d1d1-0000-0000-0000-000000000002') = @{ All = $true } }
+    # the customized process Contoso Agile: an inherited, changed User Story, a new Risk type, an unchanged Bug
+    $CA = 'e0e0e0e0-0000-0000-0000-000000000001'
+    $a.ProcessTypes = @{ $CA = @(
+            [ordered]@{ referenceName = 'ContosoAgile.UserStory'; name = 'User Story'; customization = 'inherited'; inherits = 'Microsoft.VSTS.WorkItemTypes.UserStory'; isDisabled = $false; color = '009CCC'
+                states = @([ordered]@{ name = 'New'; stateCategory = 'Proposed'; customizationType = 'system' }, [ordered]@{ name = 'Ready for QA'; stateCategory = 'InProgress'; customizationType = 'custom' }) }
+            [ordered]@{ referenceName = 'ContosoAgile.Risk'; name = 'Risk'; customization = 'custom'; isDisabled = $false; color = 'CC293D'
+                states = @([ordered]@{ name = 'Open'; stateCategory = 'Proposed'; customizationType = 'custom' }) }
+            [ordered]@{ referenceName = 'Microsoft.VSTS.WorkItemTypes.Bug'; name = 'Bug'; customization = 'system'; isDisabled = $false; states = @() }) }
+    $a.ProcessFields = @{ 'ContosoAgile.UserStory' = @([ordered]@{ referenceName = 'System.Title'; name = 'Title'; type = 'string'; customization = 'system' }, [ordered]@{ referenceName = 'Custom.CostCenter'; name = 'Cost Center'; type = 'string'; customization = 'custom' })
+        'ContosoAgile.Risk' = @([ordered]@{ referenceName = 'System.Title'; name = 'Title'; type = 'string'; customization = 'system' }, [ordered]@{ referenceName = 'Custom.CostCenter'; name = 'Cost Center'; type = 'string'; customization = 'custom' },
+            [ordered]@{ referenceName = 'Custom.Impact'; name = 'Impact'; type = 'integer'; customization = 'custom'; required = $true }) }
     # TFVC in Legacy App: branch Trunk/Main with child branch Trunk/Dev; a classic pipeline maps Main and cloaks its docs
     $a.Pipelines[$P2] = @([ordered]@{ id = 13; name = 'legacy-build'; path = '\'; queueStatus = 'enabled'; process = [ordered]@{ type = 1 }
             repository = [ordered]@{ type = 'TfsVersionControl'; name = 'Legacy App'; defaultBranch = '$/Legacy App/Trunk/Main'
@@ -1064,7 +1125,8 @@ function Add-TWAdoFixtures {
         [ordered]@{ id = 1; name = 'Azure Pipelines'; isHosted = $true; poolType = 'automation'; size = 0 }
         [ordered]@{ id = 2; name = 'Default'; isHosted = $false; poolType = 'automation'; size = 2; autoProvision = $true; createdOn = '2019-01-01T00:00:00Z'; owner = [ordered]@{ displayName = 'Alex Admin' } }
         [ordered]@{ id = 3; name = 'Scale Agents'; isHosted = $false; poolType = 'automation'; size = 0; createdOn = '2024-01-01T00:00:00Z' }
-        [ordered]@{ id = 4; name = 'Deploy Pool'; isHosted = $false; poolType = 'deployment'; size = 1 })
+        [ordered]@{ id = 4; name = 'Deploy Pool'; isHosted = $false; poolType = 'deployment'; size = 1 }
+        [ordered]@{ id = 5; name = 'Old Pool'; isHosted = $false; poolType = 'automation'; size = 0; createdOn = '2018-01-01T00:00:00Z' })
     $a.ElasticPools = @([ordered]@{ poolId = 3; azureId = ('/subscriptions/{0}/resourceGroups/rg-build/providers/Microsoft.Compute/virtualMachineScaleSets/vmss-agents' -f $global:TW_S1); maxCapacity = 4; desiredIdle = 0; osType = 'linux'; state = 'online' })
     $a.Agents = @{ '2' = @(
             [ordered]@{ id = 21; name = 'build01'; version = '3.236.1'; osDescription = 'Microsoft Windows 10.0.20348'; status = 'online'; enabled = $true; createdOn = '2023-01-01T00:00:00Z'
@@ -1151,7 +1213,9 @@ function Add-TWAdoFixtures {
             [ordered]@{ id = 1; name = 'webshop-settings'; type = 'Vsts'; variables = [ordered]@{ ApiUrl = [ordered]@{ value = 'https://api.webshop.example/v1-secretish' }; DbPassword = [ordered]@{ isSecret = $true; value = $null } }
                 createdBy = [ordered]@{ displayName = 'Alex Admin' }; modifiedOn = '2026-08-01T00:00:00Z' }
             [ordered]@{ id = 2; name = 'kv-secrets'; type = 'AzureKeyVault'; providerData = [ordered]@{ serviceEndpointId = $E1; vault = 'kv-contoso' }; variables = [ordered]@{ 'sql-password' = [ordered]@{ isSecret = $true } }
-                createdBy = [ordered]@{ displayName = 'Alex Admin' }; modifiedOn = '2026-08-01T00:00:00Z' }) }
+                createdBy = [ordered]@{ displayName = 'Alex Admin' }; modifiedOn = '2026-08-01T00:00:00Z' }
+            [ordered]@{ id = 3; name = 'legacy-settings'; type = 'Vsts'; variables = [ordered]@{ AdminPwd = [ordered]@{ value = 'Example-Not-A-Secret-4' } }
+                createdBy = [ordered]@{ displayName = 'Former Dev' }; modifiedOn = '2022-01-01T00:00:00Z' }) }
     $a.SecureFiles = @{ $P1 = @([ordered]@{ id = 's1'; name = 'signing.pfx'; createdBy = [ordered]@{ displayName = 'Alex Admin' }; createdOn = '2025-01-01T00:00:00Z'; modifiedOn = '2025-01-01T00:00:00Z' }) }
     $w.Ado = $a
 
@@ -1184,8 +1248,8 @@ function Add-TWAdoFixtures {
     }
     & $add ($org + $proj + '_apis/git/repositories/([0-9a-f-]{36})/items\?') {
         param($path, $body, $m)
-        if ($path -match 'path=%2Fazure-pipelines\.yml' -and $path -match 'versionDescriptor\.version=main') {
-            return [ordered]@{ path = '/azure-pipelines.yml'; content = "trigger:`n- main`npool:`n  vmImage: ubuntu-latest`nsteps:`n- script: dotnet build`n" }
+        if ($m[2] -eq 'c1c1c1c1-0000-0000-0000-000000000001' -and $path -match 'path=%2Fazure-pipelines\.yml' -and $path -match 'versionDescriptor\.version=main') {
+            return [ordered]@{ path = '/azure-pipelines.yml'; content = $global:TW.Ado.MainYaml }
         }
         New-TWError 404 'GitItemNotFoundException' 'The item does not exist.'
     }
@@ -1308,4 +1372,51 @@ function Add-TWAdoFixtures {
     & $add ($org + '_apis/graph/memberships/([^?]+)\?direction=down') { param($path, $body, $m) New-TWAdoList @($global:TW.Ado.Memberships[$m[1]] | ForEach-Object { [ordered]@{ containerDescriptor = $m[1]; memberDescriptor = $_ } }) }
     & $add ($org + '_odata/') { param($path, $body, $m) [ordered]@{ '@odata.context' = 'x'; value = @($global:TW.Ado.WorkItems) } }
     & $add ($org + '_apis/work/processes\?') { param($path, $body, $m) New-TWAdoList $global:TW.Ado.Processes }
+    & $add ($org + '_apis/work/processes/([0-9a-f-]{36})/workitemtypes\?') { param($path, $body, $m) New-TWAdoList @($global:TW.Ado.ProcessTypes[$m[1]] | Where-Object { $null -ne $_ }) }
+    & $add ($org + '_apis/work/processes/([0-9a-f-]{36})/workItemTypes/([^/]+)/fields\?') { param($path, $body, $m) New-TWAdoList @($global:TW.Ado.ProcessFields[[uri]::UnescapeDataString($m[2])] | Where-Object { $null -ne $_ }) }
+    # pipeline runs: two per page, the next page through the x-ms-continuationtoken header
+    & $add ($org + $proj + '_apis/build/builds\?') {
+        param($path, $body, $m)
+        $all = @($global:TW.Ado.Builds[$m[1]] | Where-Object { $null -ne $_ })
+        if ($path -match 'continuationToken=page2') { return (New-TWAdoList @($all | Select-Object -Skip 2)) }
+        if ($all.Count -gt 2) { return (New-TWAdoList @($all | Select-Object -First 2) @{ 'x-ms-continuationtoken' = 'page2' }) }
+        New-TWAdoList $all
+    }
+    & $add ($org + $proj + '_apis/serviceendpoint/([0-9a-f-]{36})/executionhistory\?') {
+        param($path, $body, $m)
+        $eid = $m[2]
+        New-TWAdoList @($global:TW.Ado.EndpointHistory[$eid] | Where-Object { $null -ne $_ } | ForEach-Object { [ordered]@{ endpointId = $eid; data = $_ } })
+    }
+    & $add ($org + $proj + '_apis/pipelines/pipelinepermissions/([a-z]+)/([^?]+)\?') {
+        param($path, $body, $m)
+        $p = $global:TW.Ado.PipelinePermissions[$m[2] + '|' + $m[1] + '|' + $m[3]]
+        if ($null -eq $p) { $p = @{} }
+        [ordered]@{ resource = [ordered]@{ id = $m[3]; type = $m[2] }
+            pipelines = @(@($p.Pipelines) | Where-Object { $null -ne $_ } | ForEach-Object { [ordered]@{ id = $_; authorized = $true; authorizedOn = '2025-01-01T00:00:00Z' } })
+            allPipelines = $(if ($p.All) { [ordered]@{ authorized = $true; authorizedOn = '2025-01-01T00:00:00Z' } } else { $null }) }
+    }
+    & $add ($org + $proj + '_apis/distributedtask/environments/(\d+)/environmentdeploymentrecords\?') { param($path, $body, $m) New-TWAdoList @($global:TW.Ado.EnvDeployments[$m[2]] | Where-Object { $null -ne $_ }) }
+}
+
+function Add-TWGalleryFixtures {
+    # A Compute Gallery image with three versions (one past its end of life, one excluded from "latest") and a VM Image
+    # Builder template whose last run failed. Added on demand (Galleries test, sample reports) so the resource counts of
+    # the other tests stay the same.
+    $S1 = $global:TW_S1
+    $imgId = New-TWId -Sub $S1 -Rg 'rg-app' -Type 'Microsoft.Compute/galleries/images' -Name 'gal_contoso/win2022-hardened'
+    $extra = @(
+        (New-TWRes $S1 'rg-app' 'Microsoft.Compute/galleries' 'gal_contoso' ([ordered]@{ description = 'Contoso images' }))
+        (New-TWRes $S1 'rg-app' 'Microsoft.Compute/galleries/images' 'gal_contoso/win2022-hardened' ([ordered]@{ osType = 'Windows'; osState = 'Generalized'; hyperVGeneration = 'V2'; architecture = 'x64'
+                    identifier = [ordered]@{ publisher = 'Contoso'; offer = 'WindowsServer'; sku = '2022-hardened' } }))
+        (New-TWRes $S1 'rg-app' 'Microsoft.Compute/galleries/images/versions' 'gal_contoso/win2022-hardened/1.0.0' ([ordered]@{
+                    publishingProfile = [ordered]@{ publishedDate = '2025-11-01T00:00:00Z'; endOfLifeDate = '2026-06-30T00:00:00Z'; replicaCount = 1; storageAccountType = 'Standard_LRS'
+                        targetRegions = @([ordered]@{ name = 'West Europe'; regionalReplicaCount = 2 }, [ordered]@{ name = 'North Europe' }) }
+                    storageProfile = [ordered]@{ source = [ordered]@{ id = $global:TW.Ids.VmApp } } }))
+        (New-TWRes $S1 'rg-app' 'Microsoft.Compute/galleries/images/versions' 'gal_contoso/win2022-hardened/1.1.0' ([ordered]@{ publishingProfile = [ordered]@{ publishedDate = '2026-02-01T00:00:00Z'; excludeFromLatest = $false; replicaCount = 1 } }))
+        (New-TWRes $S1 'rg-app' 'Microsoft.Compute/galleries/images/versions' 'gal_contoso/win2022-hardened/2.0.0' ([ordered]@{ publishingProfile = [ordered]@{ publishedDate = '2026-09-01T00:00:00Z'; excludeFromLatest = $true; replicaCount = 1 } }))
+        (New-TWRes $S1 'rg-app' 'Microsoft.VirtualMachineImages/imageTemplates' 'it-win2022' ([ordered]@{
+                    source = [ordered]@{ type = 'PlatformImage'; publisher = 'MicrosoftWindowsServer'; offer = 'WindowsServer'; sku = '2022-datacenter-azure-edition'; version = 'latest' }
+                    distribute = @([ordered]@{ type = 'SharedImage'; runOutputName = 'win2022-run'; galleryImageId = $imgId }); vmProfile = [ordered]@{ vmSize = 'Standard_D2s_v5' }; buildTimeoutInMinutes = 120
+                    lastRunStatus = [ordered]@{ runState = 'Failed'; runSubState = 'Customizing'; startTime = '2026-09-20T01:00:00Z'; endTime = '2026-09-20T01:40:00Z'; message = 'Customizer failed: exit code 1' } }) -Identity ([ordered]@{ type = 'UserAssigned' })))
+    $global:TW.Arg['resources'] = @($global:TW.Arg['resources']) + $extra
 }

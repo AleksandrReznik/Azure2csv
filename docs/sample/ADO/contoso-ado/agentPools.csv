@@ -3,3 +3,4 @@
 "contoso-ado","Default","2","Self-hosted","automation","2","1","True","2019-01-01T00:00:00Z","Alex Admin","",""
 "contoso-ado","Scale Agents","3","Scale set (VMSS)","automation","0","0","False","2024-01-01T00:00:00Z","","/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-build/providers/Microsoft.Compute/virtualMachineScaleSets/vmss-agents","4"
 "contoso-ado","Deploy Pool","4","Deployment pool","deployment","1","0","False","","","",""
+"contoso-ado","Old Pool","5","Self-hosted","automation","0","0","False","2018-01-01T00:00:00Z","","",""

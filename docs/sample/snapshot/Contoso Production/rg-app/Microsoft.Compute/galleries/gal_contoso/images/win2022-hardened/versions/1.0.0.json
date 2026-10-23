@@ -1,0 +1,30 @@
+{
+  "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/galleries/gal_contoso/images/win2022-hardened/versions/1.0.0",
+  "name": "1.0.0",
+  "type": "Microsoft.Compute/galleries/images/versions",
+  "apiVersion": "2024-05-01",
+  "location": "westeurope",
+  "properties": {
+    "publishingProfile": {
+      "publishedDate": "2025-11-01T00:00:00Z",
+      "endOfLifeDate": "2026-06-30T00:00:00Z",
+      "replicaCount": 1,
+      "storageAccountType": "Standard_LRS",
+      "targetRegions": [
+        {
+          "name": "West Europe",
+          "regionalReplicaCount": 2
+        },
+        {
+          "name": "North Europe"
+        }
+      ]
+    },
+    "storageProfile": {
+      "source": {
+        "id": "/subscriptions/11111111-aaaa-bbbb-cccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01"
+      }
+    },
+    "provisioningState": "Succeeded"
+  }
+}

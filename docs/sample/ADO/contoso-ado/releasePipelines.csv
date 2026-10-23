@@ -1,2 +1,2 @@
-﻿"Organization","Project","ReleasePipeline","ReleasePipelineId","Folder","Stages","StageCount","LastRelease","LastReleaseDate","DaysSinceLastRelease","CreatedBy","ModifiedOn","ExportedFile"
-"contoso-ado","Web Shop","webshop-release","5","","Dev; Prod","2","Release-42","2026-06-01T00:00:00Z","120","Alex Admin","2026-06-01T00:00:00Z","ADO/contoso-ado/Web Shop/pipelines/releases/webshop-release.json"
+﻿"Organization","Project","ReleasePipeline","ReleasePipelineId","Folder","Stages","StageCount","LastRelease","LastReleaseDate","DaysSinceLastRelease","CreatedBy","ModifiedOn","ExportedFile","ServiceConnections","AzureSubscriptions"
+"contoso-ado","Web Shop","webshop-release","5","","Dev; Prod","2","Release-42","2026-06-01T00:00:00Z","120","Alex Admin","2026-06-01T00:00:00Z","ADO/contoso-ado/Web Shop/pipelines/releases/webshop-release.json","Contoso Prod (WIF)","Contoso Production"

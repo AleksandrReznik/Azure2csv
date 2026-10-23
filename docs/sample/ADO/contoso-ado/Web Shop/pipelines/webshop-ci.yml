@@ -1,6 +1,22 @@
 trigger:
 - main
+schedules:
+- cron: '0 3 * * *'
+  branches:
+    include: [ main ]
 pool:
   vmImage: ubuntu-latest
+variables:
+- group: webshop-settings
+- name: StoragePassword
+  value: notreal-example
+- name: buildConfiguration
+  value: Release
 steps:
+- task: DownloadSecureFile@1
+  inputs:
+    secureFile: signing.pfx
 - script: dotnet build
+- powershell: |
+    $p = ConvertTo-SecureString 'Example-Not-A-Secret-1' -AsPlainText -Force
+  displayName: sign

@@ -1,0 +1,5 @@
+﻿"SubscriptionName","SubscriptionId","ResourceGroup","Cost","Currency","Resources","From","To"
+"Contoso Production","11111111-aaaa-bbbb-cccc-000000000001","rg-app","123.46","EUR","1","2026-08-30","2026-09-28"
+"Contoso Production","11111111-aaaa-bbbb-cccc-000000000001","rg-data","40","EUR","1","2026-08-30","2026-09-28"
+"Contoso Production","11111111-aaaa-bbbb-cccc-000000000001","rg-legacy","30.25","EUR","1","2026-08-30","2026-09-28"
+"Contoso Production","11111111-aaaa-bbbb-cccc-000000000001","(no resource group)","5","EUR","1","2026-08-30","2026-09-28"

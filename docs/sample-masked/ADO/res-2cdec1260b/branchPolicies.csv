@@ -1,0 +1,3 @@
+﻿"Organization","Project","Repository","Branch","MatchKind","Policy","Enabled","Blocking","BuildPipeline","Settings","PolicyId"
+"res-2cdec1260b","Project 9b56ce3f09","repo-4feccac035","main","Exact","Minimum approval count","True","True","","minimumApproverCount=2",""
+"res-2cdec1260b","Project 9b56ce3f09","(all repositories)","(default branch)","DefaultBranch","Build","True","True","","",""

@@ -1,0 +1,26 @@
+{
+  "id": 14,
+  "name": "webshop-old",
+  "path": "\\",
+  "queueStatus": "disabled",
+  "process": {
+    "type": 2,
+    "yamlFilename": "/azure-pipelines.yml"
+  },
+  "repository": {
+    "type": "TfsGit",
+    "name": "webshop-old",
+    "id": "c1c1c1c1-0000-0000-0000-000000000009",
+    "defaultBranch": "refs/heads/main"
+  },
+  "queue": {
+    "name": "Azure Pipelines",
+    "pool": {
+      "name": "Azure Pipelines"
+    }
+  },
+  "createdDate": "2023-01-01T00:00:00Z",
+  "authoredBy": {
+    "displayName": "Former Dev"
+  }
+}
