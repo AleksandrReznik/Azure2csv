@@ -1,6 +1,13 @@
 {
+  "hidden-title": {
+    "Operations": ""
+  },
   "costcenter": {
     "CC-100": ""
+  },
+  "owner": {
+    "Žalias ąžuolas": "",
+    "Ärzte": ""
   },
   "app": {
     "contoso-web": ""
@@ -8,18 +15,11 @@
   "dept": {
     "Ärzte": ""
   },
-  "env": {
-    "prod": "",
-    "dev": ""
-  },
   "site": {
     "東京": ""
   },
-  "hidden-title": {
-    "Operations": ""
-  },
-  "owner": {
-    "Žalias ąžuolas": "",
-    "Ärzte": ""
+  "env": {
+    "prod": "",
+    "dev": ""
   }
 }

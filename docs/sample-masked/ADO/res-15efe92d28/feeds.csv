@@ -1,0 +1,3 @@
+﻿"Organization","Project","Scope","Feed","FeedId","Packages","PublishedPackages","CachedPackages","Versions","PackagesCapped","Protocols","LastPublished","UpstreamSources","UpstreamEnabled","Views","MaxVersions","KeepDownloadedDays","Permissions"
+"res-15efe92d28","","Organization","feed-bff81e92c4","dea417dc-37f5-4f35-9886-abee90551ea7","4","3","1","5","False","NuGet; npm; Universal","2026-07-01T00:00:00Z","npmjs","True","Local; Prerelease; Release","20","30","4"
+"res-15efe92d28","Project 1cd76e52c2","Project","feed-eef3427bed","b158d85d-5801-48c0-bb8c-4c0858d14b8c","4","4","0","4","False","Maven; PyPI; Cargo; Universal","2026-08-01T00:00:00Z","","False","Local; Prerelease; Release","","",""

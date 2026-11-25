@@ -1025,9 +1025,11 @@ function Add-TWAdoFixtures {
     $a = [ordered]@{}
     $a.Projects = @(
         [ordered]@{ id = $P1; name = 'Web Shop'; description = 'Online shop of Contoso'; visibility = 'private'; state = 'wellFormed'; lastUpdateTime = '2026-09-01T00:00:00Z'
-            capabilities = [ordered]@{ processTemplate = [ordered]@{ templateName = 'Contoso Agile' }; versioncontrol = [ordered]@{ sourceControlType = 'Git'; gitEnabled = 'True'; tfvcEnabled = 'False' } } }
+            capabilities = [ordered]@{ processTemplate = [ordered]@{ templateName = 'Contoso Agile' }; versioncontrol = [ordered]@{ sourceControlType = 'Git'; gitEnabled = 'True'; tfvcEnabled = 'False' } }
+            defaultTeam = [ordered]@{ id = 'f0f0f0f0-0000-0000-0000-000000000001'; name = 'Web Shop Team' } }
         [ordered]@{ id = $P2; name = 'Legacy App'; description = ''; visibility = 'public'; state = 'wellFormed'; lastUpdateTime = '2021-01-01T00:00:00Z'
-            capabilities = [ordered]@{ processTemplate = [ordered]@{ templateName = 'Agile' }; versioncontrol = [ordered]@{ sourceControlType = 'Tfvc'; gitEnabled = 'True'; tfvcEnabled = 'True' } } })
+            capabilities = [ordered]@{ processTemplate = [ordered]@{ templateName = 'Agile' }; versioncontrol = [ordered]@{ sourceControlType = 'Tfvc'; gitEnabled = 'True'; tfvcEnabled = 'True' } }
+            defaultTeam = [ordered]@{ id = 'f0f0f0f0-0000-0000-0000-000000000003'; name = 'Legacy App Team' } })
     $a.Repos = @(
         [ordered]@{ id = 'c1c1c1c1-0000-0000-0000-000000000001'; name = 'webshop'; project = [ordered]@{ id = $P1; name = 'Web Shop' }; defaultBranch = 'refs/heads/main'; size = 52428800; isDisabled = $false; isFork = $false }
         [ordered]@{ id = 'c1c1c1c1-0000-0000-0000-000000000002'; name = 'webshop-infra'; project = [ordered]@{ id = $P1; name = 'Web Shop' }; defaultBranch = 'refs/heads/main'; size = 1048576; isDisabled = $false; isFork = $false }
@@ -1065,8 +1067,9 @@ function Add-TWAdoFixtures {
         "- task: DownloadSecureFile@1`n  inputs:`n    secureFile: signing.pfx`n- script: dotnet build`n- powershell: |`n" +
         "    `$p = ConvertTo-SecureString 'Example-Not-A-Secret-1' -AsPlainText -Force`n  displayName: sign`n"
     # runs of the last 90 days (two pages), uses of the service connections, deployments to Production
-    $run = { param($Id, $Def, $Name, $Result, $Start, $Finish, $By) [ordered]@{ id = $Id; definition = [ordered]@{ id = $Def; name = $Name }; result = $Result; status = 'completed'
-            startTime = $Start; finishTime = $Finish; requestedFor = [ordered]@{ displayName = $By } } }
+    $run = { param($Id, $Def, $Name, $Result, $Start, $Finish, $By) [ordered]@{ id = $Id; buildNumber = ('2026.' + $Id); definition = [ordered]@{ id = $Def; name = $Name }; result = $Result
+            status = 'completed'; reason = 'individualCI'; queueTime = $Start; startTime = $Start; finishTime = $Finish; requestedFor = [ordered]@{ displayName = $By }
+            requestedBy = [ordered]@{ displayName = 'Microsoft.VisualStudio.Services.TFS' }; sourceBranch = 'refs/heads/main'; sourceVersion = ('abc' + $Id); repository = [ordered]@{ name = 'webshop' } } }
     $a.Builds = @{ $P1 = @((& $run 101 11 'webshop-ci' 'succeeded' '2026-09-28T10:00:00Z' '2026-09-28T10:12:00Z' 'Alex Admin'),
             (& $run 100 11 'webshop-ci' 'failed' '2026-09-20T10:00:00Z' '2026-09-20T10:08:00Z' 'Alex Admin'),
             (& $run 99 11 'webshop-ci' 'succeeded' '2026-08-01T10:00:00Z' '2026-08-01T10:10:00Z' 'Former Dev')) }
@@ -1108,7 +1111,7 @@ function Add-TWAdoFixtures {
         '$/Legacy App/Trunk/Main' = [ordered]@{ changesetId = 120; createdDate = '2023-05-10T00:00:00Z'; author = [ordered]@{ displayName = 'Former Dev' }; comment = 'last fix' }
         '$/Legacy App/Trunk/Dev' = [ordered]@{ changesetId = 95; createdDate = '2022-01-01T00:00:00Z'; author = [ordered]@{ displayName = 'Former Dev' }; comment = 'dev work' }
     }
-    $a.Releases = @{ $P1 = @([ordered]@{ id = 5; name = 'webshop-release'; path = '\'; environments = @([ordered]@{ name = 'Dev' }, [ordered]@{ name = 'Prod' })
+    $a.Releases = @{ $P1 = @([ordered]@{ id = 5; name = 'webshop-release'; path = '\'; environments = @([ordered]@{ id = 21; name = 'Dev' }, [ordered]@{ id = 22; name = 'Prod' })
                 lastRelease = [ordered]@{ name = 'Release-42'; createdOn = '2026-06-01T00:00:00Z' }; createdBy = [ordered]@{ displayName = 'Alex Admin' }; modifiedOn = '2026-06-01T00:00:00Z'; isDisabled = $false }) }
     $wif = [ordered]@{ id = $E1; name = 'Contoso Prod (WIF)'; type = 'azurerm'; url = 'https://management.azure.com/'; isShared = $true; isReady = $true
         authorization = [ordered]@{ scheme = 'WorkloadIdentityFederation'; parameters = [ordered]@{ tenantid = $T; serviceprincipalid = 'abababab-0000-0000-0000-0000000000c1'
@@ -1184,20 +1187,32 @@ function Add-TWAdoFixtures {
             # no display name, descriptor as an object
             [ordered]@{ role = 'collaborator'; identityDescriptor = [ordered]@{ identityType = 'Microsoft.TeamFoundation.Identity'; identifier = 'S-1-9-1551374245-4' }; identityId = 'c9c9c9c9-0000-0000-0000-000000000004' }) }
     $never = '0001-01-01T00:00:00Z'
-    $mkUser = { param($Upn, $Name, $Origin, $Meta, $LicType, $LicName, $Source, $Last, $Created)
-        [ordered]@{ id = [guid]::NewGuid().ToString(); user = [ordered]@{ principalName = $Upn; displayName = $Name; origin = $Origin; metaType = $Meta; subjectKind = 'user' }
+    $mkUser = { param($Upn, $Name, $Origin, $Meta, $LicType, $LicName, $Source, $Last, $Created, $Descriptor, $Alias)
+        [ordered]@{ id = [guid]::NewGuid().ToString(); user = [ordered]@{ principalName = $Upn; displayName = $Name; origin = $Origin; metaType = $Meta; subjectKind = 'user'; descriptor = $Descriptor; directoryAlias = $Alias }
             accessLevel = [ordered]@{ accountLicenseType = $LicType; licenseDisplayName = $LicName; licensingSource = $Source; status = 'active' }; lastAccessedDate = $Last; dateCreated = $Created } }
-    $a.Users1 = @((& $mkUser 'alex.admin@contoso.onmicrosoft.com' 'Alex Admin' 'aad' 'member' 'express' 'Basic' 'account' '2026-09-28T00:00:00Z' '2019-01-01T00:00:00Z'),
-        (& $mkUser 'former.dev@contoso.com' 'Former Dev' 'aad' 'member' 'express' 'Basic' 'account' '2026-02-01T00:00:00Z' '2020-01-01T00:00:00Z'))
-    $a.Users2 = @((& $mkUser 'pat@fabrikam.com' 'Pat Partner' 'aad' 'guest' 'stakeholder' 'Stakeholder' 'account' $never '2025-01-01T00:00:00Z'),
-        (& $mkUser 'someone@example.org' 'Someone Private' 'msa' '' 'advanced' 'Basic + Test Plans' 'account' $never '2026-09-20T00:00:00Z'))
+    $a.Users1 = @((& $mkUser 'alex.admin@contoso.onmicrosoft.com' 'Alex Admin' 'aad' 'member' 'express' 'Basic' 'account' '2026-09-28T00:00:00Z' '2019-01-01T00:00:00Z' 'aad.alex' 'alex.admin'),
+        (& $mkUser 'former.dev@contoso.com' 'Former Dev' 'aad' 'member' 'express' 'Basic' 'account' '2026-02-01T00:00:00Z' '2020-01-01T00:00:00Z' 'aad.former' 'former.dev'))
+    $a.Users2 = @((& $mkUser 'pat@fabrikam.com' 'Pat Partner' 'aad' 'guest' 'stakeholder' 'Stakeholder' 'account' $never '2025-01-01T00:00:00Z' 'aad.pat' 'pat_fabrikam.com#EXT#'),
+        (& $mkUser 'someone@example.org' 'Someone Private' 'msa' '' 'advanced' 'Basic + Test Plans' 'account' $never '2026-09-20T00:00:00Z' 'msa.someone' ''))
+    $orgDomain = 'vstfs:///Framework/IdentityDomain/a0a0a0a0-0000-0000-0000-000000000001'
+    $p1Domain = 'vstfs:///Classification/TeamProject/' + $P1
     $a.Groups = @(
-        [ordered]@{ descriptor = 'vssgp.pca'; displayName = 'Project Collection Administrators'; principalName = '[contoso-ado]\Project Collection Administrators'; origin = 'vsts'; subjectKind = 'group' }
-        [ordered]@{ descriptor = 'vssgp.pa1'; displayName = 'Project Administrators'; principalName = '[Web Shop]\Project Administrators'; origin = 'vsts'; subjectKind = 'group' }
-        [ordered]@{ descriptor = 'vssgp.contrib'; displayName = 'Contributors'; principalName = '[Web Shop]\Contributors'; origin = 'vsts'; subjectKind = 'group' }
-        [ordered]@{ descriptor = 'aadgp.admins'; displayName = 'g-app-admins'; principalName = '[TEAM FOUNDATION]\g-app-admins'; origin = 'aad'; subjectKind = 'group' })
-    $a.GraphUsers = @([ordered]@{ descriptor = 'aad.alex'; displayName = 'Alex Admin'; principalName = 'alex.admin@contoso.onmicrosoft.com'; origin = 'aad'; subjectKind = 'user' })
-    $a.Memberships = @{ 'vssgp.pca' = @('aad.alex', 'aadgp.admins'); 'vssgp.pa1' = @('aad.alex', 'aadsp.pipeline') }
+        [ordered]@{ descriptor = 'vssgp.pca'; displayName = 'Project Collection Administrators'; principalName = '[contoso-ado]\Project Collection Administrators'; origin = 'vsts'; subjectKind = 'group'; domain = $orgDomain; originId = 'c9c9c9c9-0000-0000-0000-000000000001' }
+        [ordered]@{ descriptor = 'vssgp.pa1'; displayName = 'Project Administrators'; principalName = '[Web Shop]\Project Administrators'; origin = 'vsts'; subjectKind = 'group'; domain = $p1Domain; originId = 'c9c9c9c9-0000-0000-0000-000000000011' }
+        [ordered]@{ descriptor = 'vssgp.contrib'; displayName = 'Contributors'; principalName = '[Web Shop]\Contributors'; origin = 'vsts'; subjectKind = 'group'; domain = $p1Domain; originId = 'c9c9c9c9-0000-0000-0000-000000000021' }
+        [ordered]@{ descriptor = 'aadgp.admins'; displayName = 'g-app-admins'; principalName = '[TEAM FOUNDATION]\g-app-admins'; origin = 'aad'; subjectKind = 'group'; domain = $T; originId = 'b2b2b2b2-0000-0000-0000-000000000001' }
+        # AzureDevOpsStructure: a nested group (Contoso Leads in Contributors) and the groups of the three teams
+        [ordered]@{ descriptor = 'vssgp.leads'; displayName = 'Contoso Leads'; principalName = '[Web Shop]\Contoso Leads'; origin = 'vsts'; subjectKind = 'group'; domain = $p1Domain; originId = 'c9c9c9c9-0000-0000-0000-000000000031'; description = 'Leads of the Contoso web shop' }
+        [ordered]@{ descriptor = 'vssgp.team1'; displayName = 'Web Shop Team'; principalName = '[Web Shop]\Web Shop Team'; origin = 'vsts'; subjectKind = 'group'; domain = $p1Domain; originId = 'f0f0f0f0-0000-0000-0000-000000000001' }
+        [ordered]@{ descriptor = 'vssgp.team2'; displayName = 'Marketing'; principalName = '[Web Shop]\Marketing'; origin = 'vsts'; subjectKind = 'group'; domain = $p1Domain; originId = 'f0f0f0f0-0000-0000-0000-000000000002' }
+        [ordered]@{ descriptor = 'vssgp.team3'; displayName = 'Legacy App Team'; principalName = '[Legacy App]\Legacy App Team'; origin = 'vsts'; subjectKind = 'group'; domain = ('vstfs:///Classification/TeamProject/' + $P2); originId = 'f0f0f0f0-0000-0000-0000-000000000003' })
+    $a.GraphUsers = @([ordered]@{ descriptor = 'aad.alex'; displayName = 'Alex Admin'; principalName = 'alex.admin@contoso.onmicrosoft.com'; origin = 'aad'; subjectKind = 'user'; directoryAlias = 'alex.admin'; originId = 'b1b1b1b1-0000-0000-0000-0000000000a1' }
+        [ordered]@{ descriptor = 'aad.former'; displayName = 'Former Dev'; principalName = 'former.dev@contoso.com'; origin = 'aad'; subjectKind = 'user'; directoryAlias = 'former.dev'; originId = 'b1b1b1b1-0000-0000-0000-0000000000a2' }
+        [ordered]@{ descriptor = 'aad.pat'; displayName = 'Pat Partner'; principalName = 'pat@fabrikam.com'; origin = 'aad'; subjectKind = 'user'; metaType = 'guest'; originId = 'b1b1b1b1-0000-0000-0000-0000000000a3' }
+        [ordered]@{ descriptor = 'msa.someone'; displayName = 'Someone Private'; principalName = 'someone@example.org'; origin = 'msa'; subjectKind = 'user' })
+    # aad.departed is in no list: its name comes from the subject lookup
+    $a.Memberships = @{ 'vssgp.pca' = @('aad.alex', 'aadgp.admins'); 'vssgp.pa1' = @('aad.alex', 'aadsp.pipeline'); 'vssgp.contrib' = @('vssgp.leads', 'vssgp.team1', 'vssgp.team2')
+        'vssgp.leads' = @('aad.former', 'aad.departed'); 'vssgp.team1' = @('aad.alex', 'aad.former'); 'vssgp.team2' = @('aad.alex', 'aad.pat'); 'vssgp.team3' = @('aad.former'); 'aadgp.admins' = @('aad.former') }
     $a.WorkItems = @(
         [ordered]@{ Project = [ordered]@{ ProjectName = 'Web Shop' }; WorkItemType = 'User Story'; Count = 120 }
         [ordered]@{ Project = [ordered]@{ ProjectName = 'Web Shop' }; WorkItemType = 'Bug'; Count = 45 }
@@ -1396,6 +1411,396 @@ function Add-TWAdoFixtures {
             allPipelines = $(if ($p.All) { [ordered]@{ authorized = $true; authorizedOn = '2025-01-01T00:00:00Z' } } else { $null }) }
     }
     & $add ($org + $proj + '_apis/distributedtask/environments/(\d+)/environmentdeploymentrecords\?') { param($path, $body, $m) New-TWAdoList @($global:TW.Ado.EnvDeployments[$m[2]] | Where-Object { $null -ne $_ }) }
+    Add-TWAdoStructureFixtures $w
+    Add-TWAdoWorkItemFixtures $w
+}
+
+function ConvertTo-TWHex {
+    # a branch name segment as Git security tokens write it: UTF-16 little-endian bytes in hex
+    param([string] $Text)
+    return (-join @([Text.Encoding]::Unicode.GetBytes($Text) | ForEach-Object { $_.ToString('x2') }))
+}
+
+function Add-TWAdoStructureFixtures {
+    # AzureDevOpsStructure: teams Web Shop Team (default) and Marketing in Web Shop, Legacy App Team; a customized board
+    # (Marketing), a dashboard with Marketplace widgets, shared queries three folders deep, permissions with a direct user
+    # grant, approvals and checks, policies, shelvesets, wikis and pull requests.
+    param($w)
+    $a = $w.Ado
+    $T = $global:TW_Tenant
+    $P1 = 'b1b1b1b1-0000-0000-0000-000000000001'; $P2 = 'b1b1b1b1-0000-0000-0000-000000000002'
+    $T1 = 'f0f0f0f0-0000-0000-0000-000000000001'; $T2 = 'f0f0f0f0-0000-0000-0000-000000000002'; $T3 = 'f0f0f0f0-0000-0000-0000-000000000003'
+    $E1 = 'd1d1d1d1-0000-0000-0000-000000000001'; $R1 = 'c1c1c1c1-0000-0000-0000-000000000001'
+    $A0 = 'a5a5a5a5-0000-0000-0000-000000000000'; $A1 = 'a5a5a5a5-0000-0000-0000-000000000001'; $A2 = 'a5a5a5a5-0000-0000-0000-000000000002'
+    $I0 = 'a6a6a6a6-0000-0000-0000-000000000000'; $I1 = 'a6a6a6a6-0000-0000-0000-000000000001'; $I2 = 'a6a6a6a6-0000-0000-0000-000000000002'
+    $person = { param($Name, $Upn, $Admin) [ordered]@{ identity = [ordered]@{ displayName = $Name; uniqueName = $Upn; id = [guid]::NewGuid().ToString() }; isTeamAdmin = [bool]$Admin } }
+    $a.Teams = @{ $P1 = @([ordered]@{ id = $T1; name = 'Web Shop Team'; description = 'The default team of Web Shop'; projectId = $P1 }, [ordered]@{ id = $T2; name = 'Marketing'; description = 'Contoso campaigns'; projectId = $P1 })
+        $P2 = @([ordered]@{ id = $T3; name = 'Legacy App Team'; description = ''; projectId = $P2 }) }
+    $a.TeamMembers = @{
+        $T1 = @((& $person 'Alex Admin' 'alex.admin@contoso.onmicrosoft.com' $true), (& $person 'Former Dev' 'former.dev@contoso.com' $false))
+        $T2 = @((& $person 'Pat Partner' 'pat@fabrikam.com' $false), [ordered]@{ identity = [ordered]@{ displayName = '[Web Shop]\Contoso Leads'; uniqueName = 'vstfs:///Classification/TeamProject/b1b1'; isContainer = $true }; isTeamAdmin = $false },
+            (& $person 'Alex Admin' 'alex.admin@contoso.onmicrosoft.com' $true))
+        $T3 = @(& $person 'Former Dev' 'former.dev@contoso.com' $true) }
+    $weekdays = @('monday', 'tuesday', 'wednesday', 'thursday', 'friday')
+    $a.TeamSettings = @{
+        $T1 = [ordered]@{ backlogIteration = [ordered]@{ id = $I0; name = 'Web Shop'; path = '' }; defaultIterationMacro = '@currentIteration'; bugsBehavior = 'asRequirements'; workingDays = $weekdays
+            backlogVisibilities = [ordered]@{ 'Microsoft.EpicCategory' = $false; 'Microsoft.FeatureCategory' = $true; 'Microsoft.RequirementCategory' = $true } }
+        $T2 = [ordered]@{ backlogIteration = [ordered]@{ id = $I0; name = 'Web Shop'; path = '' }; defaultIteration = [ordered]@{ id = $I2; name = 'Contoso Sprint 2'; path = '\Contoso Sprint 2' }
+            bugsBehavior = 'off'; workingDays = @('monday', 'tuesday', 'wednesday', 'thursday'); backlogVisibilities = [ordered]@{ 'Microsoft.EpicCategory' = $true; 'Microsoft.FeatureCategory' = $true; 'Microsoft.RequirementCategory' = $true } }
+        $T3 = [ordered]@{ backlogIteration = [ordered]@{ name = 'Legacy App'; path = '' }; defaultIterationMacro = '@currentIteration'; bugsBehavior = 'asTasks'; workingDays = $weekdays; backlogVisibilities = [ordered]@{ 'Microsoft.RequirementCategory' = $true } } }
+    $a.TeamFieldValues = @{
+        $T1 = [ordered]@{ field = [ordered]@{ referenceName = 'System.AreaPath' }; defaultValue = 'Web Shop'; values = @([ordered]@{ value = 'Web Shop'; includeChildren = $false }) }
+        $T2 = [ordered]@{ field = [ordered]@{ referenceName = 'System.AreaPath' }; defaultValue = 'Web Shop\Contoso Checkout'; values = @([ordered]@{ value = 'Web Shop\Contoso Checkout'; includeChildren = $true }) }
+        $T3 = [ordered]@{ field = [ordered]@{ referenceName = 'System.AreaPath' }; defaultValue = 'Legacy App'; values = @([ordered]@{ value = 'Legacy App'; includeChildren = $true }) } }
+    $it = { param($Id, $Name, $Start, $Finish) [ordered]@{ id = $Id; name = $Name; path = 'Web Shop\' + $Name; attributes = [ordered]@{ startDate = $Start; finishDate = $Finish; timeFrame = 'past' } } }
+    $a.TeamIterations = @{ $T1 = @((& $it $I1 'Contoso Sprint 1' '2026-09-01T00:00:00Z' '2026-09-14T00:00:00Z'), (& $it $I2 'Contoso Sprint 2' '2026-09-15T00:00:00Z' '2026-09-28T00:00:00Z'))
+        $T2 = @(& $it $I2 'Contoso Sprint 2' '2026-09-15T00:00:00Z' '2026-09-28T00:00:00Z'); $T3 = @() }
+    # area and iteration trees (classification node paths name the structure: \Project\Area\...)
+    $node = { param($Id, $NodeId, $Name, $Path, $Type, $Kids, $Attr) $n = [ordered]@{ id = $NodeId; identifier = $Id; name = $Name; structureType = $Type; path = $Path; hasChildren = (@($Kids).Count -gt 0) }
+        if (@($Kids).Count -gt 0) { $n['children'] = @($Kids) }; if ($null -ne $Attr) { $n['attributes'] = $Attr }; $n }
+    $a.Nodes = @{
+        $P1 = @((& $node $A0 1 'Web Shop' '\Web Shop\Area' 'area' @(& $node $A1 2 'Contoso Checkout' '\Web Shop\Area\Contoso Checkout' 'area' @(& $node $A2 3 'Payments' '\Web Shop\Area\Contoso Checkout\Payments' 'area' @() $null) $null) $null),
+            (& $node $I0 4 'Web Shop' '\Web Shop\Iteration' 'iteration' @((& $node $I1 5 'Contoso Sprint 1' '\Web Shop\Iteration\Contoso Sprint 1' 'iteration' @() ([ordered]@{ startDate = '2026-09-01T00:00:00Z'; finishDate = '2026-09-14T00:00:00Z' })),
+                    (& $node $I2 6 'Contoso Sprint 2' '\Web Shop\Iteration\Contoso Sprint 2' 'iteration' @() ([ordered]@{ startDate = '2026-09-15T00:00:00Z'; finishDate = '2026-09-28T00:00:00Z' }))) $null))
+        $P2 = @((& $node 'a5a5a5a5-0000-0000-0000-000000000010' 7 'Legacy App' '\Legacy App\Area' 'area' @() $null), (& $node 'a6a6a6a6-0000-0000-0000-000000000010' 8 'Legacy App' '\Legacy App\Iteration' 'iteration' @() $null)) }
+    # boards: Web Shop Team has the default Agile board, Marketing a customized one (renamed column, split column with a
+    # definition of done, a swimlane, a card style rule and a tag color)
+    $col = { param($Name, $Type, $Limit, $State, $Split, $Dod) [ordered]@{ id = [guid]::NewGuid().ToString(); name = $Name; itemLimit = $Limit; columnType = $Type; isSplit = [bool]$Split; description = $Dod
+            stateMappings = [ordered]@{ 'User Story' = $State; 'Bug' = $State } } }
+    $default = [ordered]@{ id = '00000000-0000-0000-0000-000000000000'; name = $null }
+    $a.Boards = @{ $T1 = @([ordered]@{ id = 'b0b0b0b0-0000-0000-0000-000000000001'; name = 'Stories' }); $T2 = @([ordered]@{ id = 'b0b0b0b0-0000-0000-0000-000000000002'; name = 'Stories' }); $T3 = @() }
+    $a.BoardDetail = @{
+        'b0b0b0b0-0000-0000-0000-000000000001' = [ordered]@{ id = 'b0b0b0b0-0000-0000-0000-000000000001'; name = 'Stories'; isValid = $true; rows = @($default)
+            columns = @((& $col 'New' 'incoming' 0 'New' $false ''), (& $col 'Active' 'inProgress' 5 'Active' $false ''), (& $col 'Resolved' 'inProgress' 5 'Resolved' $false ''), (& $col 'Closed' 'outgoing' 0 'Closed' $false '')) }
+        'b0b0b0b0-0000-0000-0000-000000000002' = [ordered]@{ id = 'b0b0b0b0-0000-0000-0000-000000000002'; name = 'Stories'; isValid = $true
+            rows = @($default, [ordered]@{ id = 'b0b0b0b0-0000-0000-0000-0000000000f1'; name = 'Contoso Expedite'; color = '#ff0000' })
+            columns = @((& $col 'New' 'incoming' 0 'New' $false ''), (& $col 'Active' 'inProgress' 3 'Active' $true 'Code reviewed by a lead'), (& $col 'Contoso Review' 'inProgress' 4 'Resolved' $false ''), (& $col 'Closed' 'outgoing' 0 'Closed' $false '')) } }
+    $a.CardSettings = @{
+        'b0b0b0b0-0000-0000-0000-000000000001' = [ordered]@{ cards = [ordered]@{ 'User Story' = @([ordered]@{ fieldIdentifier = 'System.Id' }, [ordered]@{ fieldIdentifier = 'System.AssignedTo'; displayFormat = 'AvatarAndFullName' }); 'Bug' = @([ordered]@{ fieldIdentifier = 'System.Id' }) } }
+        'b0b0b0b0-0000-0000-0000-000000000002' = [ordered]@{ cards = [ordered]@{ 'User Story' = @([ordered]@{ fieldIdentifier = 'System.Id' }, [ordered]@{ fieldIdentifier = 'Microsoft.VSTS.Scheduling.StoryPoints' }, [ordered]@{ fieldIdentifier = 'Custom.CostCenter' }) } } }
+    $a.CardRules = @{
+        'b0b0b0b0-0000-0000-0000-000000000001' = [ordered]@{ rules = [ordered]@{ fill = @(); tagStyle = @() } }
+        'b0b0b0b0-0000-0000-0000-000000000002' = [ordered]@{ rules = [ordered]@{
+                fill = @([ordered]@{ name = 'Contoso blocked'; isEnabled = 'true'; filter = "[System.Tags] contains 'Blocked'"; settings = [ordered]@{ 'background-color' = '#f4cccc'; 'title-color' = '#000000' } })
+                tagStyle = @([ordered]@{ name = 'contoso-hotfix'; isEnabled = 'true'; settings = [ordered]@{ 'background-color' = '#ff0000'; color = '#ffffff' } }) } } }
+    # dashboards: a team dashboard with a built-in widget, a SonarQube widget (installed extension) and a widget of an
+    # extension that is not installed; a project dashboard. The project list also returns the team dashboard.
+    $wid = { param($Name, $Cid, $Row, $Col, $Rows, $Cols, $Settings, $TypeId) $x = [ordered]@{ id = [guid]::NewGuid().ToString(); name = $Name; contributionId = $Cid; position = [ordered]@{ row = $Row; column = $Col }
+            size = [ordered]@{ rowSpan = $Rows; columnSpan = $Cols }; settings = $Settings; settingsVersion = [ordered]@{ major = 1; minor = 0; patch = 0 }; isEnabled = $true }
+        if ($TypeId) { $x['typeId'] = $TypeId }
+        $x }
+    $D1 = 'd5d5d5d5-0000-0000-0000-000000000001'; $D2 = 'd5d5d5d5-0000-0000-0000-000000000002'
+    $a.Dashboards = @{
+        # modifiedBy: only the ID of the identity, as Azure DevOps answers (D2: an identity that no longer exists)
+        $D1 = [ordered]@{ id = $D1; name = 'Contoso Release Board'; dashboardScope = 'project_Team'; groupId = $T1; refreshInterval = 5; modifiedDate = '2026-09-01T00:00:00Z'
+            modifiedBy = 'b1b1b1b1-0000-0000-0000-0000000000a1'
+            widgets = @((& $wid 'Release notes' 'ms.vss-dashboards-web.Microsoft.VisualStudioOnline.Dashboards.MarkdownWidget' 1 1 1 2 '{"text":"Contoso release notes"}'),
+                (& $wid 'Quality gate' 'sonarsource.sonarqube.sonarqube-quality-gate-widget' 1 3 1 1 '{"project":"webshop"}' 'SonarQube.QualityGate'),
+                (& $wid 'Contoso burndown' 'contoso-labs.burndown.burndown-widget' 2 1 2 2 $null)) }
+        $D2 = [ordered]@{ id = $D2; name = 'Contoso Overview'; dashboardScope = 'project'; refreshInterval = $null; modifiedDate = '2026-08-01T00:00:00Z'; modifiedBy = 'b1b1b1b1-0000-0000-0000-0000000000a9'
+            widgets = @(& $wid 'Build history' 'ms.vss-build-web.Microsoft.VisualStudioOnline.Dashboards.BuildHistogramWidget' 1 1 1 2 '{"buildDefinition":11}') } }
+    $a.TeamDashboards = @{ $T1 = @($D1) }
+    $a.ProjectDashboards = @{ $P1 = @($D1, $D2) }
+    $a.Templates = @{ $T1 = @([ordered]@{ id = 'a7a7a7a7-0000-0000-0000-0000000000f1'; name = 'Contoso bug template'; description = 'Contoso standard bug'; workItemTypeName = 'Bug'
+                fields = [ordered]@{ 'System.Title' = '[Bug] '; 'System.Tags' = 'triage'; 'Microsoft.VSTS.Common.Priority' = '2' } }) }
+    $a.Notifications = @{ $T1 = @([ordered]@{ id = '28'; description = 'Contoso build failures'; status = 'enabled'; modifiedDate = '2026-08-15T00:00:00Z'
+                subscriber = [ordered]@{ displayName = 'Web Shop Team'; id = $T1 }; lastModifiedBy = [ordered]@{ displayName = 'Alex Admin' }
+                channel = [ordered]@{ type = 'EmailHtml'; address = 'webshop-team@contoso.com'; useCustomAddress = $true }
+                filter = [ordered]@{ type = 'Expression'; eventType = 'ms.vss-build.build-completed-event'; criteria = [ordered]@{ clauses = @(
+                            [ordered]@{ fieldName = 'Status'; operator = '='; value = 'Failed'; logicalOperator = '' }, [ordered]@{ fieldName = 'Definition name'; operator = '='; value = 'webshop-ci'; logicalOperator = 'And' }) } } }) }
+    # shared queries: "Contoso Deep" is cut off at depth 2 and read again; My Queries are never read
+    $q = { param($Id, $Name, $Path, $Folder, $Public, $Kids, $Type) $x = [ordered]@{ id = $Id; name = $Name; path = $Path; isFolder = [bool]$Folder; isPublic = [bool]$Public; hasChildren = ($Folder -and $null -ne $Kids) }
+        if ($Kids -is [array]) { $x['children'] = $Kids }
+        if (-not $Folder) { $x['queryType'] = $Type; $x['wiql'] = "SELECT [System.Id] FROM WorkItems WHERE [System.Title] CONTAINS 'Contoso'"; $x['createdBy'] = [ordered]@{ displayName = 'Alex Admin' }
+            $x['lastModifiedDate'] = '2026-07-01T00:00:00Z'; $x['lastExecutedDate'] = '2026-09-27T00:00:00Z' }
+        $x }
+    $deep = & $q 'c7c7c7c7-0000-0000-0000-000000000003' 'Contoso Deep' 'Shared Queries/Contoso Team/Contoso Deep' $true $true 'cut' 'flat'
+    $deep['hasChildren'] = $true
+    $a.Queries = @{
+        $P1 = @((& $q 'c7c7c7c7-0000-0000-0000-000000000000' 'My Queries' 'My Queries' $true $false @(& $q 'c7c7c7c7-0000-0000-0000-000000000009' 'Alex private' 'My Queries/Alex private' $false $false $null 'flat') 'flat'),
+            (& $q 'c7c7c7c7-0000-0000-0000-000000000001' 'Shared Queries' 'Shared Queries' $true $true @(
+                    (& $q 'c7c7c7c7-0000-0000-0000-000000000002' 'Contoso Team' 'Shared Queries/Contoso Team' $true $true @($deep,
+                            (& $q 'c7c7c7c7-0000-0000-0000-000000000004' 'Contoso Active Bugs' 'Shared Queries/Contoso Team/Contoso Active Bugs' $false $true $null 'flat')) 'flat'),
+                    (& $q 'c7c7c7c7-0000-0000-0000-000000000005' 'Contoso Blockers' 'Shared Queries/Contoso Blockers' $false $true $null 'tree')) 'flat'))
+        $P2 = @(& $q 'c7c7c7c7-0000-0000-0000-000000000011' 'Shared Queries' 'Shared Queries' $true $true $null 'flat') }
+    $a.QueryFolders = @{ 'c7c7c7c7-0000-0000-0000-000000000003' = (& $q 'c7c7c7c7-0000-0000-0000-000000000003' 'Contoso Deep' 'Shared Queries/Contoso Team/Contoso Deep' $true $true @(
+                & $q 'c7c7c7c7-0000-0000-0000-000000000006' 'Contoso Deep Query' 'Shared Queries/Contoso Team/Contoso Deep/Contoso Deep Query' $false $true $null 'oneHop') 'flat') }
+    $a.Tags = @{ $P1 = @([ordered]@{ id = 'a9a9a9a9-0000-0000-0000-000000000001'; name = 'contoso-hotfix'; lastUpdated = '2026-09-10T00:00:00Z' }, [ordered]@{ id = 'a9a9a9a9-0000-0000-0000-000000000002'; name = 'Blocked'; lastUpdated = '2026-06-01T00:00:00Z' }) }
+    $a.Queues = @{ $P1 = @([ordered]@{ id = 1; name = 'Azure Pipelines'; projectId = $P1; pool = [ordered]@{ id = 1; name = 'Azure Pipelines'; isHosted = $true } }, [ordered]@{ id = 2; name = 'Default'; projectId = $P1; pool = [ordered]@{ id = 2; name = 'Default' } })
+        $P2 = @([ordered]@{ id = 3; name = 'Default'; projectId = $P2; pool = [ordered]@{ id = 2; name = 'Default' } }) }
+    # approvals and checks by "<resource type>|<resource id>" (the batch read answers for the resources it is asked about)
+    $a.CheckConfigs = @{
+        'environment|1' = @([ordered]@{ id = 1; type = [ordered]@{ id = '8c6f20a7-a545-4486-9777-f762fafe0d4d'; name = 'Approval' }; resource = [ordered]@{ type = 'environment'; id = '1'; name = 'Production' }; timeout = 43200
+                settings = [ordered]@{ approvers = @([ordered]@{ displayName = 'Alex Admin'; id = 'b1b1b1b1-0000-0000-0000-0000000000a1' }, [ordered]@{ displayName = '[Web Shop]\Contoso Leads'; id = 'c9c9c9c9-0000-0000-0000-000000000031' })
+                    minRequiredApprovers = 1; instructions = 'Check the Contoso change ticket'; requesterCannotBeApprover = $true; executionOrder = 'anyOrder' }; createdBy = [ordered]@{ displayName = 'Alex Admin' }; modifiedOn = '2026-05-01T00:00:00Z' },
+            [ordered]@{ id = 2; type = [ordered]@{ id = 'fe1de3ee-a436-41b4-bb20-f6eb4cb879a7'; name = 'Task Check' }; resource = [ordered]@{ type = 'environment'; id = '1'; name = 'Production' }; timeout = 60
+                settings = [ordered]@{ displayName = 'Invoke REST API'; definitionRef = [ordered]@{ name = 'InvokeRESTAPI'; version = '1.220.0' } }; createdBy = [ordered]@{ displayName = 'Former Dev' }; modifiedOn = '2025-01-01T00:00:00Z' })
+        'queue|2' = @([ordered]@{ id = 3; type = [ordered]@{ id = 'fe1de3ee-a436-41b4-bb20-f6eb4cb879a7'; name = 'Task Check' }; resource = [ordered]@{ type = 'queue'; id = '2' }; timeout = 1440
+                settings = [ordered]@{ displayName = 'Business Hours'; definitionRef = [ordered]@{ name = 'evaluateBusinessHours' } }; createdBy = [ordered]@{ displayName = 'Alex Admin' }; modifiedOn = '2026-02-01T00:00:00Z' },
+            # an approval as Azure DevOps stores one that lets the requester approve: no requesterCannotBeApprover
+            [ordered]@{ id = 5; type = [ordered]@{ id = '8c6f20a7-a545-4486-9777-f762fafe0d4d'; name = 'Approval' }; resource = [ordered]@{ type = 'queue'; id = '2' }; timeout = 1440
+                settings = [ordered]@{ approvers = @([ordered]@{ displayName = 'Alex Admin'; id = 'b1b1b1b1-0000-0000-0000-0000000000a1' }); executionOrder = 'anyOrder'; minRequiredApprovers = 0
+                    instructions = ''; blockedApprovers = @() }; createdBy = [ordered]@{ displayName = 'Alex Admin' }; modifiedOn = '2026-04-01T00:00:00Z' })
+        ('endpoint|' + $E1) = @([ordered]@{ id = 4; type = [ordered]@{ name = 'ExclusiveLock' }; resource = [ordered]@{ type = 'endpoint'; id = $E1; name = 'Contoso Prod (WIF)' }; timeout = 43200; isDisabled = $true
+                createdBy = [ordered]@{ displayName = 'Alex Admin' }; modifiedOn = '2026-03-01T00:00:00Z' }) }
+    # permissions: access control lists by "<namespace>|<token>" ('' = the whole namespace)
+    $ace = { param($Descriptor, $Allow, $Deny) [ordered]@{ descriptor = $Descriptor; allow = $Allow; deny = $Deny } }
+    $gPa = 'Microsoft.TeamFoundation.Identity;S-1-9-1551374245-11'; $gContrib = 'Microsoft.TeamFoundation.Identity;S-1-9-1551374245-21'; $gLeads = 'Microsoft.TeamFoundation.Identity;S-1-9-1551374245-31'
+    $gEndpointAdmins = 'Microsoft.TeamFoundation.Identity;S-1-9-1551374245-41'; $gPca = 'Microsoft.TeamFoundation.Identity;S-1-9-1551374245-1'; $build = 'Microsoft.TeamFoundation.ServiceIdentity;build:1'
+    $uPat = 'Microsoft.IdentityModel.Claims.ClaimsIdentity;' + $T + '\pat@fabrikam.com'; $uFormer = 'Microsoft.IdentityModel.Claims.ClaimsIdentity;' + $T + '\former.dev@contoso.com'
+    $uAlex = 'Microsoft.IdentityModel.Claims.ClaimsIdentity;' + $T + '\alex.admin@contoso.onmicrosoft.com'
+    $acl = { param($Token, $Inherit, $Aces) $d = [ordered]@{}; foreach ($x in $Aces) { $d[$x.descriptor] = $x }; [ordered]@{ token = $Token; inheritPermissions = $Inherit; acesDictionary = $d } }
+    $ns = $script:A2CAdoNamespaces
+    $main = ConvertTo-TWHex 'main'
+    $feature = (ConvertTo-TWHex 'feature') + '/' + (ConvertTo-TWHex 'checkout')
+    $a.Acls = @{
+        ($ns.Project + '|$PROJECT:vstfs:///Classification/TeamProject/' + $P1) = @(& $acl ('$PROJECT:vstfs:///Classification/TeamProject/' + $P1) $true @(& $ace $gPa 3 0))
+        ($ns.Git + '|repoV2/' + $P1) = @((& $acl ('repoV2/' + $P1) $true @(& $ace $gContrib 6 0)),
+            (& $acl ('repoV2/' + $P1 + '/' + $R1) $true @(& $ace $uPat 4 0)),
+            (& $acl ('repoV2/' + $P1 + '/' + $R1 + '/refs/heads/' + $main + '/') $true @((& $ace $build 0 8), (& $ace $gContrib 0 0))),
+            (& $acl ('repoV2/' + $P1 + '/' + $R1 + '/refs/heads/' + $feature + '/') $true @(& $ace $gLeads 16 0)))
+        ($ns.Area + '|vstfs:///Classification/Node/' + $A0) = @(& $acl ('vstfs:///Classification/Node/' + $A0 + ':vstfs:///Classification/Node/' + $A1) $true @(& $ace $gLeads 48 0))
+        ($ns.Build + '|' + $P1) = @(& $acl ($P1 + '/Legacy/12') $false @(& $ace $uFormer 2048 0))
+        ($ns.Release + '|' + $P1) = @(& $acl ($P1 + '/5/Environment/22') $true @(& $ace $gLeads 4 0))
+        ($ns.Tfvc + '|$/Legacy App') = @(& $acl '$/Legacy App/Trunk/Main' $true @(& $ace $gContrib 1 0))
+        ($ns.Environment + '|') = @(& $acl ('Environments/' + $P1 + '/1') $true @((& $ace $gContrib 16 0), (& $ace $uAlex 8 0)))
+        ($ns.Library + '|') = @((& $acl ('Library/' + $P1) $true @(& $ace $gContrib 1 0)), (& $acl ('Library/' + $P1 + '/VariableGroup/1') $true @(& $ace $uAlex 2 0)))
+        ($ns.ServiceEndpoints + '|') = @((& $acl ('endpoints/' + $P1 + '/' + $E1) $true @(& $ace $gEndpointAdmins 2 0)), (& $acl ('endpoints/Collection/' + $E1) $true @(& $ace $gPca 2 0)))
+        ($ns.DistributedTask + '|') = @((& $acl 'AgentPools/2' $true @(& $ace $build 16 0)), (& $acl ('AgentQueues/' + $P1 + '/2') $true @(& $ace $gContrib 16 0)))
+    }
+    $act = { param($Bit, $Name, $Display) [ordered]@{ bit = $Bit; name = $Name; displayName = $Display } }
+    $a.Namespaces = @(
+        [ordered]@{ namespaceId = $ns.Project; name = 'Project'; actions = @((& $act 1 'GENERIC_READ' 'View project-level information'), (& $act 2 'GENERIC_WRITE' 'Edit project-level information')) }
+        [ordered]@{ namespaceId = $ns.Git; name = 'Git Repositories'; actions = @((& $act 1 'Administer' 'Administer'), (& $act 2 'GenericRead' 'Read'), (& $act 4 'GenericContribute' 'Contribute'),
+                (& $act 8 'ForcePush' 'Force push (rewrite history, delete branches and tags)'), (& $act 16 'CreateBranch' 'Create branch')) }
+        [ordered]@{ namespaceId = $ns.Area; name = 'CSS'; actions = @((& $act 1 'GENERIC_READ' 'View permissions for this node'), (& $act 16 'WORK_ITEM_READ' 'View work items in this node'), (& $act 32 'WORK_ITEM_WRITE' 'Edit work items in this node')) }
+        [ordered]@{ namespaceId = $ns.Iteration; name = 'Iteration'; actions = @(& $act 1 'GENERIC_READ' 'View permissions for this node') }
+        [ordered]@{ namespaceId = $ns.Build; name = 'Build'; actions = @((& $act 1 'ViewBuilds' 'View builds'), (& $act 2048 'EditBuildDefinition' 'Edit build pipeline')) }
+        [ordered]@{ namespaceId = $ns.Release; name = 'ReleaseManagement'; actions = @(& $act 4 'DeleteReleaseDefinition' 'Delete release pipeline') }
+        [ordered]@{ namespaceId = $ns.Tfvc; name = 'VersionControlItems'; actions = @(& $act 1 'Read' 'Read') }
+        [ordered]@{ namespaceId = $ns.Environment; name = 'Environment'; actions = @((& $act 1 'View' 'View'), (& $act 8 'Administer' 'Administer'), (& $act 16 'Use' 'Use')) }
+        [ordered]@{ namespaceId = $ns.Library; name = 'Library'; actions = @((& $act 1 'View' 'View library item'), (& $act 2 'Administer' 'Administer library item')) }
+        [ordered]@{ namespaceId = $ns.ServiceEndpoints; name = 'ServiceEndpoints'; actions = @((& $act 1 'Use' 'Use endpoint'), (& $act 2 'Administer' 'Administer endpoint')) }
+        [ordered]@{ namespaceId = $ns.DistributedTask; name = 'DistributedTask'; actions = @((& $act 1 'View' 'View'), (& $act 16 'Use' 'Use')) }
+        # a namespace listed twice (local and remote) is read once
+        [ordered]@{ namespaceId = $ns.Git; name = 'Git Repositories'; actions = @() })
+    # identities of the permission holders; Former Dev is not found (removed user): named from the descriptor
+    $idn = { param($Descriptor, $Name, $Container, $Account) [ordered]@{ id = [guid]::NewGuid().ToString(); descriptor = $Descriptor; providerDisplayName = $Name; isContainer = [bool]$Container
+            properties = [ordered]@{ SchemaClassName = [ordered]@{ '$type' = 'System.String'; '$value' = $(if ($Container) { 'Group' } else { 'User' }) }; Account = [ordered]@{ '$type' = 'System.String'; '$value' = $Account } } } }
+    $a.Identities = @{
+        $gPa = (& $idn $gPa '[Web Shop]\Project Administrators' $true '[Web Shop]\Project Administrators'); $gContrib = (& $idn $gContrib '[Web Shop]\Contributors' $true '[Web Shop]\Contributors')
+        $gLeads = (& $idn $gLeads '[Web Shop]\Contoso Leads' $true '[Web Shop]\Contoso Leads'); $gEndpointAdmins = (& $idn $gEndpointAdmins '[Web Shop]\Endpoint Administrators' $true '[Web Shop]\Endpoint Administrators')
+        $gPca = (& $idn $gPca '[contoso-ado]\Project Collection Administrators' $true '[contoso-ado]\Project Collection Administrators')
+        $build = (& $idn $build 'Project Collection Build Service (contoso-ado)' $false 'contoso-ado Build Service')
+        $uPat = (& $idn $uPat 'Pat Partner' $false 'pat@fabrikam.com'); $uAlex = (& $idn $uAlex 'Alex Admin' $false 'alex.admin@contoso.onmicrosoft.com') }
+    $a.ServicePrincipals = @([ordered]@{ descriptor = 'aadsp.pipeline'; displayName = 'Contoso Pipeline SP'; subjectKind = 'servicePrincipal'; origin = 'aad'; originId = 'abababab-0000-0000-0000-0000000000c1' })
+    $a.Lookups = @{ 'aad.departed' = [ordered]@{ descriptor = 'aad.departed'; displayName = 'Departed User'; principalName = 'departed.user@contoso.com'; subjectKind = 'user'; origin = 'aad'; originId = 'b1b1b1b1-0000-0000-0000-0000000000a9' } }
+    # Organization settings > Policies page data (no documented API)
+    $pol = { param($Name, $Value) [ordered]@{ policy = [ordered]@{ name = $Name; value = $Value; effectiveValue = $Value; isValueUndefined = $false } } }
+    $a.PolicyPage = [ordered]@{ fps = [ordered]@{ dataProviders = [ordered]@{ data = [ordered]@{ 'ms.vss-admin-web.organization-policies-data-provider' = [ordered]@{ policies = [ordered]@{
+                            applicationConnection = @((& $pol 'Policy.DisallowOAuthAuthentication' $false), (& $pol 'Policy.DisallowSecureShell' $true))
+                            security = @((& $pol 'Policy.AllowAnonymousAccess' $true), (& $pol 'Policy.LogAuditEvents' $true))
+                            user = @((& $pol 'Policy.DisallowAadGuestUserAccess' $false), (& $pol 'Policy.AllowTeamAdminsInvitationsAccessToken' $true)) } } } } } }
+    $a.Wikis = @{ $P1 = @([ordered]@{ id = 'e7e7e7e7-0000-0000-0000-000000000001'; name = 'Web Shop.wiki'; type = 'projectWiki'; projectId = $P1; repositoryId = 'e7e7e7e7-0000-0000-0000-00000000000a'; mappedPath = '/'; versions = @([ordered]@{ version = 'wikiMaster' }) },
+            [ordered]@{ id = 'e7e7e7e7-0000-0000-0000-000000000002'; name = 'Contoso Docs'; type = 'codeWiki'; projectId = $P1; repositoryId = $R1; mappedPath = '/docs'; versions = @([ordered]@{ version = 'main' }) }) }
+    $pr = { param($Id, $Title, $Status, $Source, $Created, $Closed, $By, $Reviewers) [ordered]@{ pullRequestId = $Id; title = $Title; status = $Status; repository = [ordered]@{ id = $R1; name = 'webshop' }
+            sourceRefName = 'refs/heads/' + $Source; targetRefName = 'refs/heads/main'; creationDate = $Created; closedDate = $Closed; createdBy = [ordered]@{ displayName = $By }; reviewers = @($Reviewers); isDraft = $false; mergeStatus = 'succeeded' } }
+    $a.PullRequests = @{ $P1 = @((& $pr 7 'Contoso checkout redesign' 'active' 'feature/checkout' '2026-09-20T00:00:00Z' $null 'Former Dev' @([ordered]@{ displayName = 'Alex Admin'; vote = 10 }, [ordered]@{ displayName = '[Web Shop]\Contoso Leads'; vote = 0 })),
+            (& $pr 6 'Contoso fix payment rounding' 'completed' 'fix/rounding' '2026-08-01T00:00:00Z' '2026-08-02T00:00:00Z' 'Alex Admin' @([ordered]@{ displayName = 'Former Dev'; vote = -10 })),
+            (& $pr 5 'Contoso old experiment' 'abandoned' 'spike/old' '2025-01-01T00:00:00Z' '2025-01-05T00:00:00Z' 'Former Dev' @())) }
+    $a.Shelvesets = @([ordered]@{ id = 'Contoso WIP;b1b1b1b1-0000-0000-0000-0000000000a2'; name = 'Contoso WIP'; owner = [ordered]@{ displayName = 'Former Dev'; uniqueName = 'former.dev@contoso.com' }; createdDate = '2023-04-01T00:00:00Z'; comment = 'wip' }
+        [ordered]@{ id = 'old-fix;b1b1b1b1-0000-0000-0000-0000000000a2'; name = 'old-fix'; owner = [ordered]@{ displayName = 'Former Dev'; uniqueName = 'former.dev@contoso.com' }; createdDate = '2022-01-01T00:00:00Z' }
+        [ordered]@{ id = 'try;b1b1b1b1-0000-0000-0000-0000000000a1'; name = 'try'; owner = [ordered]@{ displayName = 'Alex Admin'; uniqueName = 'alex.admin@contoso.onmicrosoft.com' }; createdDate = '2023-05-01T00:00:00Z' })
+
+    $org = '^(?:[a-z]+\.)?dev\.azure\.com/contoso-ado/'
+    $proj = '([0-9a-f-]{36})/'
+    $team = '([0-9a-f-]{36})/'
+    $add = { param($Pattern, [scriptblock] $Handler, [string] $Method = 'GET') $w.AdoRoutes.Add(@{ Method = $Method; Pattern = $Pattern; Handler = $Handler }) }
+    & $add ($org + '_apis/graph/serviceprincipals\?') { param($path, $body, $m) New-TWAdoList $global:TW.Ado.ServicePrincipals }
+    & $add ($org + '_apis/graph/subjectlookup\?') {
+        param($path, $body, $m)
+        $v = [ordered]@{}
+        foreach ($k in @((ConvertFrom-Json $body).lookupKeys | ForEach-Object { $_.descriptor })) { if ($global:TW.Ado.Lookups.ContainsKey($k)) { $v[$k] = $global:TW.Ado.Lookups[$k] } }
+        [ordered]@{ count = $v.Count; value = $v }
+    } 'POST'
+    & $add ($org + '_settings/organizationPolicy\?__rt=fps') { param($path, $body, $m) $global:TW.Ado.PolicyPage }
+    & $add ($org + '_apis/securitynamespaces\?') { param($path, $body, $m) New-TWAdoList $global:TW.Ado.Namespaces }
+    & $add ($org + '_apis/accesscontrollists/([0-9a-f-]{36})\?') {
+        param($path, $body, $m)
+        $tok = ''
+        if ($path -match '[?&]token=([^&]+)') { $tok = [uri]::UnescapeDataString($Matches[1]) }
+        New-TWAdoList @($global:TW.Ado.Acls[$m[1] + '|' + $tok] | Where-Object { $null -ne $_ })
+    }
+    & $add '^vssps\.dev\.azure\.com/contoso-ado/_apis/identities\?descriptors=([^&]+)' {
+        param($path, $body, $m)
+        # one answer per descriptor, in order; null for identities that are not found
+        $vals = [System.Collections.Generic.List[object]]::new()
+        foreach ($d in ($m[1] -split ',')) { $vals.Add($global:TW.Ado.Identities[[uri]::UnescapeDataString($d)]) }
+        New-TWResponse -Obj ([ordered]@{ count = $vals.Count; value = $vals })
+    }
+    & $add '^vssps\.dev\.azure\.com/contoso-ado/_apis/identities\?identityIds=([^&]+)' {
+        param($path, $body, $m)
+        # identities by ID: the ones that exist (the dashboard editor Alex Admin)
+        $byId = @{ 'b1b1b1b1-0000-0000-0000-0000000000a1' = [ordered]@{ id = 'b1b1b1b1-0000-0000-0000-0000000000a1'; descriptor = 'Microsoft.IdentityModel.Claims.ClaimsIdentity;contoso\alex.admin'; providerDisplayName = 'Alex Admin'; isContainer = $false } }
+        $vals = @($m[1] -split ',' | ForEach-Object { $byId[$_] } | Where-Object { $null -ne $_ })
+        New-TWResponse -Obj ([ordered]@{ count = $vals.Count; value = $vals })
+    }
+    & $add ($org + '_apis/projects/([0-9a-f-]{36})/teams\?') { param($path, $body, $m) New-TWAdoList (Select-TWAdoPage @($global:TW.Ado.Teams[$m[1]]) $path) }
+    & $add ($org + '_apis/projects/([0-9a-f-]{36})/teams/([0-9a-f-]{36})/members\?') { param($path, $body, $m) New-TWAdoList (Select-TWAdoPage @($global:TW.Ado.TeamMembers[$m[2]]) $path) }
+    & $add ($org + $proj + $team + '_apis/work/teamsettings\?') { param($path, $body, $m) $global:TW.Ado.TeamSettings[$m[2]] }
+    & $add ($org + $proj + $team + '_apis/work/teamsettings/teamfieldvalues\?') { param($path, $body, $m) $global:TW.Ado.TeamFieldValues[$m[2]] }
+    # the team iterations answer in "values" (as the REST reference shows them)
+    & $add ($org + $proj + $team + '_apis/work/teamsettings/iterations\?') { param($path, $body, $m) $v = @($global:TW.Ado.TeamIterations[$m[2]] | Where-Object { $null -ne $_ }); [ordered]@{ count = $v.Count; values = $v } }
+    & $add ($org + $proj + $team + '_apis/work/boards\?') { param($path, $body, $m) New-TWAdoList $global:TW.Ado.Boards[$m[2]] }
+    & $add ($org + $proj + $team + '_apis/work/boards/([0-9a-f-]{36})/cardsettings\?') { param($path, $body, $m) $global:TW.Ado.CardSettings[$m[3]] }
+    & $add ($org + $proj + $team + '_apis/work/boards/([0-9a-f-]{36})/cardrulesettings\?') { param($path, $body, $m) $global:TW.Ado.CardRules[$m[3]] }
+    & $add ($org + $proj + $team + '_apis/work/boards/([0-9a-f-]{36})\?') { param($path, $body, $m) $global:TW.Ado.BoardDetail[$m[3]] }
+    & $add ($org + $proj + $team + '_apis/dashboard/dashboards\?api-version=7\.1-preview\.3$') {
+        param($path, $body, $m)
+        New-TWAdoList @($global:TW.Ado.TeamDashboards[$m[2]] | Where-Object { $_ } | ForEach-Object { $d = $global:TW.Ado.Dashboards[$_]; [ordered]@{ id = $d.id; name = $d.name; dashboardScope = $d.dashboardScope } })
+    }
+    & $add ($org + $proj + $team + '_apis/dashboard/dashboards/([0-9a-f-]{36})\?api-version=7\.1-preview\.3$') { param($path, $body, $m) $global:TW.Ado.Dashboards[$m[3]] }
+    & $add ($org + $proj + '_apis/dashboard/dashboards\?api-version=7\.1-preview\.3$') {
+        param($path, $body, $m)
+        New-TWAdoList @($global:TW.Ado.ProjectDashboards[$m[1]] | Where-Object { $_ } | ForEach-Object { $d = $global:TW.Ado.Dashboards[$_]; [ordered]@{ id = $d.id; name = $d.name; dashboardScope = $d.dashboardScope } })
+    }
+    & $add ($org + $proj + '_apis/dashboard/dashboards/([0-9a-f-]{36})\?api-version=7\.1-preview\.3$') { param($path, $body, $m) $global:TW.Ado.Dashboards[$m[2]] }
+    & $add ($org + $proj + $team + '_apis/wit/templates\?') { param($path, $body, $m) New-TWAdoList @($global:TW.Ado.Templates[$m[2]] | Where-Object { $null -ne $_ } | ForEach-Object { [ordered]@{ id = $_.id; name = $_.name; workItemTypeName = $_.workItemTypeName } }) }
+    & $add ($org + $proj + $team + '_apis/wit/templates/([0-9a-f-]{36})\?') { param($path, $body, $m) @($global:TW.Ado.Templates[$m[2]] | Where-Object { $_.id -eq $m[3] })[0] }
+    & $add ($org + '_apis/notification/subscriptions\?targetId=([0-9a-f-]{36})') { param($path, $body, $m) New-TWAdoList $global:TW.Ado.Notifications[$m[1]] }
+    & $add ($org + $proj + '_apis/wit/classificationnodes\?') { param($path, $body, $m) New-TWAdoList $global:TW.Ado.Nodes[$m[1]] }
+    & $add ($org + $proj + '_apis/wit/queries\?') { param($path, $body, $m) New-TWAdoList $global:TW.Ado.Queries[$m[1]] }
+    & $add ($org + $proj + '_apis/wit/queries/([0-9a-f-]{36})\?') { param($path, $body, $m) $global:TW.Ado.QueryFolders[$m[2]] }
+    & $add ($org + $proj + '_apis/wit/tags\?') { param($path, $body, $m) New-TWAdoList $global:TW.Ado.Tags[$m[1]] }
+    & $add ($org + $proj + '_apis/distributedtask/queues\?') { param($path, $body, $m) New-TWAdoList $global:TW.Ado.Queues[$m[1]] }
+    & $add ($org + $proj + '_apis/pipelines/checks/queryconfigurations\?') {
+        param($path, $body, $m)
+        $v = [System.Collections.Generic.List[object]]::new()
+        $asked = ConvertFrom-Json $body   # an array (Windows PowerShell 5.1 does not unroll it)
+        foreach ($r in $asked) { foreach ($c in @($global:TW.Ado.CheckConfigs[[string]$r.type + '|' + [string]$r.id] | Where-Object { $null -ne $_ })) { $v.Add($c) } }
+        New-TWAdoList $v
+    } 'POST'
+    & $add ($org + $proj + '_apis/wiki/wikis\?') { param($path, $body, $m) New-TWAdoList $global:TW.Ado.Wikis[$m[1]] }
+    & $add ($org + $proj + '_apis/git/pullrequests\?') { param($path, $body, $m) New-TWAdoList (Select-TWAdoPage @($global:TW.Ado.PullRequests[$m[1]]) $path) }
+    & $add ($org + '_apis/tfvc/shelvesets\?') { param($path, $body, $m) New-TWAdoList (Select-TWAdoPage $global:TW.Ado.Shelvesets $path) }
+}
+
+function Add-TWAdoWorkItemFixtures {
+    # AzureDevOpsWorkItems: work items 1-5 in Web Shop (4 is found by the query but not returned) and 10 in Legacy App;
+    # revisions, links, comments (two pages), attachments (one too large, one name twice, one gone), images linked from
+    # the text (description, comment, an older revision only, test steps; one gone), a work item with one revision,
+    # one comment and one relation (2), a test plan with a requirement suite, a manual and an automated test run,
+    # releases and run logs.
+    param($w)
+    $a = $w.Ado
+    $P1 = 'b1b1b1b1-0000-0000-0000-000000000001'; $P2 = 'b1b1b1b1-0000-0000-0000-000000000002'
+    $alex = [ordered]@{ displayName = 'Alex Admin'; uniqueName = 'alex.admin@contoso.onmicrosoft.com'; id = 'b1b1b1b1-0000-0000-0000-0000000000a1' }
+    $former = [ordered]@{ displayName = 'Former Dev'; uniqueName = 'former.dev@contoso.com'; id = 'b1b1b1b1-0000-0000-0000-0000000000a2' }
+    $wiUrl = 'https://dev.azure.com/contoso-ado/_apis/wit/workItems/'
+    $attUrl = 'https://dev.azure.com/contoso-ado/_apis/wit/attachments/'
+    # images pasted into the text link to the attachment with the project ID in the path
+    $imgUrl = 'https://dev.azure.com/contoso-ado/' + $P1 + '/_apis/wit/attachments/'
+    $desc1 = '<div>Contoso redesign</div><div><img src="' + $imgUrl + 'e1e1e1e1-0000-0000-0000-000000000001?fileName=image.png" alt=Image></div>' +
+        '<div><a href="' + $attUrl + 'a1a1a1a1-0000-0000-0000-000000000001?fileName=design.txt">design.txt</a></div>'
+    $item = { param($Id, $Type, $Title, $State, $Rev, $Comments, $Extra, $Rels)
+        $f = [ordered]@{ 'System.Id' = $Id; 'System.WorkItemType' = $Type; 'System.Title' = $Title; 'System.State' = $State; 'System.Reason' = 'New'; 'System.AreaPath' = 'Web Shop\Contoso Checkout'
+            'System.IterationPath' = 'Web Shop\Contoso Sprint 1'; 'System.AssignedTo' = $alex; 'System.CreatedBy' = $former; 'System.CreatedDate' = '2026-08-01T10:00:00Z'; 'System.ChangedBy' = $alex
+            'System.ChangedDate' = '2026-09-20T10:00:00Z'; 'System.Rev' = $Rev; 'System.CommentCount' = $Comments }
+        if ($null -ne $Extra) { foreach ($k in $Extra.Keys) { $f[$k] = $Extra[$k] } }
+        [ordered]@{ id = $Id; rev = $Rev; fields = $f; relations = @($Rels); url = $wiUrl + $Id } }
+    $rel = { param($Rel, $Url, $Attr) [ordered]@{ rel = $Rel; url = $Url; attributes = $Attr } }
+    $steps = '<steps id="0" last="4"><step id="2" type="ActionStep"><parameterizedString isformatted="true">&lt;DIV&gt;&lt;P&gt;Open the Contoso checkout&lt;/P&gt;' +
+        '&lt;IMG src=&quot;' + $imgUrl + 'e4e4e4e4-0000-0000-0000-000000000004?fileName=checkout.png&quot;&gt;&lt;/DIV&gt;</parameterizedString>' +
+        '<parameterizedString isformatted="true">&lt;DIV&gt;&lt;P&gt;The cart shows 1 item&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step>' +
+        '<step id="3" type="ValidateStep"><parameterizedString isformatted="true">Pay with card &amp;amp; confirm</parameterizedString><parameterizedString isformatted="true">Payment accepted</parameterizedString><description/></step>' +
+        '<compref id="4" ref="8" /></steps>'
+    $a.WorkItems2 = @{
+        1 = (& $item 1 'User Story' 'Contoso checkout redesign' 'Active' 3 2 ([ordered]@{ 'System.Tags' = 'contoso-hotfix; Blocked'; 'System.Description' = $desc1 }) @(
+                (& $rel 'System.LinkTypes.Hierarchy-Forward' ($wiUrl + '2') ([ordered]@{ isLocked = $false; name = 'Child' })),
+                (& $rel 'AttachedFile' ($attUrl + 'a1a1a1a1-0000-0000-0000-000000000001') ([ordered]@{ name = 'design.txt'; resourceSize = 2048; resourceCreatedDate = '2026-08-02T00:00:00Z'; comment = 'first draft' })),
+                (& $rel 'Hyperlink' 'https://wiki.contoso.example/checkout' ([ordered]@{ comment = 'spec' })),
+                (& $rel 'ArtifactLink' 'vstfs:///Git/Commit/b1b1b1b1-0000-0000-0000-000000000001%2Fc1c1c1c1-0000-0000-0000-000000000001%2Fabc123' ([ordered]@{ name = 'Fixed in Commit' }))))
+        2 = (& $item 2 'Task' 'Contoso card form' 'New' 1 1 ([ordered]@{ 'System.Parent' = 1 }) @(& $rel 'System.LinkTypes.Hierarchy-Reverse' ($wiUrl + '1') ([ordered]@{ isLocked = $false; name = 'Parent' })))
+        3 = (& $item 3 'Test Case' 'Contoso pay with card' 'Design' 1 0 ([ordered]@{ 'Microsoft.VSTS.TCM.Steps' = $steps }) @(& $rel 'Microsoft.VSTS.Common.TestedBy-Reverse' ($wiUrl + '1') ([ordered]@{ name = 'Tests' })))
+        5 = (& $item 5 'Bug' 'Contoso rounding error' 'Resolved' 2 0 $null @(
+                (& $rel 'AttachedFile' ($attUrl + 'a1a1a1a1-0000-0000-0000-000000000002') ([ordered]@{ name = 'screen-recording.mp4'; resourceSize = 314572800 })),
+                (& $rel 'AttachedFile' ($attUrl + 'a1a1a1a1-0000-0000-0000-000000000003') ([ordered]@{ name = 'log.txt'; resourceSize = 100 })),
+                (& $rel 'AttachedFile' ($attUrl + 'a1a1a1a1-0000-0000-0000-000000000004') ([ordered]@{ name = 'log.txt' })),
+                (& $rel 'AttachedFile' ($attUrl + 'a1a1a1a1-0000-0000-0000-000000000005') ([ordered]@{ name = 'gone.txt'; resourceSize = 10 }))))
+        10 = (& $item 10 'Task' 'Contoso legacy migration' 'Active' 2 1 ([ordered]@{ 'System.AreaPath' = 'Legacy App'; 'System.IterationPath' = 'Legacy App' }) @())
+    }
+    $a.WiqlIds = @{ $P1 = @(1, 2, 3, 4, 5); $P2 = @(10) }
+    $revOf = { param($Id, $N) @(1..$N | ForEach-Object { [ordered]@{ id = $Id; rev = $_; fields = [ordered]@{ 'System.Rev' = $_; 'System.State' = $(if ($_ -eq 1) { 'New' } else { 'Active' }) } } }) }
+    # work item 1: revision 2 showed an image that revision 3 (the current text) no longer has
+    $rev1 = & $revOf 1 3
+    $rev1[1].fields['System.Description'] = '<div>Contoso redesign, first draft</div><img src="' + $imgUrl + 'e3e3e3e3-0000-0000-0000-000000000003?fileName=old%20diagram.png">'
+    $rev1[2].fields['System.Description'] = $desc1
+    $a.Revisions = @{ '1' = $rev1; '2' = (& $revOf 2 1); '3' = (& $revOf 3 1); '5' = (& $revOf 5 2); '10' = (& $revOf 10 2) }
+    $a.Comments = @{ '1' = @([ordered]@{ id = 11; workItemId = 1; text = 'Contoso first comment'; createdBy = $alex; createdDate = '2026-08-03T00:00:00Z' },
+            [ordered]@{ id = 12; workItemId = 1; text = '<div>Second comment</div><div><img src="' + $imgUrl + 'e2e2e2e2-0000-0000-0000-000000000002?fileName=image.png" alt=Image></div>'
+                createdBy = $former; createdDate = '2026-08-04T00:00:00Z' })
+        '2' = @([ordered]@{ id = 14; workItemId = 2; text = 'Contoso card note'; createdBy = $alex; createdDate = '2026-08-05T00:00:00Z' })
+        '10' = @([ordered]@{ id = 13; workItemId = 10; text = 'Legacy note'; createdBy = $former; createdDate = '2026-01-01T00:00:00Z' }) }
+    $a.Plans = @{ $P1 = @([ordered]@{ id = 50; name = 'Contoso Release Tests'; state = 'Active'; areaPath = 'Web Shop'; iteration = 'Web Shop\Contoso Sprint 1'; owner = $alex
+                startDate = '2026-09-01T00:00:00Z'; endDate = '2026-09-28T00:00:00Z'; rootSuite = [ordered]@{ id = 51 } }) }
+    $a.Suites = @{ '50' = @([ordered]@{ id = 51; name = 'Contoso Release Tests'; suiteType = 'staticTestSuite' }, [ordered]@{ id = 52; name = 'Checkout'; suiteType = 'requirementTestSuite'; parentSuite = [ordered]@{ id = 51; name = 'Contoso Release Tests' }; requirementId = 1 }) }
+    $a.SuiteCases = @{ '52' = @([ordered]@{ workItem = [ordered]@{ id = 3; name = 'Contoso pay with card'; workItemFields = @([ordered]@{ 'System.Title' = 'Contoso pay with card' }, [ordered]@{ 'Microsoft.VSTS.TCM.Steps' = $steps }) }
+                pointAssignments = @([ordered]@{ id = 1; configurationId = 1; configurationName = 'Windows 10'; tester = [ordered]@{ displayName = 'Pat Partner' } }) }) }
+    # as the lists answer: a run names its plan, a result its configuration, by ID only
+    $a.TestRuns = @{ $P1 = @([ordered]@{ id = 70; name = 'Contoso manual run'; state = 'Completed'; isAutomated = $false; plan = [ordered]@{ id = '50' }; startedDate = '2026-09-10T09:00:00Z'
+                completedDate = '2026-09-10T10:00:00Z'; totalTests = 1; passedTests = 0; owner = [ordered]@{ displayName = 'Pat Partner' } },
+            [ordered]@{ id = 71; name = 'VSTest_TestResults_101'; state = 'Completed'; isAutomated = $true; build = [ordered]@{ id = '101'; name = '2026.101' }; startedDate = '2026-09-28T10:05:00Z'
+                completedDate = '2026-09-28T10:10:00Z'; totalTests = 120; passedTests = 118 }) }
+    $a.TestResults = @{ '70' = @([ordered]@{ id = 100000; testCase = [ordered]@{ id = '3'; name = 'Contoso pay with card' }; testCaseTitle = 'Contoso pay with card'; outcome = 'Failed'
+                startedDate = '2026-09-10T09:10:00Z'; completedDate = '2026-09-10T09:11:05Z'; durationInMs = 65000; runBy = [ordered]@{ displayName = 'Pat Partner' }; configuration = [ordered]@{ id = '1' }
+                errorMessage = 'Card declined by the test gateway' }) }
+    $a.ReleaseRuns = @{ $P1 = @([ordered]@{ id = 42; name = 'Release-42'; releaseDefinition = [ordered]@{ id = 5; name = 'webshop-release' }; status = 'active'; reason = 'manual'; createdOn = '2026-06-01T00:00:00Z'
+                createdBy = $alex; description = 'Contoso go-live'; environments = @([ordered]@{ id = 1001; name = 'Dev'; status = 'succeeded' }, [ordered]@{ id = 1002; name = 'Prod'; status = 'rejected' }) },
+            [ordered]@{ id = 41; name = 'Release-41'; releaseDefinition = [ordered]@{ id = 5; name = 'webshop-release' }; status = 'abandoned'; reason = 'manual'; createdOn = '2026-05-01T00:00:00Z'
+                createdBy = $former; environments = @([ordered]@{ id = 1003; name = 'Dev'; status = 'notStarted' }) }) }
+
+    $org = '^(?:[a-z]+\.)?dev\.azure\.com/contoso-ado/'
+    $proj = '([0-9a-f-]{36})/'
+    $add = { param($Pattern, [scriptblock] $Handler, [string] $Method = 'GET') $w.AdoRoutes.Add(@{ Method = $Method; Pattern = $Pattern; Handler = $Handler }) }
+    & $add ($org + $proj + '_apis/wit/wiql\?') {
+        param($path, $body, $m)
+        # the IDs above the one in the query, sorted, at most $top
+        $last = 0
+        if ((ConvertFrom-Json $body).query -match '\[System\.Id\] > (\d+)') { $last = [int]$Matches[1] }
+        $top = 20000
+        if ($path -match '\$top=(\d+)') { $top = [int]$Matches[1] }
+        $ids = @($global:TW.Ado.WiqlIds[$m[1]] | Where-Object { $_ -gt $last } | Sort-Object | Select-Object -First $top)
+        [ordered]@{ queryType = 'flat'; queryResultType = 'workItem'; workItems = @($ids | ForEach-Object { [ordered]@{ id = $_; url = 'https://dev.azure.com/contoso-ado/_apis/wit/workItems/' + $_ } }) }
+    } 'POST'
+    & $add ($org + $proj + '_apis/wit/workitems\?ids=([0-9,]+)&') {
+        param($path, $body, $m)
+        New-TWAdoList @($m[2] -split ',' | ForEach-Object { $global:TW.Ado.WorkItems2[[int]$_] } | Where-Object { $null -ne $_ })
+    }
+    & $add ($org + $proj + '_apis/wit/workItems/(\d+)/revisions\?') { param($path, $body, $m) New-TWAdoList (Select-TWAdoPage @($global:TW.Ado.Revisions[$m[2]]) $path) }
+    & $add ($org + $proj + '_apis/wit/workItems/(\d+)/comments\?') {
+        param($path, $body, $m)
+        # one comment per page, the next page through the continuation token
+        $all = @($global:TW.Ado.Comments[$m[2]] | Where-Object { $null -ne $_ })
+        $from = 0
+        if ($path -match 'continuationToken=c(\d+)') { $from = [int]$Matches[1] }
+        $next = $null
+        if ($from + 1 -lt $all.Count) { $next = 'c' + ($from + 1) }
+        [ordered]@{ totalCount = $all.Count; count = 1; comments = @($all | Select-Object -Skip $from -First 1); continuationToken = $next }
+    }
+    & $add ($org + '(?:[0-9a-f-]{36}/)?_apis/wit/attachments/([0-9a-f-]{36})\?fileName=([^&]+)&download=true') {
+        param($path, $body, $m)
+        if ($m[1] -in @('a1a1a1a1-0000-0000-0000-000000000005', 'e4e4e4e4-0000-0000-0000-000000000004')) { return (New-TWError 404 'AttachmentNotFoundException' 'TF401232: The attachment was not found.') }
+        @{ StatusCode = 200; Content = ''; Headers = @{}; File = ('attachment ' + [uri]::UnescapeDataString($m[2]) + ' ' + $m[1]) }
+    }
+    & $add ($org + $proj + '_apis/testplan/plans\?') { param($path, $body, $m) New-TWAdoList $global:TW.Ado.Plans[$m[1]] }
+    & $add ($org + $proj + '_apis/testplan/Plans/(\d+)/suites\?') { param($path, $body, $m) New-TWAdoList $global:TW.Ado.Suites[$m[2]] }
+    & $add ($org + $proj + '_apis/testplan/Plans/(\d+)/Suites/(\d+)/TestCase\?') { param($path, $body, $m) New-TWAdoList $global:TW.Ado.SuiteCases[$m[3]] }
+    & $add ($org + $proj + '_apis/test/runs\?') { param($path, $body, $m) New-TWAdoList (Select-TWAdoPage @($global:TW.Ado.TestRuns[$m[1]]) $path) }
+    & $add ($org + $proj + '_apis/test/Runs/(\d+)/results\?') { param($path, $body, $m) New-TWAdoList (Select-TWAdoPage @($global:TW.Ado.TestResults[$m[2]]) $path) }
+    & $add ($org + $proj + '_apis/testplan/configurations\?') { param($path, $body, $m) New-TWAdoList @([ordered]@{ id = 1; name = 'Windows 10'; isDefault = $true }, [ordered]@{ id = 2; name = 'Windows 11' }) }
+    & $add ($org + $proj + '_apis/build/builds/(\d+)/logs\?') { param($path, $body, $m) @{ StatusCode = 200; Content = ''; Headers = @{}; Zip = [ordered]@{ ('logs/1_Job.txt') = ('log of run ' + $m[2]) } } }
+    & $add ($org + $proj + '_apis/release/releases\?') { param($path, $body, $m) New-TWAdoList $global:TW.Ado.ReleaseRuns[$m[1]] }
+    & $add ($org + $proj + '_apis/release/releases/(\d+)/logs\?') { param($path, $body, $m) @{ StatusCode = 200; Content = ''; Headers = @{}; Zip = [ordered]@{ ('Dev/1_Deploy.txt') = ('log of release ' + $m[2]) } } }
 }
 
 function Add-TWGalleryFixtures {

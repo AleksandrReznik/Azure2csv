@@ -46,6 +46,15 @@ Test-Case 'script parses without errors' {
     Assert-Equal 0 @($errors).Count (($errors | ForEach-Object { $_.Message }) -join '; ')
 }
 
+Test-Case 'every function is defined once (a second definition silently replaces the first)' {
+    $tokens = $null; $errors = $null
+    $ast = [System.Management.Automation.Language.Parser]::ParseFile($scriptPath, [ref]$tokens, [ref]$errors)
+    $names = @($ast.FindAll({ param($n) $n -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $false) | ForEach-Object { $_.Name })
+    $dup = @($names | Group-Object | Where-Object { $_.Count -gt 1 } | ForEach-Object { $_.Name })
+    Assert-True ($names.Count -gt 100) ('functions found: ' + $names.Count)
+    Assert-Equal 0 $dup.Count ('defined more than once: ' + ($dup -join ', '))
+}
+
 Test-Case 'script source is ASCII only (safe for Windows PowerShell 5.1 without BOM)' {
     $bytes = [IO.File]::ReadAllBytes($scriptPath)
     $bad = 0
@@ -73,7 +82,7 @@ Test-Case 'tab completion of -Reports, -AddReports and -SkipReports offers the r
         $ac = $cmd.Parameters[$p].Attributes | Where-Object { $_ -is [System.Management.Automation.ArgumentCompleterAttribute] }
         Assert-True ($null -ne $ac) ($p + ' has no completer')
         Assert-Equal (($expected | Sort-Object) -join ',') ((@(& $ac.ScriptBlock 'azure2csv.ps1' $p '') | Sort-Object) -join ',') $p
-        Assert-Equal 'AzureDevOps,AzureDevOpsPackages,AzureDevOpsPipelines,AzureDevOpsRepos' ((@(& $ac.ScriptBlock 'azure2csv.ps1' $p 'azuredev') | Sort-Object) -join ',') ($p + ' filtered')
+        Assert-Equal 'AzureDevOps,AzureDevOpsPackages,AzureDevOpsPipelines,AzureDevOpsRepos,AzureDevOpsStructure,AzureDevOpsWorkItems' ((@(& $ac.ScriptBlock 'azure2csv.ps1' $p 'azuredev') | Sort-Object) -join ',') ($p + ' filtered')
         Assert-Equal 0 @($cmd.Parameters[$p].Attributes | Where-Object { $_ -is [System.Management.Automation.ValidateSetAttribute] }).Count ($p + ': ValidateSet would refuse lists from cmd')
     }
     $pt = $cmd.Parameters['AdoPackageTypes'].Attributes | Where-Object { $_ -is [System.Management.Automation.ArgumentCompleterAttribute] }
@@ -81,10 +90,11 @@ Test-Case 'tab completion of -Reports, -AddReports and -SkipReports offers the r
 }
 
 Test-Case 'lists from cmd or pwsh -File: "A,B", "A, B" and words cut apart (A, B) all work; names are checked by the script' {
-    # -AddReports AzureDevOpsRepos, AzureDevOpsPackages, AppCode started from cmd: one value with a comma, the rest loose
-    $o = New-A2COptions -Params ([ordered]@{ ReportProfile = 'Full'; AddReports = @('AzureDevOpsRepos,'); CostDays = 365; RemainingArguments = @('AzureDevOpsPackages,', 'AppCode') })
-    Assert-Equal 'AzureDevOpsRepos,AzureDevOpsPackages,AppCode' ($o.AddReports -join ',')
-    Assert-Equal @($script:A2CReportCatalog).Count (Resolve-A2CSelection $o).Count 'Full plus the three reports that run only when named = every report'
+    # -AddReports AzureDevOpsRepos, AzureDevOpsPackages, AppCode, AzureDevOpsWorkItems started from cmd: one value with a
+    # comma, the rest loose
+    $o = New-A2COptions -Params ([ordered]@{ ReportProfile = 'Full'; AddReports = @('AzureDevOpsRepos,'); CostDays = 365; RemainingArguments = @('AzureDevOpsPackages,', 'AppCode,', 'AzureDevOpsWorkItems') })
+    Assert-Equal 'AzureDevOpsRepos,AzureDevOpsPackages,AppCode,AzureDevOpsWorkItems' ($o.AddReports -join ',')
+    Assert-Equal @($script:A2CReportCatalog).Count (Resolve-A2CSelection $o).Count 'Full plus the four reports that run only when named = every report'
     # two cut lists: the loose words go back to their own list, in command-line order
     $o = New-A2COptions -Params ([ordered]@{ Reports = @('VMs,'); SkipReports = @('Disks,'); AdoPackageTypes = @('npm,'); RemainingArguments = @('Disks,', 'Backup', 'Locks', 'MAVEN') })
     Assert-Equal 'VMs,Disks,Backup' ($o.Reports -join ','); Assert-Equal 'Disks,Locks' ($o.SkipReports -join ','); Assert-Equal 'npm,Maven' ($o.AdoPackageTypes -join ',')
@@ -99,9 +109,9 @@ Test-Case 'lists from cmd or pwsh -File: "A,B", "A, B" and words cut apart (A, B
 
 Test-Case 'started with -File like from cmd: the list is put together again, a mistake is one error line with exit code 2' {
     $exe = (Get-Process -Id $PID).Path
-    $out = @(& $exe -NoProfile -ExecutionPolicy Bypass -File $scriptPath -Profile Full -AddReports 'AzureDevOpsRepos,' 'AzureDevOpsPackages,' 'AppCode' -CostDays 365 -ListReports 2>&1 | ForEach-Object { "$_" })
+    $out = @(& $exe -NoProfile -ExecutionPolicy Bypass -File $scriptPath -Profile Full -AddReports 'AzureDevOpsRepos,' 'AzureDevOpsPackages,' 'AppCode,' 'AzureDevOpsWorkItems' -CostDays 365 -ListReports 2>&1 | ForEach-Object { "$_" })
     Assert-Equal 0 $LASTEXITCODE ($out -join ' | ')
-    Assert-True (@($out | Where-Object { $_ -match ('Selection: -Profile Full -AddReports AzureDevOpsRepos, AzureDevOpsPackages, AppCode +-> +' + @($script:A2CReportCatalog).Count + ' reports') }).Count -eq 1) ($out[0..2] -join ' | ')
+    Assert-True (@($out | Where-Object { $_ -match ('Selection: -Profile Full -AddReports AzureDevOpsRepos, AzureDevOpsPackages, AppCode, AzureDevOpsWorkItems +-> +' + @($script:A2CReportCatalog).Count + ' reports') }).Count -eq 1) ($out[0..2] -join ' | ')
     $bad = @(& $exe -NoProfile -ExecutionPolicy Bypass -File $scriptPath -Reports RBAC Policy -ListReports 2>&1 | ForEach-Object { "$_" })
     Assert-Equal 2 $LASTEXITCODE
     Assert-Equal 'ERROR: Unexpected argument(s): Policy. Lists are written with commas, for example -Reports RBAC,Policy' (@($bad | Where-Object { $_ })[-1])
@@ -1973,7 +1983,7 @@ Test-Case 'Azure DevOps files: organizations.csv in ADO\, the other 23 in one fo
     Assert-False (Test-Path ([IO.Path]::Combine($ado, 'projects.csv'))) 'combined files are not written'
     Assert-Equal 'processes' (@(Get-ChildItem -LiteralPath ([IO.Path]::Combine($ado, 'contoso-ado')) -Directory | ForEach-Object { $_.Name }) -join ',') 'project folders come only with the export reports; customized processes are exported'
     Assert-True (@($run8.Log | Where-Object { $_ -match 'ADO/contoso-ado/ +\d+ rows in 23 files' }).Count -eq 1) 'one summary line per organization folder'
-    $hint = 'Not exported in this run: pipelines \(add AzureDevOpsPipelines to -Reports\), Git and TFVC repositories \(add AzureDevOpsRepos to -Reports\), packages \(add AzureDevOpsPackages to -Reports\)'
+    $hint = 'Not exported in this run: pipelines \(add AzureDevOpsPipelines to -Reports\), Git and TFVC repositories \(add AzureDevOpsRepos to -Reports\), packages \(add AzureDevOpsPackages to -Reports\), work items, test plans and run history \(add AzureDevOpsWorkItems to -Reports\)'
     Assert-True (@($run8.Log | Where-Object { $_ -match $hint }).Count -eq 1) 'hint about the export reports'
 }
 
@@ -2203,6 +2213,436 @@ Test-Case 'Azure DevOps is skipped without billing resources or -AdoOrganization
 }
 
 # ------------------------------------------------------------------------------------------------------
+Write-Host 'Azure DevOps structure and work item export' -ForegroundColor Cyan
+
+Test-Case 'AzureDevOpsStructure is in the profiles that have AzureDevOps; AzureDevOpsWorkItems runs only when named' {
+    foreach ($p in @('Standard', 'Migration', 'Security', 'Full')) { Assert-True ((Resolve-A2CSelection (New-A2COptions -Params @{ ReportProfile = $p })) -contains 'AzureDevOpsStructure') $p }
+    foreach ($p in @('Quick', 'Governance')) { Assert-True ((Resolve-A2CSelection (New-A2COptions -Params @{ ReportProfile = $p })) -notcontains 'AzureDevOpsStructure') $p }
+    Assert-True ((Resolve-A2CSelection (New-A2COptions -Params @{ ReportProfile = 'Full' })) -notcontains 'AzureDevOpsWorkItems') 'not in -Profile Full'
+    Assert-True ((Resolve-A2CSelection (New-A2COptions -Params @{ Reports = @('Operations') })) -notcontains 'AzureDevOpsWorkItems') 'not in its group'
+    Assert-Equal 'Subscriptions,Resources,AzureDevOps,AzureDevOpsWorkItems' ((Resolve-A2CDatasets @('AzureDevOpsWorkItems')) -join ',')
+    $o = New-A2COptions -Params @{}
+    Assert-Equal '100|5120|False|False' ('{0}|{1}|{2}|{3}' -f $o.AdoAttachmentMaxSizeMB, $o.AdoAttachmentsMaxMB, $o.AdoSkipAttachments, $o.AdoRunLogs)
+}
+
+$run9 = Invoke-TWRun -Params @{ Reports = @('AzureDevOps', 'AzureDevOpsStructure') }
+
+Test-Case 'Azure DevOps structure: organization settings (tenant, billing, users) and the policies from the settings page' {
+    Assert-Equal 0 $run9.Errors.Count ($run9.Errors -join ' | ')
+    $cov = Import-TWCsv $run9 'coverage.csv'
+    $c = $cov | Where-Object Area -eq 'Azure DevOps structure contoso-ado'
+    Assert-Equal 'Collected' $c.Status $c.Detail; Assert-Equal '3' $c.Items
+    Assert-Match ($cov | Where-Object Area -eq 'Azure DevOps TFVC workspaces contoso-ado').Detail '^Not offered by the Azure DevOps REST API'
+    $s = Import-TWCsv $run9 'ADO/contoso-ado/orgSettings.csv'
+    $v = @{}; foreach ($x in $s) { $v[$x.Setting] = $x }
+    Assert-Equal $global:TW_Tenant $v['Connected tenant'].Value
+    Assert-Equal 'Yes' $v['In the organization list of the tenant'].Value
+    Assert-Equal ('Contoso Production ({0})' -f $global:TW_S1) $v['Billing subscription'].Value; Assert-Equal 'resource group rg-app' $v['Billing subscription'].Detail
+    Assert-Equal '4' $v['Users'].Value; Assert-Equal '' $v['Users'].Detail
+    foreach ($k in @{ 'Third-party application access via OAuth' = 'Allowed'; 'SSH authentication' = 'Not allowed'; 'Allow public projects' = 'Allowed'; 'Log audit events' = 'On'
+            'External guest access' = 'Allowed'; 'Policy.AllowTeamAdminsInvitationsAccessToken' = 'True' }.GetEnumerator()) {
+        Assert-Equal $k.Value $v[$k.Key].Value $k.Key
+    }
+    Assert-Equal 'Policy: Application connection' $v['SSH authentication'].Category; Assert-Equal 'Policy.DisallowSecureShell = True' $v['SSH authentication'].Detail
+    Assert-Equal 1 @($global:TWRequests | Where-Object { $_.Uri -match '_settings/organizationPolicy\?__rt=fps' -and $_.Method -eq 'GET' }).Count
+}
+
+Test-Case 'Azure DevOps structure: security groups with members (nested groups, looked-up members); users.csv directory alias and groups' {
+    $g = Import-TWCsv $run9 'ADO/contoso-ado/securityGroups.csv'
+    Assert-Equal 8 @($g).Count
+    $c = $g | Where-Object Group -eq 'Contributors'
+    Assert-Equal 'Project|Web Shop|3|3|False' ('{0}|{1}|{2}|{3}|{4}' -f $c.Scope, $c.ScopeName, $c.Members, $c.MemberGroups, $c.IsTeam)
+    Assert-Equal 'True' ($g | Where-Object Group -eq 'Marketing').IsTeam
+    Assert-Equal 'Entra ID|Entra ID' ('{0}|{1}' -f ($g | Where-Object Group -eq 'g-app-admins').Scope, ($g | Where-Object Group -eq 'g-app-admins').Origin)
+    Assert-Equal 'Organization' ($g | Where-Object Group -eq 'Project Collection Administrators').Scope
+    $m = Import-TWCsv $run9 'ADO/contoso-ado/groupMembers.csv'
+    $nested = $m | Where-Object { $_.Group -eq 'Contributors' -and $_.Member -eq 'Contoso Leads' }
+    Assert-Equal 'Group|Web Shop|Azure DevOps' ('{0}|{1}|{2}' -f $nested.MemberType, $nested.MemberScope, $nested.MemberOrigin)
+    $gone = $m | Where-Object Member -eq 'Departed User'
+    Assert-Equal 'Contoso Leads|departed.user@contoso.com|User' ('{0}|{1}|{2}' -f $gone.Group, $gone.MemberUpn, $gone.MemberType)
+    Assert-Equal 'Service principal' ($m | Where-Object Member -eq 'Contoso Pipeline SP').MemberType
+    $look = @($global:TWRequests | Where-Object { $_.Method -eq 'POST' -and $_.Uri -match 'graph/subjectlookup' })
+    Assert-Equal 1 $look.Count; Assert-Equal '{"lookupKeys":[{"descriptor":"aad.departed"}]}' $look[0].Body
+    $u = Import-TWCsv $run9 'ADO/contoso-ado/users.csv'
+    $alex = $u | Where-Object User -eq 'alex.admin@contoso.onmicrosoft.com'
+    Assert-Equal 'alex.admin' $alex.DirectoryAlias
+    Assert-Equal '[contoso-ado]\Project Collection Administrators; [Web Shop]\Project Administrators; [Web Shop]\Web Shop Team; [Web Shop]\Marketing' $alex.Groups
+    Assert-Equal '' ($u | Where-Object User -eq 'someone@example.org').Groups
+    Assert-Equal '' @(Import-TWCsv $run8 'ADO/contoso-ado/users.csv')[0].Groups 'groups only with AzureDevOpsStructure'
+    Assert-Equal 'alex.admin' @(Import-TWCsv $run8 'ADO/contoso-ado/users.csv')[0].DirectoryAlias 'the directory alias always'
+}
+
+Test-Case 'Azure DevOps structure: teams (default team, members, area and iteration paths, backlog settings) and the area and iteration trees' {
+    $t = Import-TWCsv $run9 'ADO/contoso-ado/teams.csv'
+    Assert-Equal 'Web Shop Team,Marketing,Legacy App Team' (($t | ForEach-Object { $_.Team }) -join ',')
+    $ws = $t | Where-Object Team -eq 'Web Shop Team'
+    # the CSV formula guard writes a value that starts with @ with a leading quote
+    foreach ($k in @{ DefaultTeam = 'True'; Members = '2'; Administrators = 'Alex Admin'; AreaPaths = 'Web Shop'; BacklogIteration = 'Web Shop'; DefaultIteration = "'@currentIteration"
+            Iterations = '2'; IterationPaths = 'Web Shop\Contoso Sprint 1; Web Shop\Contoso Sprint 2'; BacklogLevels = 'Features; Requirements'; BugsBehavior = 'asRequirements'
+            WorkingDays = 'monday; tuesday; wednesday; thursday; friday' }.GetEnumerator()) {
+        Assert-Equal $k.Value $ws.($k.Key) ('Web Shop Team ' + $k.Key)
+    }
+    $mk = $t | Where-Object Team -eq 'Marketing'
+    foreach ($k in @{ DefaultTeam = 'False'; Members = '3'; AreaPaths = 'Web Shop\Contoso Checkout (+children)'; DefaultArea = 'Web Shop\Contoso Checkout'; DefaultIteration = 'Web Shop\Contoso Sprint 2'
+            Iterations = '1'; BacklogLevels = 'Epics; Features; Requirements'; BugsBehavior = 'off' }.GetEnumerator()) {
+        Assert-Equal $k.Value $mk.($k.Key) ('Marketing ' + $k.Key)
+    }
+    $tm = Import-TWCsv $run9 'ADO/contoso-ado/teamMembers.csv'
+    Assert-Equal 6 @($tm).Count
+    Assert-Equal 'Group' ($tm | Where-Object Member -eq '[Web Shop]\Contoso Leads').MemberType
+    Assert-Equal 'True' ($tm | Where-Object { $_.Team -eq 'Legacy App Team' }).Administrator
+    $ar = Import-TWCsv $run9 'ADO/contoso-ado/areaPaths.csv'
+    $pay = $ar | Where-Object Path -eq 'Web Shop\Contoso Checkout\Payments'
+    Assert-Equal 'Payments|2|Marketing' ('{0}|{1}|{2}' -f $pay.Name, $pay.Level, $pay.Teams) 'below an area path the team takes with its children'
+    Assert-Equal 'Web Shop Team' ($ar | Where-Object Path -eq 'Web Shop').Teams
+    $it = Import-TWCsv $run9 'ADO/contoso-ado/iterationPaths.csv'
+    $s2 = $it | Where-Object Path -eq 'Web Shop\Contoso Sprint 2'
+    Assert-Equal '2026-09-15T00:00:00Z|2026-09-28T00:00:00Z|Web Shop Team; Marketing' ('{0}|{1}|{2}' -f $s2.StartDate, $s2.FinishDate, $s2.Teams)
+    Assert-Equal 4 @($it).Count
+    Assert-True (@($global:TWRequests | Where-Object { $_.Uri -match '_apis/projects/b1b1b1b1-0000-0000-0000-000000000001/teams\?.*\$skip=1' }).Count -eq 1) 'team list paging ($top/$skip)'
+}
+
+Test-Case 'Azure DevOps structure: boards (columns with state mapping and WIP limits, swimlanes, card fields and rules); a customized board' {
+    $b = Import-TWCsv $run9 'ADO/contoso-ado/boards.csv'
+    $def = $b | Where-Object Team -eq 'Web Shop Team'
+    Assert-Equal 'Stories|4|False|' ('{0}|{1}|{2}|{3}' -f $def.Board, $def.Columns, $def.Customized, $def.Changes)
+    Assert-Equal 'User Story: System.Id, System.AssignedTo; Bug: System.Id' $def.CardFields
+    $mk = $b | Where-Object Team -eq 'Marketing'
+    Assert-Equal 'True' $mk.Customized; Assert-Equal 'Contoso Expedite' $mk.Swimlanes
+    Assert-Equal 'columns not named after a state: 1; split columns: 1; definition of done: 1; swimlanes: 1; card style rules: 1; tag colors: 1' $mk.Changes
+    $col = Import-TWCsv $run9 'ADO/contoso-ado/boardColumns.csv'
+    Assert-Equal 8 @($col).Count
+    $rv = $col | Where-Object Column -eq 'Contoso Review'
+    Assert-Equal '3|inProgress|4|User Story=Resolved; Bug=Resolved' ('{0}|{1}|{2}|{3}' -f $rv.Order, $rv.ColumnType, $rv.WipLimit, $rv.StateMappings)
+    $act = $col | Where-Object { $_.Team -eq 'Marketing' -and $_.Column -eq 'Active' }
+    Assert-Equal 'True|Code reviewed by a lead' ('{0}|{1}' -f $act.Split, $act.DefinitionOfDone)
+    $rules = Import-TWCsv $run9 'ADO/contoso-ado/boardCardRules.csv'
+    $fill = $rules | Where-Object RuleType -eq 'Card style'
+    Assert-Equal "Contoso blocked|True|[System.Tags] contains 'Blocked'|background-color=#f4cccc; title-color=#000000" ('{0}|{1}|{2}|{3}' -f $fill.Rule, $fill.Enabled, $fill.Filter, $fill.Style)
+    Assert-Equal 'contoso-hotfix' ($rules | Where-Object RuleType -eq 'Tag color').Rule
+}
+
+Test-Case 'Azure DevOps structure: dashboards with every widget (Marketplace widgets marked) and their JSON files; shared queries at full depth, no personal ones' {
+    $d = Import-TWCsv $run9 'ADO/contoso-ado/dashboards.csv'
+    Assert-Equal 2 @($d).Count 'a dashboard that the project list also returns is read once'
+    $rb = $d | Where-Object Dashboard -eq 'Contoso Release Board'
+    Assert-Equal 'Web Shop Team|project_Team|3|2|5' ('{0}|{1}|{2}|{3}|{4}' -f $rb.Team, $rb.Scope, $rb.Widgets, $rb.MarketplaceWidgets, $rb.RefreshMinutes)
+    Assert-Equal 'Alex Admin|' ('{0}|{1}' -f $rb.ModifiedBy, ($d | Where-Object Dashboard -eq 'Contoso Overview').ModifiedBy) 'the editor read by identity ID; a removed identity stays empty'
+    Assert-Equal 1 @($global:TWRequests | Where-Object { $_.Uri -match 'vssps\.dev\.azure\.com/contoso-ado/_apis/identities\?identityIds=b1b1b1b1-0000-0000-0000-0000000000a1,b1b1b1b1-0000-0000-0000-0000000000a9&' }).Count 'both IDs in one read'
+    Assert-Equal 'ADO/contoso-ado/Web Shop/dashboards/Web Shop Team/Contoso Release Board.json' $rb.ExportedFile
+    $json = Get-Content -Raw -Encoding UTF8 ([IO.Path]::Combine($run9.OutDir, $rb.ExportedFile)) | ConvertFrom-Json
+    Assert-Equal 3 @($json.widgets).Count
+    Assert-Equal '' ($d | Where-Object Dashboard -eq 'Contoso Overview').Team 'project dashboard'
+    Assert-Equal 1 @($global:TWRequests | Where-Object { $_.Uri -match 'dashboard/dashboards/d5d5d5d5-0000-0000-0000-000000000001\?' }).Count
+    $w = Import-TWCsv $run9 'ADO/contoso-ado/dashboardWidgets.csv'
+    Assert-Equal 'Built-in|Microsoft.VisualStudioOnline.Dashboards.MarkdownWidget' ('{0}|{1}' -f ($w | Where-Object Widget -eq 'Release notes').Source, ($w | Where-Object Widget -eq 'Release notes').WidgetType)
+    $qg = $w | Where-Object Widget -eq 'Quality gate'
+    Assert-Equal 'SonarQube.QualityGate' $qg.WidgetType 'the typeId when the widget has one'
+    Assert-Equal 'sonarsource.sonarqube|Marketplace extension|1|3|1|1|{"project":"webshop"}' ('{0}|{1}|{2}|{3}|{4}|{5}|{6}' -f $qg.Extension, $qg.Source, $qg.Row, $qg.Column, $qg.RowSpan, $qg.ColumnSpan, $qg.Settings)
+    Assert-Equal 'Marketplace extension (not installed)' ($w | Where-Object Widget -eq 'Contoso burndown').Source
+    $q = Import-TWCsv $run9 'ADO/contoso-ado/queries.csv'
+    Assert-Equal 'Contoso Blockers,Contoso Active Bugs,Contoso Deep Query' (($q | ForEach-Object { $_.Query }) -join ',')
+    $deep = $q | Where-Object Query -eq 'Contoso Deep Query'
+    Assert-Equal 'Shared Queries/Contoso Team/Contoso Deep|oneHop' ('{0}|{1}' -f $deep.Folder, $deep.QueryType)
+    Assert-Match $deep.Wiql "^SELECT \[System\.Id\] FROM WorkItems"
+    Assert-Equal 1 @($global:TWRequests | Where-Object { $_.Uri -match '_apis/wit/queries/c7c7c7c7-0000-0000-0000-000000000003\?\$depth=2&\$expand=all' }).Count 'the folder cut off at depth 2 is read again'
+    Assert-Equal 0 @($q | Where-Object Query -eq 'Alex private').Count 'personal queries are not listed'
+}
+
+Test-Case 'Azure DevOps structure: tags, work item templates, notification subscriptions, wikis, pull requests and TFVC shelvesets' {
+    Assert-Equal 'contoso-hotfix,Blocked' ((Import-TWCsv $run9 'ADO/contoso-ado/tags.csv' | ForEach-Object { $_.Tag }) -join ',')
+    $tp = @(Import-TWCsv $run9 'ADO/contoso-ado/workItemTemplates.csv')
+    Assert-Equal 'Web Shop Team|Contoso bug template|Bug' ('{0}|{1}|{2}' -f $tp[0].Team, $tp[0].Template, $tp[0].WorkItemType)
+    Assert-Equal 'triage' ($tp[0].Fields | ConvertFrom-Json).'System.Tags'
+    $n = @(Import-TWCsv $run9 'ADO/contoso-ado/notificationSubscriptions.csv')
+    Assert-Equal 1 $n.Count
+    Assert-Equal 'Web Shop Team|ms.vss-build.build-completed-event|EmailHtml|webshop-team@contoso.com|enabled|Status = Failed And Definition name = webshop-ci' ('{0}|{1}|{2}|{3}|{4}|{5}' -f $n[0].Team, $n[0].EventType, $n[0].Channel, $n[0].Address, $n[0].Status, $n[0].Criteria)
+    $wk = Import-TWCsv $run9 'ADO/contoso-ado/wikis.csv'
+    Assert-Equal 'codeWiki|webshop|/docs|main' ('{0}|{1}|{2}|{3}' -f ($wk | Where-Object Wiki -eq 'Contoso Docs').Type, ($wk | Where-Object Wiki -eq 'Contoso Docs').Repository, ($wk | Where-Object Wiki -eq 'Contoso Docs').MappedPath, ($wk | Where-Object Wiki -eq 'Contoso Docs').Versions)
+    $pr = Import-TWCsv $run9 'ADO/contoso-ado/pullRequests.csv'
+    Assert-Equal '7,6,5' (($pr | ForEach-Object { $_.PullRequestId }) -join ',')
+    $p7 = $pr | Where-Object PullRequestId -eq '7'
+    Assert-Equal 'webshop|active|feature/checkout|main|Former Dev|Alex Admin (approved); [Web Shop]\Contoso Leads (no vote)' ('{0}|{1}|{2}|{3}|{4}|{5}' -f $p7.Repository, $p7.Status, $p7.SourceBranch, $p7.TargetBranch, $p7.Author, $p7.Reviewers)
+    Assert-Equal 'rejected' (($pr | Where-Object PullRequestId -eq '6').Reviewers -replace '^.*\((.+)\)$', '$1')
+    Assert-Equal 2 @($global:TWRequests | Where-Object { $_.Uri -match 'b1b1b1b1-0000-0000-0000-000000000001/_apis/git/pullrequests\?searchCriteria\.status=all' }).Count 'pull requests paged with $top/$skip'
+    $sh = Import-TWCsv $run9 'ADO/contoso-ado/tfvcShelvesets.csv'
+    $fd = $sh | Where-Object Owner -eq 'Former Dev'
+    Assert-Equal 'former.dev@contoso.com|2|2023-04-01T00:00:00Z|2022-01-01T00:00:00Z' ('{0}|{1}|{2}|{3}' -f $fd.OwnerUpn, $fd.Shelvesets, $fd.Newest, $fd.Oldest)
+}
+
+Test-Case 'Azure DevOps structure: permissions (project, repositories and branches, paths, pipelines, release stages, environments, library, service connections, agent pools), holders named' {
+    $p = Import-TWCsv $run9 'ADO/contoso-ado/permissions.csv'
+    Assert-Equal 17 @($p).Count (($p | ForEach-Object { $_.ObjectType + ':' + $_.Object }) -join ' | ')
+    $main = $p | Where-Object { $_.ObjectType -eq 'Git branch' -and $_.Branch -eq 'main' }
+    Assert-Equal 'webshop|Project Collection Build Service (contoso-ado)|Service account||Force push (rewrite history, delete branches and tags)' ('{0}|{1}|{2}|{3}|{4}' -f $main.Object, $main.Identity, $main.IdentityType, $main.Allow, $main.Deny)
+    Assert-Equal 'Create branch' ($p | Where-Object { $_.ObjectType -eq 'Git branch' -and $_.Branch -eq 'feature/checkout' }).Allow 'branch names decoded per segment'
+    $pat = $p | Where-Object Identity -eq 'Pat Partner'
+    Assert-Equal 'Git repository|webshop|pat@fabrikam.com|User|Contribute' ('{0}|{1}|{2}|{3}|{4}' -f $pat.ObjectType, $pat.Object, $pat.IdentityUpn, $pat.IdentityType, $pat.Allow)
+    $rc = $p | Where-Object { $_.ObjectType -eq 'Git repositories' }
+    Assert-Equal '(all repositories)|Contributors|Web Shop|Group|Read; Contribute' ('{0}|{1}|{2}|{3}|{4}' -f $rc.Object, $rc.Identity, $rc.IdentityScope, $rc.IdentityType, $rc.Allow)
+    $fd = $p | Where-Object ObjectType -eq 'Pipeline'
+    Assert-Equal 'webshop-classic|Legacy|former.dev@contoso.com|User|False' ('{0}|{1}|{2}|{3}|{4}' -f $fd.Object, $fd.Path, $fd.Identity, $fd.IdentityType, $fd.InheritPermissions) 'a removed user is named from its descriptor'
+    Assert-Equal 'Contoso Checkout|Web Shop\Contoso Checkout' ('{0}|{1}' -f ($p | Where-Object ObjectType -eq 'Area path').Object, ($p | Where-Object ObjectType -eq 'Area path').Path)
+    Assert-Equal 'webshop-release / Prod' ($p | Where-Object ObjectType -eq 'Release stage').Object
+    Assert-Equal '$/Legacy App/Trunk/Main|Legacy App' ('{0}|{1}' -f ($p | Where-Object ObjectType -eq 'TFVC path').Path, ($p | Where-Object ObjectType -eq 'TFVC path').Project)
+    foreach ($x in @(@('Environment', 'Production'), @('Variable group', 'webshop-settings'), @('Service connection', 'Contoso Prod (WIF)'), @('Agent pool', 'Default'), @('Agent pool (project)', 'Default'), @('Library', '(all variable groups and secure files)'))) {
+        Assert-True (@($p | Where-Object { $_.ObjectType -eq $x[0] -and $_.Object -eq $x[1] }).Count -ge 1) ($x -join ': ')
+    }
+    Assert-Equal '' ($p | Where-Object { $_.ObjectType -eq 'Agent pool' }).Project 'organization agent pool'
+    Assert-Equal 'Organization pool|Use' ('Organization pool|' + ($p | Where-Object ObjectType -eq 'Agent pool').Allow)
+    Assert-Equal 0 @($p | Where-Object { $_.Allow -eq '' -and $_.Deny -eq '' }).Count 'empty entries are left out'
+    $acl = @($global:TWRequests | Where-Object { $_.Uri -match '_apis/accesscontrollists/' })
+    Assert-Equal 4 @($acl | Where-Object { $_.Uri -notmatch 'token=' }).Count 'whole namespaces: environments, library, service connections, agent pools'
+    Assert-True (@($acl | Where-Object { $_.Uri -match 'token=repoV2%2Fb1b1b1b1-0000-0000-0000-000000000001&recurse=true' }).Count -eq 1) 'repositories and branches of the project'
+    $ids = @($global:TWRequests | Where-Object { $_.Uri -match 'vssps\.dev\.azure\.com/contoso-ado/_apis/identities\?descriptors=' })
+    Assert-Equal 3 $ids.Count '9 holders, 3 per call'
+}
+
+Test-Case 'Azure DevOps structure: approvals and checks of environments, agent pools and service connections (one batch read per project; a shared check once)' {
+    $c = Import-TWCsv $run9 'ADO/contoso-ado/checks.csv'
+    Assert-Equal 5 @($c).Count
+    $ap = $c | Where-Object { $_.Check -eq 'Approval' -and $_.ResourceType -eq 'Environment' }
+    Assert-Equal 'Environment|Production|Alex Admin; [Web Shop]\Contoso Leads|1|False|Check the Contoso change ticket|43200|True' ('{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}' -f $ap.ResourceType, $ap.Resource, $ap.Approvers, $ap.MinApprovers, $ap.RequesterCanApprove, $ap.Instructions, $ap.TimeoutMinutes, $ap.Enabled)
+    $ap2 = $c | Where-Object { $_.Check -eq 'Approval' -and $_.ResourceType -eq 'Agent pool' }
+    Assert-Equal 'Default|Alex Admin|True|' ('{0}|{1}|{2}|{3}' -f $ap2.Resource, $ap2.Approvers, $ap2.RequesterCanApprove, $ap2.Instructions) 'requesterCannotBeApprover not stored: the requester may approve'
+    $bh = $c | Where-Object Check -eq 'Business Hours'
+    Assert-Equal 'Agent pool|Default' ('{0}|{1}' -f $bh.ResourceType, $bh.Resource) 'named from the agent queue list'
+    $lock = @($c | Where-Object Check -eq 'Exclusive lock')
+    Assert-Equal 1 $lock.Count 'the check of a shared service connection is listed once'
+    Assert-Equal 'Service connection|False' ('{0}|{1}' -f $lock[0].ResourceType, $lock[0].Enabled)
+    $posts = @($global:TWRequests | Where-Object { $_.Method -eq 'POST' -and $_.Uri -match 'checks/queryconfigurations\?\$expand=settings&api-version=7\.1-preview\.1$' })
+    Assert-Equal 2 $posts.Count 'one batch read per project'
+    $kinds = @((ConvertFrom-Json $posts[0].Body) | ForEach-Object { $_.type } | Select-Object -Unique)
+    Assert-Equal 'environment,queue,endpoint,variablegroup,securefile' ($kinds -join ',')
+}
+
+Test-Case 'Azure DevOps findings ADO-18 to ADO-21 (and ADO-17 not below 100 users)' {
+    $f = Import-TWCsv $run9 'findings.csv'
+    foreach ($x in @(@('ADO-18', 2), @('ADO-19', 2), @('ADO-20', 1), @('ADO-21', 4))) { Assert-Equal $x[1] ($f | Where-Object Id -eq $x[0]).Count $x[0] }
+    Assert-Equal 0 @($f | Where-Object Id -eq 'ADO-17').Count
+    Assert-Equal 'guest (1), Microsoft account (1)' ($f | Where-Object Id -eq 'ADO-18').Detail
+    Assert-Equal 'contoso-labs.burndown (1), sonarsource.sonarqube (1)' ($f | Where-Object Id -eq 'ADO-19').Detail
+    Assert-Equal 'by team: Marketing (1)' ($f | Where-Object Id -eq 'ADO-20').Detail
+    Assert-Equal 'Environment (1), Git repository (1), Pipeline (1), Variable group (1)' ($f | Where-Object Id -eq 'ADO-21').Detail
+    Assert-Equal 'Migration' ($f | Where-Object Id -eq 'ADO-20').Category
+}
+
+Test-Case 'ADO-17: an organization with more than 100 users (a switch to another Entra tenant then needs Microsoft Support)' {
+    Reset-TWState
+    $mk = { param($n) [ordered]@{ id = [guid]::NewGuid().ToString(); user = [ordered]@{ principalName = ('user{0}@contoso.com' -f $n); displayName = ('User {0}' -f $n); origin = 'aad'; metaType = 'member'; subjectKind = 'user' }
+            accessLevel = [ordered]@{ accountLicenseType = 'stakeholder'; licenseDisplayName = 'Stakeholder'; licensingSource = 'account'; status = 'active' }; lastAccessedDate = '2026-09-01T00:00:00Z'; dateCreated = '2025-01-01T00:00:00Z' } }
+    $global:TW.Ado.Users2 = @($global:TW.Ado.Users2) + @(1..97 | ForEach-Object { & $mk $_ })
+    $r = Invoke-TWRun -Params @{ Reports = @('AzureDevOps', 'AzureDevOpsStructure') } -KeepWorld
+    Assert-Equal 0 $r.Errors.Count ($r.Errors -join ' | ')
+    $f = (Import-TWCsv $r 'findings.csv') | Where-Object Id -eq 'ADO-17'
+    Assert-Equal '1|contoso-ado (101 users)|Migration' ('{0}|{1}|{2}' -f $f.Count, $f.Detail, $f.Category)
+    $u = (Import-TWCsv $r 'ADO/contoso-ado/orgSettings.csv') | Where-Object Setting -eq 'Users'
+    Assert-Equal '101' $u.Value; Assert-Match $u.Detail '^More than 100: '
+}
+
+Test-Case 'Azure DevOps structure: a failed read is counted once per kind; policies need an administrator; Retry-After on a successful answer is honored' {
+    Reset-TWState
+    # Marketing boards refused, the policy page refused, the tag list answers with Retry-After
+    $global:TW.AdoRoutes.Insert(0, @{ Method = 'GET'; Pattern = '/f0f0f0f0-0000-0000-0000-000000000002/_apis/work/boards\?'; Handler = { param($path, $body, $m) New-TWError 403 'Forbidden' 'TF400409: no access to the boards' } })
+    $global:TW.AdoRoutes.Insert(0, @{ Method = 'GET'; Pattern = '_settings/organizationPolicy\?'; Handler = { param($path, $body, $m) New-TWResponse -Obj ([ordered]@{ message = 'TF400813: not authorized'; typeKey = 'UnauthorizedRequestException' }) -Status 401 } })
+    $global:TW.AdoRoutes.Insert(0, @{ Method = 'GET'; Pattern = 'b1b1b1b1-0000-0000-0000-000000000001/_apis/wit/tags\?'; Handler = { param($path, $body, $m) New-TWAdoList @() @{ 'Retry-After' = '3'; 'X-RateLimit-Resource' = 'ATCPU' } } })
+    $r = Invoke-TWRun -Params @{ Reports = @('AzureDevOps', 'AzureDevOpsStructure') } -KeepWorld
+    Assert-Equal 0 $r.Errors.Count ($r.Errors -join ' | ')
+    $cov = Import-TWCsv $r 'coverage.csv'
+    $c = $cov | Where-Object Area -eq 'Azure DevOps structure contoso-ado'
+    Assert-Equal 'Partial' $c.Status
+    Assert-Equal 'boards: 1 of 3 not readable (HTTP 403 Forbidden: TF400409: no access to the boards)' $c.Detail
+    Assert-Match ($cov | Where-Object Area -eq 'Azure DevOps organization policies contoso-ado').Detail '^Not readable with this account \(HTTP 401'
+    $pol = (Import-TWCsv $r 'ADO/contoso-ado/orgSettings.csv') | Where-Object Category -eq 'Policy'
+    Assert-Equal '(not read)' $pol.Setting
+    Assert-Equal 1 @((Import-TWCsv $r 'ADO/contoso-ado/boards.csv')).Count 'the other boards are still read'
+    Assert-True ($global:TWSleeps -contains 3) ('waited for Retry-After: ' + ($global:TWSleeps -join ','))
+    Assert-Equal 1 ([int]$r.Stats['Delayed'])
+}
+
+Test-Case 'Azure DevOps structure: a refused permission read names the permission set and the missing permission; policies the page leaves out' {
+    Reset-TWState
+    # the iteration permissions refused as Azure DevOps refuses an account without "View permissions for this node"
+    $global:TW.AdoRoutes.Insert(0, @{ Method = 'GET'; Pattern = '_apis/accesscontrollists/bf7bfa03-b2b7-47db-8113-fa2e002cc5b1\?'; Handler = { param($path, $body, $m)
+                New-TWResponse -Obj ([ordered]@{ message = 'TF50309: The following account does not have sufficient permissions to complete the operation: Alex Admin. The following permissions are needed to perform this operation: View permissions for this node.'; typeKey = 'UnauthorizedAccessException' }) -Status 403 } })
+    # page data without the policies data provider: what Azure DevOps sends to an account that may not see them
+    $global:TW.Ado.PolicyPage = [ordered]@{ fps = [ordered]@{ dataProviders = [ordered]@{ data = [ordered]@{ 'ms.vss-web.page-data' = [ordered]@{ isHosted = $true } } } } }
+    $r = Invoke-TWRun -Params @{ Reports = @('AzureDevOps', 'AzureDevOpsStructure') } -KeepWorld
+    Assert-Equal 0 $r.Errors.Count ($r.Errors -join ' | ')
+    $cov = Import-TWCsv $r 'coverage.csv'
+    $c = ($cov | Where-Object Area -eq 'Azure DevOps structure contoso-ado').Detail
+    Assert-Match $c '^permissions: \d+ of \d+ not readable \(Iteration: HTTP 403 UnauthorizedAccessException: TF50309: needs the permission "View permissions for this node"\)$'
+    Assert-True ($c -notmatch 'Alex Admin') 'the account name of the TF50309 text is left out'
+    $p = $cov | Where-Object Area -eq 'Azure DevOps organization policies contoso-ado'
+    Assert-Equal 'Skipped|Not shown to this account: the Policies page leaves them out (Project Collection Administrators can read them)' ('{0}|{1}' -f $p.Status, $p.Detail)
+    Assert-True (@(Import-TWCsv $r 'ADO/contoso-ado/permissions.csv').Count -gt 0) 'the other permission sets are still read'
+}
+
+$run10 = Invoke-TWRun -Params @{ Reports = @('AzureDevOps', 'AzureDevOpsWorkItems'); AdoRunLogs = $true }
+
+Test-Case 'AzureDevOpsWorkItems: every work item as JSON with its revisions, links and comments; allWorkItems.csv; WIQL in ID ranges' {
+    Assert-Equal 0 $run10.Errors.Count ($run10.Errors -join ' | ')
+    $wi = Import-TWCsv $run10 'ADO/contoso-ado/allWorkItems.csv'
+    Assert-Equal '1,2,3,5,10' (($wi | ForEach-Object { $_.Id }) -join ',')
+    $one = $wi | Where-Object Id -eq '1'
+    foreach ($k in @{ Project = 'Web Shop'; WorkItemType = 'User Story'; Title = 'Contoso checkout redesign'; State = 'Active'; AreaPath = 'Web Shop\Contoso Checkout'; IterationPath = 'Web Shop\Contoso Sprint 1'
+            AssignedTo = 'Alex Admin'; CreatedBy = 'Former Dev'; Created = '2026-08-01T10:00:00Z'; Changed = '2026-09-20T10:00:00Z'; Tags = 'contoso-hotfix; Blocked'; Parent = ''; Revisions = '3'
+            Comments = '2'; Links = '3'; Attachments = '1'; InlineImages = '3'; ExportedFile = 'ADO/contoso-ado/Web Shop/workitems/0xxx/1.json' }.GetEnumerator()) {
+        Assert-Equal $k.Value $one.($k.Key) ('item 1 ' + $k.Key)
+    }
+    Assert-Equal '1' ($wi | Where-Object Id -eq '2').Parent
+    $doc = Get-Content -Raw -Encoding UTF8 ([IO.Path]::Combine($run10.OutDir, $one.ExportedFile)) | ConvertFrom-Json
+    Assert-Equal '3|3|2|4' ('{0}|{1}|{2}|{3}' -f $doc.rev, @($doc.revisions).Count, @($doc.comments).Count, @($doc.relations).Count)
+    Assert-Equal 'Contoso first comment' @($doc.comments)[0].text
+    Assert-Match $doc.fields.'System.Description' '^<div>Contoso redesign</div><div><img src="https://dev\.azure\.com/contoso-ado/b1b1b1b1-0000-0000-0000-000000000001/_apis/wit/attachments/e1e1e1e1-0000-0000-0000-000000000001\?fileName=image\.png"' 'the links in the text stay as they are'
+    # every work item file holds as many revisions as its rev says, also a work item that was never changed
+    foreach ($w in $wi) {
+        $d = Get-Content -Raw -Encoding UTF8 ([IO.Path]::Combine($run10.OutDir, $w.ExportedFile)) | ConvertFrom-Json
+        Assert-Equal ([int]$d.rev) @($d.revisions).Count ('revisions of #' + $w.Id)
+    }
+    Assert-True (Test-Path ([IO.Path]::Combine($run10.OutDir, 'ADO', 'contoso-ado', 'Legacy App', 'workitems', '0xxx', '10.json'))) 'second project'
+    $wiql = @($global:TWRequests | Where-Object { $_.Method -eq 'POST' -and $_.Uri -match 'b1b1b1b1-0000-0000-0000-000000000001/_apis/wit/wiql\?\$top=2&api-version=7\.1$' })
+    Assert-Equal 3 $wiql.Count 'IDs 1-2, 3-4 and 5'
+    Assert-Match ((ConvertFrom-Json $wiql[1].Body).query) '\[System\.TeamProject\] = @project AND \[System\.Id\] > 2 ORDER BY \[System\.Id\] ASC$'
+    Assert-Equal 1 @($global:TWRequests | Where-Object { $_.Uri -match 'b1b1b1b1-0000-0000-0000-000000000001/_apis/wit/workitems\?ids=1,2,3,4,5&\$expand=all&errorPolicy=omit' }).Count 'one read for up to 200 work items'
+    $rev = @($global:TWRequests | Where-Object { $_.Uri -match '/_apis/wit/workItems/(\d+)/revisions\?' } | ForEach-Object { [void]($_.Uri -match '/workItems/(\d+)/'); $Matches[1] } | Select-Object -Unique)
+    Assert-Equal '1,2,3,5,10' ($rev -join ',') 'the revisions of every work item, also of one with a single revision'
+    Assert-Equal 2 @($global:TWRequests | Where-Object { $_.Uri -match '/_apis/wit/workItems/1/comments\?' }).Count 'two pages of comments'
+    Assert-Equal 0 @($global:TWRequests | Where-Object { $_.Uri -match '/_apis/wit/workItems/(3|5)/comments\?' }).Count 'no comments read for work items without comments'
+}
+
+Test-Case 'AzureDevOpsWorkItems: a work item with one revision, one comment and one relation keeps each as a list in its JSON file' {
+    $two = Import-TWCsv $run10 'ADO/contoso-ado/allWorkItems.csv' | Where-Object Id -eq '2'
+    Assert-Equal '1|1|1|0|0' ('{0}|{1}|{2}|{3}|{4}' -f $two.Revisions, $two.Comments, $two.Links, $two.Attachments, $two.InlineImages)
+    $raw = Get-Content -Raw -Encoding UTF8 ([IO.Path]::Combine($run10.OutDir, $two.ExportedFile))
+    $doc = ConvertFrom-Json $raw
+    foreach ($k in @('revisions', 'comments', 'relations')) {
+        Assert-True ($doc.$k -is [array]) ($k + ' is a JSON list')
+        Assert-Equal 1 @($doc.$k).Count $k
+        Assert-Match $raw ('"' + $k + '":\s*\[') ($k + ' written as a list')
+    }
+    Assert-Equal '1|Contoso card note|Parent' ('{0}|{1}|{2}' -f $doc.revisions[0].rev, $doc.comments[0].text, $doc.relations[0].attributes.name)
+}
+
+Test-Case 'AzureDevOpsWorkItems: images linked from work item text (description, comment, test steps, an older revision) in inline/' {
+    $a = Import-TWCsv $run10 'ADO/contoso-ado/workItemAttachments.csv'
+    $in = @($a | Where-Object Kind -eq 'InlineImage')
+    Assert-Equal 'e1e1e1e1-0000-0000-0000-000000000001,e2e2e2e2-0000-0000-0000-000000000002,e3e3e3e3-0000-0000-0000-000000000003,e4e4e4e4-0000-0000-0000-000000000004' (($in | ForEach-Object { $_.AttachmentId }) -join ',') 'description, comment, older revision, test steps; the attachment the text links to is not listed again'
+    Assert-Equal 5 @($a | Where-Object Kind -eq 'Attachment').Count
+    $dir = 'ADO/contoso-ado/Web Shop/workitems/attachments/1/inline/'
+    Assert-Equal ('1|image.png|' + $dir + 'image_e1e1e1e1.png') ('{0}|{1}|{2}' -f $in[0].Id, $in[0].Attachment, $in[0].ExportedTo) 'a name two images share gets the start of the GUID'
+    Assert-Equal ($dir + 'image_e2e2e2e2.png') $in[1].ExportedTo
+    Assert-Equal ('old diagram.png|' + $dir + 'old diagram.png') ('{0}|{1}' -f $in[2].Attachment, $in[2].ExportedTo) 'an image that only an older revision shows'
+    Assert-Match ([IO.File]::ReadAllText([IO.Path]::Combine($run10.OutDir, $in[0].ExportedTo))) '^attachment image\.png e1e1e1e1-0000-0000-0000-000000000001$'
+    Assert-True ([double]$in[0].SizeKB -gt 0) 'the size of the downloaded file'
+    Assert-Equal '3|checkout.png|' ('{0}|{1}|{2}' -f $in[3].Id, $in[3].Attachment, $in[3].ExportedTo) 'test steps hold their HTML encoded'
+    Assert-Match $in[3].ExportNote '^Failed: HTTP 404 AttachmentNotFoundException'
+    $dl = @($global:TWRequests | Where-Object { $_.Uri -match '/_apis/wit/attachments/e[1-4]' })
+    Assert-Equal 4 $dl.Count 'each image once, also when several revisions show it'
+    Assert-Match $dl[0].Uri 'dev\.azure\.com/contoso-ado/b1b1b1b1-0000-0000-0000-000000000001/_apis/wit/attachments/e1e1e1e1-0000-0000-0000-000000000001\?fileName=image\.png&download=true&api-version=7\.1$'
+    Assert-Equal 'application/octet-stream' ((@($dl | ForEach-Object { $_.Accept }) | Select-Object -Unique) -join ',')
+    Assert-Equal '1=3,2=0,3=1,5=0,10=0' ((Import-TWCsv $run10 'ADO/contoso-ado/allWorkItems.csv' | ForEach-Object { '{0}={1}' -f $_.Id, $_.InlineImages }) -join ',')
+    $cov = Import-TWCsv $run10 'coverage.csv'
+    Assert-Match ($cov | Where-Object Area -eq 'Azure DevOps work item export contoso-ado').Detail ', 3 of 4 inline image\(s\) downloaded \(1 failed\), '
+    Assert-Match ($cov | Where-Object Area -eq 'Azure DevOps work item inline image').Detail '^contoso-ado/Web Shop #3 checkout\.png: HTTP 404'
+}
+
+Test-Case 'AzureDevOpsWorkItems: links and attachments (size limit, a name twice, a failed download and a missing work item in coverage.csv)' {
+    $l = Import-TWCsv $run10 'ADO/contoso-ado/workItemLinks.csv'
+    Assert-Equal 5 @($l).Count
+    $child = $l | Where-Object Relation -eq 'System.LinkTypes.Hierarchy-Forward'
+    Assert-Equal '1|Child|2|' ('{0}|{1}|{2}|{3}' -f $child.Id, $child.Link, $child.TargetId, $child.TargetUrl)
+    Assert-Equal 'https://wiki.contoso.example/checkout|spec' ('{0}|{1}' -f ($l | Where-Object Relation -eq 'Hyperlink').TargetUrl, ($l | Where-Object Relation -eq 'Hyperlink').Comment)
+    $a = @(Import-TWCsv $run10 'ADO/contoso-ado/workItemAttachments.csv' | Where-Object Kind -eq 'Attachment')
+    Assert-Equal 5 @($a).Count
+    $d = $a | Where-Object Attachment -eq 'design.txt'
+    Assert-Equal 'ADO/contoso-ado/Web Shop/workitems/attachments/1/design.txt|2|first draft' ('{0}|{1}|{2}' -f $d.ExportedTo, $d.SizeKB, $d.Comment)
+    Assert-Match ([IO.File]::ReadAllText([IO.Path]::Combine($run10.OutDir, $d.ExportedTo))) '^attachment design\.txt a1a1a1a1-0000-0000-0000-000000000001$'
+    Assert-Equal 'Not downloaded: 300 MB, above -AdoAttachmentMaxSizeMB 100' ($a | Where-Object Attachment -eq 'screen-recording.mp4').ExportNote
+    Assert-Equal 'ADO/contoso-ado/Web Shop/workitems/attachments/5/log.txt,ADO/contoso-ado/Web Shop/workitems/attachments/5/log (2).txt' ((@($a | Where-Object Attachment -eq 'log.txt') | ForEach-Object { $_.ExportedTo }) -join ',')
+    Assert-True (@($global:TWSizeProbes | Where-Object { $_ -match 'attachments/a1a1a1a1-0000-0000-0000-000000000004\?' }).Count -eq 1) 'size asked before the download when the work item does not have it'
+    $dl = @($global:TWRequests | Where-Object { $_.Uri -match '/_apis/wit/attachments/a1a1a1a1-[^?]+\?fileName=' })
+    Assert-Equal 4 $dl.Count 'attachment downloads'
+    Assert-Equal 'application/octet-stream' ((@($dl | ForEach-Object { $_.Accept }) | Select-Object -Unique) -join ',') 'attachments asked for as the file (a zip request gets the file inside a zip)'
+    Assert-Equal '' ((@($global:TWRequests | Where-Object { $_.Uri -match '/_apis/build/builds/\d+/logs\?' } | ForEach-Object { $_.Accept }) | Select-Object -Unique) -join ',') 'run logs keep the zip default'
+    Assert-Match ($a | Where-Object Attachment -eq 'gone.txt').ExportNote '^Failed: HTTP 404 AttachmentNotFoundException'
+    $cov = Import-TWCsv $run10 'coverage.csv'
+    Assert-Equal 'Partial' ($cov | Where-Object Area -eq 'Azure DevOps work item export contoso-ado').Status
+    Assert-Match ($cov | Where-Object Area -eq 'Azure DevOps work item attachment').Detail '^contoso-ado/Web Shop #5 gone\.txt: HTTP 404'
+    Assert-Equal 'contoso-ado/Web Shop #4: not returned (deleted, moved or no access)' ($cov | Where-Object Area -eq 'Azure DevOps work item').Detail
+}
+
+Test-Case 'AzureDevOpsWorkItems: test plans, suites, test cases with steps, manual test results; automated runs counted only' {
+    $pl = @(Import-TWCsv $run10 'ADO/contoso-ado/testPlans.csv')
+    Assert-Equal 'Contoso Release Tests|Active|Alex Admin|2|1' ('{0}|{1}|{2}|{3}|{4}' -f $pl[0].Plan, $pl[0].State, $pl[0].Owner, $pl[0].Suites, $pl[0].TestCases)
+    $su = Import-TWCsv $run10 'ADO/contoso-ado/testSuites.csv'
+    $req = $su | Where-Object Suite -eq 'Checkout'
+    Assert-Equal 'requirementTestSuite|51|1|1' ('{0}|{1}|{2}|{3}' -f $req.SuiteType, $req.ParentSuiteId, $req.RequirementId, $req.TestCases)
+    $tc = @(Import-TWCsv $run10 'ADO/contoso-ado/testCases.csv')
+    Assert-Equal '3|Contoso pay with card|3|Windows 10|Pat Partner' ('{0}|{1}|{2}|{3}|{4}' -f $tc[0].TestCaseId, $tc[0].Title, $tc[0].Steps, $tc[0].Configurations, $tc[0].Testers)
+    $st = Import-TWCsv $run10 'ADO/contoso-ado/testSteps.csv'
+    Assert-Equal 'Open the Contoso checkout|The cart shows 1 item' ('{0}|{1}' -f ($st | Where-Object Step -eq '1').Action, ($st | Where-Object Step -eq '1').ExpectedResult)
+    Assert-Equal 'Pay with card & confirm' ($st | Where-Object Step -eq '2').Action
+    Assert-Equal '8' ($st | Where-Object Step -eq '3').SharedSteps
+    $runs = Import-TWCsv $run10 'ADO/contoso-ado/testRuns.csv'
+    Assert-Equal 'False|1|1|0|1' ('{0}|{1}|{2}|{3}|{4}' -f ($runs | Where-Object RunId -eq '70').Automated, ($runs | Where-Object RunId -eq '70').ResultsExported, ($runs | Where-Object RunId -eq '70').TotalTests, ($runs | Where-Object RunId -eq '70').PassedTests, ($runs | Where-Object RunId -eq '70').NotPassed)
+    $auto = $runs | Where-Object RunId -eq '71'
+    Assert-Equal 'True|2026.101|120|118|2|' ('{0}|{1}|{2}|{3}|{4}|{5}' -f $auto.Automated, $auto.Build, $auto.TotalTests, $auto.PassedTests, $auto.NotPassed, $auto.ResultsExported)
+    Assert-Equal 'Contoso Release Tests' ($runs | Where-Object RunId -eq '70').Plan 'the plan named from the plan list (runs give its ID only)'
+    $res = @(Import-TWCsv $run10 'ADO/contoso-ado/testResults.csv')
+    Assert-Equal '70|3|Failed|65|Pat Partner|Windows 10|Card declined by the test gateway' ('{0}|{1}|{2}|{3}|{4}|{5}|{6}' -f $res[0].RunId, $res[0].TestCaseId, $res[0].Outcome, $res[0].DurationSec, $res[0].RunBy, $res[0].Configuration, $res[0].ErrorMessage)
+    Assert-Equal 1 @($global:TWRequests | Where-Object { $_.Uri -match 'b1b1b1b1-0000-0000-0000-000000000001/_apis/testplan/configurations\?' }).Count 'configurations read once for the project (results give their ID only)'
+    Assert-Equal 0 @($global:TWRequests | Where-Object { $_.Uri -match '_apis/test/Runs/71/results' }).Count 'no results read for an automated run'
+}
+
+Test-Case 'AzureDevOpsWorkItems: pipeline runs and releases with their logs (-AdoRunLogs)' {
+    $pr = Import-TWCsv $run10 'ADO/contoso-ado/pipelineRuns.csv'
+    Assert-Equal '101,100,99' (($pr | ForEach-Object { $_.RunId }) -join ',')
+    $r101 = $pr | Where-Object RunId -eq '101'
+    foreach ($k in @{ Pipeline = 'webshop-ci'; PipelineId = '11'; BuildNumber = '2026.101'; Status = 'completed'; Result = 'succeeded'; Reason = 'individualCI'; RequestedFor = 'Alex Admin'
+            SourceBranch = 'main'; SourceVersion = 'abc101'; Repository = 'webshop'; LogFile = 'ADO/contoso-ado/Web Shop/runs/pipelines/webshop-ci/101.zip' }.GetEnumerator()) {
+        Assert-Equal $k.Value $r101.($k.Key) ('run 101 ' + $k.Key)
+    }
+    Assert-Equal '' (Test-A2CZipFile ([IO.Path]::Combine($run10.OutDir, $r101.LogFile))) 'the log file is a zip'
+    $rel = Import-TWCsv $run10 'ADO/contoso-ado/releaseRuns.csv'
+    $r42 = $rel | Where-Object ReleaseId -eq '42'
+    Assert-Equal 'webshop-release|active|Dev: succeeded; Prod: rejected|Contoso go-live|ADO/contoso-ado/Web Shop/runs/releases/webshop-release/42.zip' ('{0}|{1}|{2}|{3}|{4}' -f $r42.ReleasePipeline, $r42.Status, $r42.Stages, $r42.Description, $r42.LogFile)
+    Assert-Equal '' ($rel | Where-Object ReleaseId -eq '41').LogFile 'a release that never deployed has no log'
+    Assert-True (Test-Path ([IO.Path]::Combine($run10.OutDir, $r42.LogFile))) 'release log written'
+}
+
+Test-Case 'AzureDevOpsWorkItems: -AdoSkipAttachments lists only; -AdoAttachmentsMaxMB stops the downloads; no logs without -AdoRunLogs; never with -Mask' {
+    $r = Invoke-TWRun -Params @{ Reports = @('AzureDevOps', 'AzureDevOpsWorkItems'); AdoSkipAttachments = $true }
+    Assert-Equal 0 $r.Errors.Count ($r.Errors -join ' | ')
+    $a = Import-TWCsv $r 'ADO/contoso-ado/workItemAttachments.csv'
+    Assert-Equal 'Attachment=5,InlineImage=4' ((@($a | Where-Object ExportNote -eq 'Not downloaded: -AdoSkipAttachments') | Group-Object Kind | Sort-Object Name | ForEach-Object { '{0}={1}' -f $_.Name, $_.Count }) -join ',') 'attachments and images listed only'
+    Assert-False (Test-Path ([IO.Path]::Combine($r.OutDir, 'ADO', 'contoso-ado', 'Web Shop', 'workitems', 'attachments'))) 'no attachments folder'
+    Assert-False (Test-Path ([IO.Path]::Combine($r.OutDir, 'ADO', 'contoso-ado', 'Web Shop', 'runs'))) 'no logs without -AdoRunLogs'
+    Assert-Equal '' @(Import-TWCsv $r 'ADO/contoso-ado/pipelineRuns.csv')[0].LogFile
+    # the first attachment fills the 1 MB budget: the others are listed, not downloaded
+    Reset-TWState
+    $global:TW.AdoRoutes.Insert(0, @{ Method = 'GET'; Pattern = '_apis/wit/attachments/a1a1a1a1-0000-0000-0000-000000000001\?'; Handler = { param($path, $body, $m) @{ StatusCode = 200; Content = ''; Headers = @{}; File = ('x' * 1100000) } } })
+    $r = Invoke-TWRun -Params @{ Reports = @('AzureDevOps', 'AzureDevOpsWorkItems'); AdoAttachmentsMaxMB = 1 } -KeepWorld
+    $a = Import-TWCsv $r 'ADO/contoso-ado/workItemAttachments.csv'
+    Assert-Equal 8 @($a | Where-Object ExportNote -eq 'Not downloaded: -AdoAttachmentsMaxMB reached').Count (($a | ForEach-Object { $_.Attachment + '=' + $_.ExportNote }) -join ' | ')
+    Assert-Equal 4 @($a | Where-Object { $_.Kind -eq 'InlineImage' -and $_.ExportNote -eq 'Not downloaded: -AdoAttachmentsMaxMB reached' }).Count 'the images share the budget'
+    Assert-True (@($r.Warnings | Where-Object { $_ -match '-AdoAttachmentsMaxMB 1 reached' }).Count -eq 1) 'one warning'
+    $m = Invoke-TWRun -Params @{ Reports = @('AzureDevOps', 'AzureDevOpsWorkItems'); Mask = $true }
+    Assert-Equal 'Skipped' ((Import-TWCsv $m 'coverage.csv') | Where-Object Area -eq 'Azure DevOps work item export').Status
+    Assert-Equal 0 @(Get-ChildItem -LiteralPath $m.OutDir -Recurse -File -Filter '*.json' | Where-Object { $_.FullName -match '[\\/]workitems[\\/]' }).Count 'no work items under -Mask'
+    Assert-Equal 0 @($global:TWRequests | Where-Object { $_.Uri -match '_apis/wit/wiql' }).Count
+}
+
+Test-Case 'Azure DevOps files: the structure and work item files in the organization folder' {
+    $files = @(Get-ChildItem -LiteralPath ([IO.Path]::Combine($run9.OutDir, 'ADO', 'contoso-ado')) -File -Filter *.csv | ForEach-Object { $_.BaseName })
+    foreach ($f in $script:A2CAdoStructureFiles) { Assert-True ($files -contains $f) ('missing ' + $f) }
+    Assert-Equal (23 + $script:A2CAdoStructureFiles.Count) $files.Count
+    $files = @(Get-ChildItem -LiteralPath ([IO.Path]::Combine($run10.OutDir, 'ADO', 'contoso-ado')) -File -Filter *.csv | ForEach-Object { $_.BaseName })
+    foreach ($f in $script:A2CAdoArchiveFiles) { Assert-True ($files -contains $f) ('missing ' + $f) }
+    Assert-Equal (23 + $script:A2CAdoArchiveFiles.Count) $files.Count
+}
+
+# ------------------------------------------------------------------------------------------------------
 Write-Host 'Full profile: findings, HTML, Excel fallback' -ForegroundColor Cyan
 
 $run6 = Invoke-TWRun -Params @{ ReportProfile = 'Full'; NoHtml = $false; NoExcel = $false }
@@ -2290,7 +2730,12 @@ $originals = @($global:TW_Tenant, $global:TW_S1, $global:TW_S2, $global:TW_S3, $
     'contoso-ado', 'fabrikam-old', 'Web Shop', 'Legacy App', 'webshop', 'legacy-code', 'Contoso Prod (WIF)', 'Legacy SPN', 'contoso-github', 'Scale Agents',
     'build01', 'oldagent', 'buildbox-old', 'former.dev', 'Former Dev', 'someone@example.org', 'Someone Private', 'kv-secrets', 'signing.pfx', 'dg-web',
     'contoso-packages', 'Contoso Agile', 'Release-42', 'v1-secretish', 'SECRETTOKEN42', 'do-not-export', 'hooks.slack.com', 'vmss-agents',
-    'contoso-sandbox', 'contoso-archive', 'Contoso.Core', 'contoso/ui', 'webshop-lib', 'contoso-utils', 'contoso-tools', 'contoso-rs', 'webshop-assets', 'Project Collection Build Service', 'S-1-9-1551374245')
+    'contoso-sandbox', 'contoso-archive', 'Contoso.Core', 'contoso/ui', 'webshop-lib', 'contoso-utils', 'contoso-tools', 'contoso-rs', 'webshop-assets', 'Project Collection Build Service', 'S-1-9-1551374245',
+    # AzureDevOpsStructure (part of -Profile Full)
+    'Marketing', 'Contoso Leads', 'Leads of the Contoso', 'Contoso Checkout', 'Contoso Sprint', 'Contoso Release Board', 'Contoso Overview', 'Contoso burndown', 'Contoso Team', 'Contoso Deep',
+    'Contoso Blockers', 'Contoso Active Bugs', 'contoso-hotfix', 'Contoso bug template', 'Contoso standard bug', 'Contoso build failures', 'webshop-team@contoso.com', 'Contoso Expedite',
+    'Contoso blocked', 'Contoso Review', 'Code reviewed by a lead', 'Contoso Docs', 'Contoso checkout redesign', 'Contoso fix payment', 'feature/checkout', 'Contoso WIP', 'Departed User',
+    'departed.user', 'Contoso Pipeline SP', 'Contoso change ticket', 'Contoso campaigns', 'The default team of Web Shop', 'Contoso release notes')
 
 Test-Case 'mask run completes; zip created; mapping file and log outside the folder and the zip' {
     Assert-Equal 0 $run7.Errors.Count ($run7.Errors -join ' | ')
@@ -2340,6 +2785,27 @@ Test-Case 'masked feeds: own package names masked, public upstream packages, vie
 Test-Case 'masking keeps the word "Azure" readable in notes and finding titles' {
     $t = @((Import-TWCsv $run7 'findings.csv') | ForEach-Object { $_.Title }) -join ' | '
     Assert-Match $t 'privileged Azure roles'
+}
+
+Test-Case 'masking a note: a project name inside the organization name is not cut out of it (the rest would stay readable)' {
+    Initialize-A2CMask
+    $org = Add-A2CMaskEntry 'name' 'ContosoWebShop' 'ado-'
+    $proj = Add-A2CMaskEntry 'adodn' 'WebShop' 'Project '
+    $script:A2CMask.Multi = @('WebShop')
+    Assert-Equal ('Azure DevOps structure {0}: 1 team in {1}' -f $org, $proj) (Protect-A2CNote 'Azure DevOps structure ContosoWebShop: 1 team in WebShop')
+    Assert-Equal ('{0} for {1}' -f $proj, $org) (Protect-A2CNote 'WebShop for ContosoWebShop') 'the shorter name first in the text'
+}
+
+Test-Case 'masking: a registered name that is also a common word ("pipelines") stays in fixed labels, finding texts and Microsoft Learn links' {
+    Initialize-A2CMask
+    $p = Add-A2CMaskEntry 'name' 'pipelines' 'x-'
+    Assert-Equal '(all pipelines)' (Remove-A2CMaskResidue '(all pipelines)') 'a fixed label'
+    $rows = Protect-A2CRows -File 'findings.csv' -Rows @([ordered]@{ Id = 'ADO-05'; Severity = 'Low'; Category = 'Migration'; Title = 'Classic Azure DevOps pipelines'; Count = 1
+            AffectedFile = 'ADO/pipelines.csv'; Recommendation = 'Move the pipelines to YAML'; LearnMore = 'https://learn.microsoft.com/azure/devops/pipelines/release/'; Detail = 'repository pipelines' })
+    $r = $rows[0]
+    Assert-Equal 'Classic Azure DevOps pipelines|Move the pipelines to YAML|https://learn.microsoft.com/azure/devops/pipelines/release/' ('{0}|{1}|{2}' -f $r.Title, $r.Recommendation, $r.LearnMore)
+    Assert-Equal ('repository ' + $p) $r.Detail 'tenant text in Detail is still masked'
+    Assert-Equal ('https://github.com/contoso/' + $p) (Remove-A2CMaskResidue 'https://github.com/contoso/pipelines') 'a GitHub link can name a customer repository: still masked'
 }
 
 Test-Case 'masked outputs stay useful: consistent pseudonyms, private IPs, types and regions kept, Properties dropped' {

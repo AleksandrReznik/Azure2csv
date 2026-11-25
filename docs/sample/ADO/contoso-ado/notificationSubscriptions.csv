@@ -1,0 +1,2 @@
+﻿"Organization","Project","Team","Subscription","SubscriptionId","EventType","Channel","Address","Status","Criteria","ModifiedBy","Modified"
+"contoso-ado","Web Shop","Web Shop Team","Contoso build failures","28","ms.vss-build.build-completed-event","EmailHtml","webshop-team@contoso.com","enabled","Status = Failed And Definition name = webshop-ci","Alex Admin","2026-08-15T00:00:00Z"

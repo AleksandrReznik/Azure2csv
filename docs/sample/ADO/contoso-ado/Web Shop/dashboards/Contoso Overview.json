@@ -1,0 +1,30 @@
+{
+  "id": "d5d5d5d5-0000-0000-0000-000000000002",
+  "name": "Contoso Overview",
+  "dashboardScope": "project",
+  "refreshInterval": null,
+  "modifiedDate": "2026-08-01T00:00:00Z",
+  "modifiedBy": "b1b1b1b1-0000-0000-0000-0000000000a9",
+  "widgets": [
+    {
+      "id": "57e2e276-b2ac-4fc9-b8c0-f14d3c0187c3",
+      "name": "Build history",
+      "contributionId": "ms.vss-build-web.Microsoft.VisualStudioOnline.Dashboards.BuildHistogramWidget",
+      "position": {
+        "row": 1,
+        "column": 1
+      },
+      "size": {
+        "rowSpan": 1,
+        "columnSpan": 2
+      },
+      "settings": "{\"buildDefinition\":11}",
+      "settingsVersion": {
+        "major": 1,
+        "minor": 0,
+        "patch": 0
+      },
+      "isEnabled": true
+    }
+  ]
+}

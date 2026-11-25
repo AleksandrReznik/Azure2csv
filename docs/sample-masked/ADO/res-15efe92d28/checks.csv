@@ -1,0 +1,6 @@
+﻿"Organization","Project","ResourceType","Resource","Check","Approvers","MinApprovers","RequesterCanApprove","Instructions","TimeoutMinutes","Enabled","CreatedBy","Modified","CheckId"
+"res-15efe92d28","Project 1cd76e52c2","Environment","Production","Approval","User cab0977b7f; Name 5a8a440778","1","False","[masked]","43200","True","User cab0977b7f","2026-05-01T00:00:00Z","1"
+"res-15efe92d28","Project 1cd76e52c2","Environment","Production","Invoke REST API","","","","","60","True","User 8f168f32a5","2025-01-01T00:00:00Z","2"
+"res-15efe92d28","Project 1cd76e52c2","Agent pool","Default","Business Hours","","","","","1440","True","User cab0977b7f","2026-02-01T00:00:00Z","3"
+"res-15efe92d28","Project 1cd76e52c2","Agent pool","Default","Approval","User cab0977b7f","0","True","","1440","True","User cab0977b7f","2026-04-01T00:00:00Z","5"
+"res-15efe92d28","Project 1cd76e52c2","Service connection","Connection b6abf0ab08","Exclusive lock","","","","","43200","False","User cab0977b7f","2026-03-01T00:00:00Z","4"

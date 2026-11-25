@@ -1,0 +1,6 @@
+﻿"Organization","Project","ResourceType","Resource","Check","Approvers","MinApprovers","RequesterCanApprove","Instructions","TimeoutMinutes","Enabled","CreatedBy","Modified","CheckId"
+"contoso-ado","Web Shop","Environment","Production","Approval","Alex Admin; [Web Shop]\Contoso Leads","1","False","Check the Contoso change ticket","43200","True","Alex Admin","2026-05-01T00:00:00Z","1"
+"contoso-ado","Web Shop","Environment","Production","Invoke REST API","","","","","60","True","Former Dev","2025-01-01T00:00:00Z","2"
+"contoso-ado","Web Shop","Agent pool","Default","Business Hours","","","","","1440","True","Alex Admin","2026-02-01T00:00:00Z","3"
+"contoso-ado","Web Shop","Agent pool","Default","Approval","Alex Admin","0","True","","1440","True","Alex Admin","2026-04-01T00:00:00Z","5"
+"contoso-ado","Web Shop","Service connection","Contoso Prod (WIF)","Exclusive lock","","","","","43200","False","Alex Admin","2026-03-01T00:00:00Z","4"

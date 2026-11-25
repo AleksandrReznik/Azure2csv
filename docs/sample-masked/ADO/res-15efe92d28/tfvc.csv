@@ -1,0 +1,3 @@
+﻿"Organization","Project","Path","IsBranch","Parent","Owner","Created","LastChangeset","LastChange","DaysSinceLastChange","LastChangeBy","Files","SizeMB","FilesCapped","Pipelines","ExportedTo"
+"res-15efe92d28","Project 924e99b5f5","$/Project 924e99b5f5/Trunk/Main","True","","User 8f168f32a5","2015-03-01T00:00:00Z","120","2023-05-10T00:00:00Z","1238","User 8f168f32a5","3","3.5","False","1",""
+"res-15efe92d28","Project 924e99b5f5","$/Project 924e99b5f5/Trunk/tv-8dd7bb3fc2","True","$/Project 924e99b5f5/Trunk/Main","User 8f168f32a5","2016-01-01T00:00:00Z","95","2022-01-01T00:00:00Z","1732","User 8f168f32a5","1","0.5","False","0",""

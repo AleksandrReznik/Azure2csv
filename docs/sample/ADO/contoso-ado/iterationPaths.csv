@@ -1,0 +1,5 @@
+﻿"Organization","Project","Path","Name","Level","StartDate","FinishDate","Teams","NodeId","Identifier"
+"contoso-ado","Web Shop","Web Shop","Web Shop","0","","","","4","a6a6a6a6-0000-0000-0000-000000000000"
+"contoso-ado","Web Shop","Web Shop\Contoso Sprint 1","Contoso Sprint 1","1","2026-09-01T00:00:00Z","2026-09-14T00:00:00Z","Web Shop Team","5","a6a6a6a6-0000-0000-0000-000000000001"
+"contoso-ado","Web Shop","Web Shop\Contoso Sprint 2","Contoso Sprint 2","1","2026-09-15T00:00:00Z","2026-09-28T00:00:00Z","Web Shop Team; Marketing","6","a6a6a6a6-0000-0000-0000-000000000002"
+"contoso-ado","Legacy App","Legacy App","Legacy App","0","","","","8","a6a6a6a6-0000-0000-0000-000000000010"

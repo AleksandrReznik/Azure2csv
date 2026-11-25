@@ -1,3 +1,3 @@
 ﻿"SubscriptionName","ResourceGroup","SqlServer","Name","StartIpAddress","EndIpAddress","Id"
-"sub-4682304a9f","rg-9d2043f292","sql-266a79a469","x-dbdb08e0a3","192.0.2.4","192.0.2.4","/subscriptions/3069eea6-82ae-482b-a6de-fa6573c77b1f/resourceGroups/rg-9d2043f292/providers/Microsoft.Sql/servers/sql-266a79a469/firewallRules/x-dbdb08e0a3"
-"sub-4682304a9f","rg-9d2043f292","sql-266a79a469","x-55a131cde0","192.0.2.5","192.0.2.6","/subscriptions/3069eea6-82ae-482b-a6de-fa6573c77b1f/resourceGroups/rg-9d2043f292/providers/Microsoft.Sql/servers/sql-266a79a469/firewallRules/x-55a131cde0"
+"sub-a40635b1f0","rg-43aaa1baff","sql-2928876e5e","x-a52ad853ca","192.0.2.4","192.0.2.4","/subscriptions/5ea19159-47eb-4887-a3cf-156a02215e55/resourceGroups/rg-43aaa1baff/providers/Microsoft.Sql/servers/sql-2928876e5e/firewallRules/x-a52ad853ca"
+"sub-a40635b1f0","rg-43aaa1baff","sql-2928876e5e","x-cba067694b","192.0.2.5","192.0.2.6","/subscriptions/5ea19159-47eb-4887-a3cf-156a02215e55/resourceGroups/rg-43aaa1baff/providers/Microsoft.Sql/servers/sql-2928876e5e/firewallRules/x-cba067694b"

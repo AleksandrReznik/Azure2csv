@@ -1,0 +1,5 @@
+﻿"Organization","User","DisplayName","Origin","UserType","License","LicenseSource","Status","Paid","LastAccess","DaysSinceLastAccess","DateAdded","Domain","External","DirectoryAlias","Groups"
+"res-15efe92d28","u-96bffa650d@MG eaa409f3c3.onmicrosoft.com","User cab0977b7f","Entra ID","member","Basic","account","active","True","2026-09-28T00:00:00Z","1","2019-01-01T00:00:00Z","MG eaa409f3c3.onmicrosoft.com","False","u-96bffa650d","x-f96bf4d499; x-c4dc63747b; x-ed8c6a03d8; x-664e77842b"
+"res-15efe92d28","u-57bd0c6a35@d-06e17c4a0a","User 8f168f32a5","Entra ID","member","Basic","account","active","True","2026-02-01T00:00:00Z","240","2020-01-01T00:00:00Z","d-06e17c4a0a","False","u-57bd0c6a35","x-18e433d934; Name 5a8a440778; x-ed8c6a03d8; x-8376bfd092"
+"res-15efe92d28","u-49f807d31a@d-2c0e5c0ac3","User 95448f4c24","Entra ID","guest","Stakeholder","account","active","False","","","2025-01-01T00:00:00Z","d-2c0e5c0ac3","True","x-ea3e381afc","x-664e77842b"
+"res-15efe92d28","u-60ae00f394@d-af147adef8.example","User 9742be0c8a","Microsoft account","","Basic + Test Plans","account","active","True","","","2026-09-20T00:00:00Z","d-af147adef8","True","",""

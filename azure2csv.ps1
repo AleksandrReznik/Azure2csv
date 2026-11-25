@@ -1,5 +1,5 @@
 <#PSScriptInfo
-.VERSION 2.1.0
+.VERSION 2.2.0
 .GUID 5439c558-8570-4b37-ac13-9e93b40ab2aa
 .AUTHOR Aleksandr Reznik
 .COMPANYNAME it4it.solutions
@@ -12,6 +12,12 @@
 .REQUIREDSCRIPTS
 .EXTERNALSCRIPTDEPENDENCIES
 .RELEASENOTES
+2.2.0 - Azure DevOps structure (AzureDevOpsStructure, in the profiles with AzureDevOps): security groups and members,
+        organization policies, teams with members and settings, area and iteration trees, boards, dashboards and
+        widgets, shared queries, tags, work item templates, permissions (ACLs), approvals and checks, notification
+        subscriptions, TFVC shelvesets, wikis, pull requests. Work item export (AzureDevOpsWorkItems, only when named):
+        every work item with revisions, links, comments, attachments and the images in its text, test plans and
+        runs, pipeline and release runs. Findings ADO-17 to ADO-21; 65 reports.
 2.1.0 - Azure DevOps usage: how each pipeline starts, its runs of the last 90 days, the service connections,
         subscriptions, environments, variable groups and secure files it uses; last use of service connections,
         resources open to all pipelines, branch policies, plain-text secrets in pipelines (names only), customized
@@ -124,7 +130,7 @@
 
 .PARAMETER AdoOrganization
     Azure DevOps organizations to inventory (names or https://dev.azure.com/<name> URLs), in addition to the ones
-    billed to the scanned subscriptions (Microsoft.VisualStudio/account resources). Used by the AzureDevOps report.
+    billed to the scanned subscriptions (Microsoft.VisualStudio/account resources). Used by the Azure DevOps reports.
 
 .PARAMETER AdoRepoMaxSizeMB
     AzureDevOpsRepos report: repositories larger than this (MB, as reported by Azure DevOps) are skipped.
@@ -150,6 +156,22 @@
     executable or its folder. Use it for a copy you trust or when downloads are blocked.
     By default the script gets ArtifactTool from Azure DevOps, the way Azure CLI does, and keeps it under
     <LocalAppData>\azure2csv\ArtifactTool.
+
+.PARAMETER AdoAttachmentMaxSizeMB
+    AzureDevOpsWorkItems report: work item attachments and images linked from work item text that are larger than
+    this many MB are listed but not downloaded. Default 100; 0 = no limit.
+
+.PARAMETER AdoAttachmentsMaxMB
+    AzureDevOpsWorkItems report: stop downloading attachments and images after this many MB in total. Default 5120;
+    0 = no limit.
+
+.PARAMETER AdoSkipAttachments
+    AzureDevOpsWorkItems report: list the attachments of the work items and the images linked from their text
+    (workItemAttachments.csv) without downloading them.
+
+.PARAMETER AdoRunLogs
+    AzureDevOpsWorkItems report: also download the logs of every pipeline run and release (one zip each). Off by default:
+    logs can be large.
 
 .PARAMETER TemplateFormat
     ArmTemplates report: Both (default) exports every resource group as an ARM template (.json) and as Bicep, with two
@@ -205,6 +227,11 @@
     Azure DevOps inventory (ADO\ folder) for the organizations billed to the subscriptions plus two named ones.
 
 .EXAMPLE
+    .\azure2csv.ps1 -Reports AzureDevOps, AzureDevOpsStructure, AzureDevOpsWorkItems -AdoOrganization contoso -AdoRunLogs
+    Azure DevOps only: inventory, structure (teams, boards, dashboards, queries, permissions...) and the content of every
+    project (work items with history, comments and attachments, test plans, pipeline and release runs with their logs).
+
+.EXAMPLE
     pwsh -File .\azure2csv.ps1 -Reports RBAC, Policy -SkipReports Locks
     Started from cmd, a scheduler or with -File, lists work the same way (with or without spaces after the commas).
 
@@ -226,7 +253,7 @@
     v1 syntax still works.
 
 .NOTES
-    Version : 2.0.0 (2026)
+    Version : 2.2.0 (2026)
     Author  : Aleksandr Reznik - aleksandr@reznik.lt - https://it4it.solutions
     License : MIT
     History : v1.0 published 2021-10-15, https://it4it.solutions/2021/10/15/inventory-all-azure-resources-to-csv-file/
@@ -264,7 +291,7 @@ param(
         'VirtualNetworks', 'NetworkSecurity', 'Routing', 'PublicIPs', 'PrivateEndpoints', 'PrivateDNS',
         'NetworkInterfaces', 'LoadBalancers', 'AppGateways', 'Firewalls', 'Gateways', 'DnsRecords',
         'VMs', 'Disks', 'AKS', 'AppService', 'ScaleSets', 'Galleries', 'ContainerRegistries', 'ContainerApps', 'Storage', 'SQL', 'KeyVault', 'Databases', 'Messaging',
-        'Monitoring', 'Backup', 'Automation', 'AzureCode', 'AppCode', 'Advisor', 'Retirements', 'Orphans', 'Cost', 'AzureDevOps', 'AzureDevOpsPipelines', 'AzureDevOpsRepos', 'AzureDevOpsPackages',
+        'Monitoring', 'Backup', 'Automation', 'AzureCode', 'AppCode', 'Advisor', 'Retirements', 'Orphans', 'Cost', 'AzureDevOps', 'AzureDevOpsStructure', 'AzureDevOpsPipelines', 'AzureDevOpsRepos', 'AzureDevOpsPackages', 'AzureDevOpsWorkItems',
         'ManagementGroups', 'Policy', 'RBAC', 'Defender', 'Lighthouse', 'ResourceProviders', 'TenantTransfer',
         'EntraTenant', 'EntraUsers', 'EntraGroups', 'EntraGroupMembers', 'EntraApps', 'EntraAppAssignments', 'EntraRoles', 'EntraPolicies') | Where-Object { $_ -like ($a2cWord + '*') } })]
     [string[]] $Reports,
@@ -274,7 +301,7 @@ param(
         'VirtualNetworks', 'NetworkSecurity', 'Routing', 'PublicIPs', 'PrivateEndpoints', 'PrivateDNS',
         'NetworkInterfaces', 'LoadBalancers', 'AppGateways', 'Firewalls', 'Gateways', 'DnsRecords',
         'VMs', 'Disks', 'AKS', 'AppService', 'ScaleSets', 'Galleries', 'ContainerRegistries', 'ContainerApps', 'Storage', 'SQL', 'KeyVault', 'Databases', 'Messaging',
-        'Monitoring', 'Backup', 'Automation', 'AzureCode', 'AppCode', 'Advisor', 'Retirements', 'Orphans', 'Cost', 'AzureDevOps', 'AzureDevOpsPipelines', 'AzureDevOpsRepos', 'AzureDevOpsPackages',
+        'Monitoring', 'Backup', 'Automation', 'AzureCode', 'AppCode', 'Advisor', 'Retirements', 'Orphans', 'Cost', 'AzureDevOps', 'AzureDevOpsStructure', 'AzureDevOpsPipelines', 'AzureDevOpsRepos', 'AzureDevOpsPackages', 'AzureDevOpsWorkItems',
         'ManagementGroups', 'Policy', 'RBAC', 'Defender', 'Lighthouse', 'ResourceProviders', 'TenantTransfer',
         'EntraTenant', 'EntraUsers', 'EntraGroups', 'EntraGroupMembers', 'EntraApps', 'EntraAppAssignments', 'EntraRoles', 'EntraPolicies') | Where-Object { $_ -like ($a2cWord + '*') } })]
     [string[]] $AddReports,
@@ -284,7 +311,7 @@ param(
         'VirtualNetworks', 'NetworkSecurity', 'Routing', 'PublicIPs', 'PrivateEndpoints', 'PrivateDNS',
         'NetworkInterfaces', 'LoadBalancers', 'AppGateways', 'Firewalls', 'Gateways', 'DnsRecords',
         'VMs', 'Disks', 'AKS', 'AppService', 'ScaleSets', 'Galleries', 'ContainerRegistries', 'ContainerApps', 'Storage', 'SQL', 'KeyVault', 'Databases', 'Messaging',
-        'Monitoring', 'Backup', 'Automation', 'AzureCode', 'AppCode', 'Advisor', 'Retirements', 'Orphans', 'Cost', 'AzureDevOps', 'AzureDevOpsPipelines', 'AzureDevOpsRepos', 'AzureDevOpsPackages',
+        'Monitoring', 'Backup', 'Automation', 'AzureCode', 'AppCode', 'Advisor', 'Retirements', 'Orphans', 'Cost', 'AzureDevOps', 'AzureDevOpsStructure', 'AzureDevOpsPipelines', 'AzureDevOpsRepos', 'AzureDevOpsPackages', 'AzureDevOpsWorkItems',
         'ManagementGroups', 'Policy', 'RBAC', 'Defender', 'Lighthouse', 'ResourceProviders', 'TenantTransfer',
         'EntraTenant', 'EntraUsers', 'EntraGroups', 'EntraGroupMembers', 'EntraApps', 'EntraAppAssignments', 'EntraRoles', 'EntraPolicies') | Where-Object { $_ -like ($a2cWord + '*') } })]
     [string[]] $SkipReports,
@@ -328,6 +355,16 @@ param(
 
     [string] $ArtifactToolPath,
 
+    [ValidateRange(0, 1048576)]
+    [int] $AdoAttachmentMaxSizeMB = 100,
+
+    [ValidateRange(0, 1048576)]
+    [int] $AdoAttachmentsMaxMB = 5120,
+
+    [switch] $AdoSkipAttachments,
+
+    [switch] $AdoRunLogs,
+
     [ValidateSet('Both', 'Json', 'Bicep')]
     [string] $TemplateFormat = 'Both',
 
@@ -368,7 +405,7 @@ Set-StrictMode -Version 1.0
 
 #region ============================== 1. CONSTANTS AND CATALOGS ======================================
 
-$script:A2CVersion = '2.1.0'
+$script:A2CVersion = '2.2.0'
 $script:A2CBrand = [ordered]@{
     Tool    = 'azure2csv'
     Author  = 'Aleksandr Reznik'
@@ -598,6 +635,10 @@ $script:A2CReportCatalog = @(
        Files = 'ADO\ folder: organizations, projects, repositories, branch policies, pipelines, service connections, pipeline secrets, agents, users, processes (JSON)...'
        Needs = @('Subscriptions', 'Resources', 'AzureDevOps')
        Desc  = 'Azure DevOps organizations billed to the subscriptions or named with -AdoOrganization: projects, Git and TFVC repos, branch policies, pipelines (triggers, runs, service connections, environments, variable groups they use), service connections (last use), plain-text secrets, agents, users, feeds and packages, integrations, work items, customized processes' }
+    @{ Name = 'AzureDevOpsStructure'; Group = 'Operations'; Speed = 'Medium'; OptIn = $false; Perm = 'Member of the Azure DevOps organization (Project Collection Administrator for all permissions and the policies)'
+       Files = 'ADO\<organization>\ securityGroups, groupMembers, orgSettings, notificationSubscriptions, teams, teamMembers, areaPaths, iterationPaths, boards, boardColumns, boardCardRules, dashboards, dashboardWidgets, queries, tags, workItemTemplates, permissions, checks, tfvcShelvesets, wikis, pullRequests (+ dashboards as JSON)'
+       Needs = @('Subscriptions', 'Resources', 'AzureDevOps', 'AzureDevOpsStructure')
+       Desc  = 'How each Azure DevOps organization is set up, to rebuild it or map its users to a new tenant: security groups with members (nested groups too), organization policies, notification subscriptions, teams (members, area and iteration paths, backlog settings), area and iteration trees, boards (columns, swimlanes, card fields and rules), dashboards and widgets, shared queries, tags, work item templates, permissions (access control lists), approvals and checks, TFVC shelvesets, wikis and pull requests' }
     @{ Name = 'AzureDevOpsPipelines'; Group = 'Operations'; Speed = 'Slow'; OptIn = $true;  Perm = 'Member of the Azure DevOps organization (code read for YAML files)'
        Files = 'ADO\<organization>\<project>\pipelines\ folder (+ ExportedFile columns)'
        Needs = @('Subscriptions', 'Resources', 'AzureDevOps', 'AzureDevOpsPipelines')
@@ -610,6 +651,10 @@ $script:A2CReportCatalog = @(
        Files = 'ADO\<organization>\<project>\feeds\ folder (+ ExportedTo column in packages.csv)'
        Needs = @('Subscriptions', 'Resources', 'AzureDevOps', 'AzureDevOpsPackages')
        Desc  = 'Download the packages published to Azure Artifacts feeds, Universal Packages with Microsoft ArtifactTool (latest versions, or all with -AdoPackageVersions All; up to -AdoPackagesMaxMB) - only when named, never with -Mask' }
+    @{ Name = 'AzureDevOpsWorkItems'; Group = 'Operations'; Speed = 'Slow'; OptIn = $true;  Explicit = $true; Perm = 'Member of the Azure DevOps organization with Basic access (read access to the projects)'
+       Files = 'ADO\<organization>\<project>\workitems\ folder (JSON per work item, attachments, images from the text), allWorkItems.csv, workItemLinks.csv, workItemAttachments.csv, testPlans.csv, testSuites.csv, testCases.csv, testSteps.csv, testRuns.csv, testResults.csv, pipelineRuns.csv, releaseRuns.csv (+ run logs with -AdoRunLogs)'
+       Needs = @('Subscriptions', 'Resources', 'AzureDevOps', 'AzureDevOpsWorkItems')
+       Desc  = 'Export the content of every project: each work item with all fields, revisions, links and comments as JSON, attachments and the images linked from work item text (up to -AdoAttachmentMaxSizeMB each and -AdoAttachmentsMaxMB in total), test plans, suites, test cases with steps, test runs and results, pipeline and release runs (logs with -AdoRunLogs) - thousands of calls, only when named, never with -Mask' }
     @{ Name = 'ManagementGroups';   Group = 'Governance'; Speed = 'Fast';   OptIn = $false; Perm = 'Reader (management groups)'
        Files = 'managementGroups.csv'
        Needs = @('Subscriptions', 'Containers', 'ManagementGroups')
@@ -684,16 +729,16 @@ $script:A2CProfiles = [ordered]@{
                    'VMs', 'Disks', 'AKS', 'AppService', 'ScaleSets', 'Galleries', 'ContainerRegistries', 'ContainerApps', 'Storage', 'SQL', 'KeyVault', 'Databases', 'Messaging',
                    'Monitoring', 'Backup', 'Automation', 'Advisor', 'Retirements', 'Orphans', 'ManagementGroups',
                    'DiagnosticSettings', 'Locks', 'Policy', 'RBAC', 'Defender', 'Lighthouse', 'ResourceProviders', 'TenantTransfer',
-                   'EntraTenant', 'EntraUsers', 'EntraGroups', 'EntraApps', 'EntraRoles', 'EntraPolicies', 'AzureDevOps')
+                   'EntraTenant', 'EntraUsers', 'EntraGroups', 'EntraApps', 'EntraRoles', 'EntraPolicies', 'AzureDevOps', 'AzureDevOpsStructure')
     Full       = @('All')
     Migration  = @('Resources', 'Tags', 'MoveSupport', 'CrossReferences', 'Locks', 'Deployments', 'VirtualNetworks', 'NetworkSecurity',
                    'Routing', 'PublicIPs', 'PrivateEndpoints', 'PrivateDNS', 'NetworkInterfaces', 'LoadBalancers', 'AppGateways', 'Firewalls', 'Gateways', 'DnsRecords',
                    'VMs', 'Disks', 'AKS', 'AppService', 'ScaleSets', 'Galleries', 'ContainerRegistries', 'ContainerApps', 'Storage',
                    'SQL', 'KeyVault', 'Databases', 'Messaging', 'Monitoring', 'Backup', 'Automation', 'Retirements', 'Orphans', 'ManagementGroups', 'Policy',
-                   'RBAC', 'Defender', 'Lighthouse', 'ResourceProviders', 'TenantTransfer', 'EntraApps', 'AzureDevOps')
+                   'RBAC', 'Defender', 'Lighthouse', 'ResourceProviders', 'TenantTransfer', 'EntraApps', 'AzureDevOps', 'AzureDevOpsStructure')
     Security   = @('RBAC', 'Defender', 'Lighthouse', 'EntraTenant', 'EntraUsers', 'EntraGroups', 'EntraApps', 'EntraRoles', 'EntraPolicies',
                    'NetworkSecurity', 'PublicIPs', 'PrivateEndpoints', 'AppGateways', 'Firewalls', 'Gateways', 'Storage', 'SQL', 'KeyVault', 'DiagnosticSettings', 'Policy',
-                   'Advisor', 'Locks', 'Retirements', 'AzureDevOps')
+                   'Advisor', 'Locks', 'Retirements', 'AzureDevOps', 'AzureDevOpsStructure')
     Governance = @('ManagementGroups', 'Policy', 'RBAC', 'Defender', 'Lighthouse', 'ResourceProviders', 'Locks', 'Deployments', 'Tags', 'DiagnosticSettings', 'Advisor')
 }
 
@@ -732,9 +777,11 @@ $script:A2CDatasetCatalog = [ordered]@{
     ChildResources         = @{ Needs = @('Subscriptions', 'Resources', 'Providers'); Desc = 'Child resources that Resource Graph does not list (ARM, several calls per resource)' }
     Cost                   = @{ Needs = @('Subscriptions');                    Desc = 'Actual cost per resource (Cost Management)' }
     AzureDevOps            = @{ Needs = @('Subscriptions', 'Resources');       Desc = 'Azure DevOps organizations (Azure DevOps REST with the Az sign-in)' }
+    AzureDevOpsStructure   = @{ Needs = @('AzureDevOps');                      Desc = 'Azure DevOps organization structure: groups, teams, boards, dashboards, queries, permissions, checks' }
     AzureDevOpsPipelines   = @{ Needs = @('AzureDevOps');                      Desc = 'Azure DevOps pipeline export (YAML files and definitions)' }
     AzureDevOpsRepos       = @{ Needs = @('AzureDevOps');                      Desc = 'Azure DevOps repository export (default branch files)' }
     AzureDevOpsPackages    = @{ Needs = @('AzureDevOps');                      Desc = 'Azure Artifacts package download (versions published to the feeds)' }
+    AzureDevOpsWorkItems   = @{ Needs = @('AzureDevOps');                      Desc = 'Azure DevOps project content: work items with history, comments and attachments, test plans and runs, pipeline and release runs' }
     EntraTenant            = @{ Needs = @();                                   Desc = 'Organization, domains, licenses (Graph)' }
     EntraUsers             = @{ Needs = @();                                   Desc = 'Users (Graph)' }
     EntraGroups            = @{ Needs = @();                                   Desc = 'Groups (Graph)' }
@@ -1394,8 +1441,9 @@ $script:A2CGraphBase = 'https://graph.microsoft.com'
 function Invoke-A2CHttp {
     # The single network seam (tests replace this function). Never throws.
     # Returns @{ StatusCode = int (0 = transport error); Content = string; Headers = case-insensitive hashtable }
-    # -OutFile (Azure DevOps downloads): the response body is written to that file instead of returned as Content
-    param([string] $Method = 'GET', [Parameter(Mandatory)] [string] $Uri, [string] $Body, [string] $Kind = 'arm', [string] $OutFile)
+    # -OutFile (Azure DevOps downloads): the response body is written to that file instead of returned as Content;
+    # -Accept: the media type asked for then (default: a zip)
+    param([string] $Method = 'GET', [Parameter(Mandatory)] [string] $Uri, [string] $Body, [string] $Kind = 'arm', [string] $OutFile, [string] $Accept)
     if ($Kind -eq 'web') {
         # public downloads (move-support table, ArtifactTool zip): never with a token
         try {
@@ -1414,8 +1462,8 @@ function Invoke-A2CHttp {
             return @{ StatusCode = $code; Content = [string]$_.Exception.Message; Headers = @{} }
         }
     }
-    if ($Kind -eq 'ado') { return (Invoke-A2CTokenHttp -Resource $script:A2CAdoResource -AzureDevOps -Method $Method -Uri $Uri -Body $Body -OutFile $OutFile) }
-    if ($Kind -eq 'kudu') { return (Invoke-A2CTokenHttp -Resource ($script:A2CArmBase + '/') -Method $Method -Uri $Uri -Body $Body -OutFile $OutFile) }
+    if ($Kind -eq 'ado') { return (Invoke-A2CTokenHttp -Resource $script:A2CAdoResource -AzureDevOps -Method $Method -Uri $Uri -Body $Body -OutFile $OutFile -Accept $Accept) }
+    if ($Kind -eq 'kudu') { return (Invoke-A2CTokenHttp -Resource ($script:A2CArmBase + '/') -Method $Method -Uri $Uri -Body $Body -OutFile $OutFile -Accept $Accept) }
     $p = @{ Method = $Method; Uri = $Uri; ErrorAction = 'Stop' }
     if ($Body) { $p['Payload'] = $Body }
     try { $r = Invoke-AzRestMethod @p }
@@ -1459,7 +1507,7 @@ function Test-A2CHtmlFile {
 function Invoke-A2CTokenHttp {
     # A request with an Entra bearer token (Azure DevOps, Kudu); part of the network seam (only Invoke-A2CHttp calls
     # it). -OutFile streams the body to a file (zip downloads). Never throws.
-    param([string] $Resource, [switch] $AzureDevOps, [string] $Method, [string] $Uri, [string] $Body, [string] $OutFile)
+    param([string] $Resource, [switch] $AzureDevOps, [string] $Method, [string] $Uri, [string] $Body, [string] $OutFile, [string] $Accept)
     try { $token = Get-A2CBearerToken $Resource }
     catch { return @{ StatusCode = 0; Content = [string]$_.Exception.Message; Headers = @{} } }
     $p = @{ Uri = $Uri; Method = $Method; UseBasicParsing = $true; TimeoutSec = 120; ErrorAction = 'Stop'
@@ -1472,7 +1520,7 @@ function Invoke-A2CTokenHttp {
         # redirect to blob storage; Invoke-WebRequest drops the Authorization header on such redirects.
         $p['OutFile'] = $OutFile
         $p['TimeoutSec'] = 3600
-        $p['Headers']['Accept'] = 'application/zip, */*'
+        $p['Headers']['Accept'] = $(if ($Accept) { $Accept } else { 'application/zip, */*' })
     }
     try {
         $r = Invoke-WebRequest @p
@@ -1548,13 +1596,13 @@ function Invoke-A2CRequest {
     # One request with retries on 429/5xx/transport errors; retries are shown so a slow call never looks like a hang.
     # A sign-in error opens the sign-in once per API kind; if that does not help, it is reported and later calls of
     # that kind fail at once.
-    param([string] $Method = 'GET', [string] $Uri, [string] $Body, [string] $Kind = 'arm', [int] $MaxRetries = 6, [string] $OutFile)
+    param([string] $Method = 'GET', [string] $Uri, [string] $Body, [string] $Kind = 'arm', [int] $MaxRetries = 6, [string] $OutFile, [string] $Accept)
     $signInError = $script:A2C.SignInFailed[$Kind]
     if ($signInError) { return @{ StatusCode = 0; Content = $signInError; Headers = @{} } }
     $attempt = 0
     while ($true) {
         $script:A2C.Stats[$Kind] = [int]$script:A2C.Stats[$Kind] + 1
-        $r = Invoke-A2CHttp -Method $Method -Uri $Uri -Body $Body -Kind $Kind -OutFile $OutFile
+        $r = Invoke-A2CHttp -Method $Method -Uri $Uri -Body $Body -Kind $Kind -OutFile $OutFile -Accept $Accept
         $code = [int]$r.StatusCode
         if ($code -eq 0 -and (Test-A2CSignInError ([string]$r.Content))) {
             # once per API kind: let the user sign in again (expired session, MFA) and repeat the call
@@ -1614,7 +1662,10 @@ function Get-A2CErrorText {
     if ($null -eq $ErrorInfo) { return '' }
     $t = 'HTTP ' + $ErrorInfo.Status
     if ($ErrorInfo.Code) { $t += ' ' + $ErrorInfo.Code }
-    if ($ErrorInfo.Message) { $t += ': ' + $ErrorInfo.Message }
+    $m = [string]$ErrorInfo.Message
+    # Azure DevOps TF50309 names the signed-in account first and the missing permission last: only the permission is kept
+    if ($m -match '^TF50309:.*permissions are needed to perform this operation:\s*(.+?)\.?\s*$') { $m = 'TF50309: needs the permission "' + $Matches[1] + '"' }
+    if ($m) { $t += ': ' + $m }
     return $t
 }
 
@@ -1757,6 +1808,15 @@ function Invoke-A2CAdo {
     if ($ok -and $r.Content) { try { $json = ConvertFrom-A2CJson $r.Content } catch { $json = $null } }
     $err = $null
     if (-not $ok) { $err = Get-A2CError $r }
+    # near its rate limit Azure DevOps sends Retry-After also with answers that succeed: wait before the next call
+    if ($ok -and $null -ne $r.Headers -and $r.Headers.ContainsKey('Retry-After')) {
+        $wait = ConvertTo-A2CSeconds $r.Headers['Retry-After']
+        if ($wait -gt 0) {
+            $script:A2C.Stats['Delayed'] = [int]$script:A2C.Stats['Delayed'] + 1
+            Write-A2CLog -Level Verbose ('Azure DevOps asks to slow down (Retry-After {0:N0}s, {1})' -f $wait, [string]$r.Headers['X-RateLimit-Resource'])
+            Start-A2CSleep -Seconds ([math]::Min(60, $wait))
+        }
+    }
     return [pscustomobject]@{ Ok = $ok; Status = [int]$r.StatusCode; Json = $json; Content = [string]$r.Content; Error = $err; Headers = $r.Headers }
 }
 
@@ -1770,8 +1830,9 @@ function Set-A2CQueryParam {
 }
 
 function Invoke-A2CAdoList {
-    # Azure DevOps GET with paging: items in value/members/items; the next page comes from the x-ms-continuationtoken
-    # header, a continuationToken in the body or an @odata.nextLink. Returns @{ Ok; Items; Error }
+    # Azure DevOps GET with paging: items in value/members/items (values: team iterations, comments: work item comments);
+    # the next page comes from the x-ms-continuationtoken header, a continuationToken in the body or an @odata.nextLink.
+    # Returns @{ Ok; Items; Error }
     param([string] $Uri, [int] $MaxItems = 0)
     $items = [System.Collections.Generic.List[object]]::new()
     $seen = [System.Collections.Generic.HashSet[string]]::new()
@@ -1783,7 +1844,7 @@ function Invoke-A2CAdoList {
         $token = [string]$r.Headers['x-ms-continuationtoken']
         $link = ''
         if ($null -ne $j) {
-            foreach ($n in @('value', 'members', 'items')) {
+            foreach ($n in @('value', 'members', 'items', 'values', 'comments')) {
                 if ($null -ne $j.PSObject.Properties[$n]) { foreach ($v in @($j.$n)) { if ($null -ne $v) { $items.Add($v) } }; break }
             }
             if (-not $token -and $null -ne $j.PSObject.Properties['continuationToken']) { $token = [string]$j.continuationToken }
@@ -3105,7 +3166,7 @@ function Get-A2CDatasetCost {
 
 function Get-A2CSafeFileName {
     param([string] $Name)
-    return (($Name -replace '[\\/:*?"<>|]', '_').Trim())
+    return (($Name -replace '[\\/:*?"<>|\x00-\x1f]', '_').Trim())
 }
 
 function Get-A2CDatasetRunbookContent {
@@ -4435,6 +4496,7 @@ $script:A2CAdoApi = @{
     Download = '7.1-preview.1'   # NuGet, Maven and PyPI downloads are preview-only (7.1 answers HTTP 400)
     Extensions = '7.1-preview.1'; Graph = '7.1-preview.1'; Entitlements = '7.1-preview.3'; Analytics = 'v4.0-preview'
     Permissions = '7.1-preview.1'   # pipeline permissions exist only as preview
+    Dashboards = '7.1-preview.3'; Comments = '7.1-preview.4'   # dashboards and work item comments exist only as preview
 }
 $script:A2CAdoRunDays = 90      # pipeline runs counted per pipeline (pipelines.csv Runs90d)
 $script:A2CAdoHistoryTop = 100  # last uses of a service connection and deployments to an environment that are read
@@ -4498,10 +4560,11 @@ function Get-A2CAdoCatalog {
 function New-A2CAdoOrg {
     param($Source)
     $o = [ordered]@{ Name = [string]$Source.Name; Source = [string]$Source.Source; Billing = $Source.Billing
-        Url = 'https://dev.azure.com/' + $Source.Name; Id = ''; User = ''; Owner = ''; Status = 'Not collected'; Detail = ''; LastCommit = @{} }
+        Url = 'https://dev.azure.com/' + $Source.Name; Id = ''; User = ''; Owner = ''; Status = 'Not collected'; Detail = ''; LastCommit = @{}
+        InCatalog = $false; Structure = $null; Archive = $null }   # Structure: AzureDevOpsStructure; Archive: AzureDevOpsWorkItems
     foreach ($k in @('Problems', 'Projects', 'Repos', 'Policies', 'Pipelines', 'Releases', 'Endpoints', 'Pools', 'ElasticPools', 'Agents',
             'DeploymentGroups', 'Environments', 'VariableGroups', 'SecureFiles', 'Extensions', 'Hooks', 'Feeds', 'Tfvc', 'Users', 'Admins',
-            'WorkItems', 'Processes', 'Builds')) { $o[$k] = [System.Collections.Generic.List[object]]::new() }
+            'WorkItems', 'Processes', 'Builds', 'GraphGroups', 'GraphUsers')) { $o[$k] = [System.Collections.Generic.List[object]]::new() }
     # Permissions: "<type>|<project id>|<resource id>" -> @{ All; Pipelines }; EndpointUsage: endpoint id -> runs that used it;
     # Yaml: "<project id>|<pipeline id>" -> text of the main YAML file; ProcessDetails: process type id -> work item types
     foreach ($k in @('Permissions', 'EndpointUsage', 'Yaml', 'ProcessDetails')) { $o[$k] = @{} }
@@ -4640,9 +4703,10 @@ $script:A2CAdoPageSize = 100   # $top of Azure DevOps lists that page with $skip
 function Get-A2CAdoPagedItems {
     # Azure DevOps GET paged with $top/$skip (projects, packages): until a short page or MaxPages.
     # Returns @{ Items; Capped }; throws with the error text when a call fails.
-    param([string] $Uri, [int] $MaxPages = 100)
+    param([string] $Uri, [int] $MaxPages = 100, [int] $PageSize = 0)
     $items = [System.Collections.Generic.List[object]]::new()
     $size = $script:A2CAdoPageSize
+    if ($PageSize -gt 0) { $size = $PageSize }
     $full = $true
     for ($page = 0; $page -lt $MaxPages -and $full; $page++) {
         $r = Invoke-A2CAdo (Set-A2CQueryParam (Set-A2CQueryParam $Uri '$top' ([string]$size)) '$skip' ([string]($page * $size)))
@@ -4757,6 +4821,8 @@ function Get-A2CAdoOrgData {
         $vssps = 'https://vssps.dev.azure.com/' + $orgEnc + '/_apis/graph/'
         $groups = Get-A2CAdoItems ($vssps + 'groups?api-version=' + $v.Graph)
         $users = Get-A2CAdoItems ($vssps + 'users?api-version=' + $v.Graph)
+        foreach ($x in $groups) { $d.GraphGroups.Add($x) }   # kept for the AzureDevOpsStructure report
+        foreach ($x in $users) { $d.GraphUsers.Add($x) }
         $byDescriptor = @{}
         foreach ($x in (@($groups) + @($users))) { if ($null -ne $x -and $x.descriptor) { $byDescriptor[[string]$x.descriptor] = $x } }
         foreach ($g in $groups) {
@@ -5742,7 +5808,7 @@ function Get-A2CDatasetAzureDevOps {
         if ($null -eq $c) { continue }
         $n = [string]$c.'Organization Name'
         $known = @($orgs | Where-Object { $_.Name -eq $n -or ($_.Id -and $_.Id -eq [string]$c.'Organization Id') })
-        if ($known.Count -gt 0) { foreach ($k in $known) { $k.Owner = [string]$c.Owner; if (-not $k.Id) { $k.Id = [string]$c.'Organization Id' } }; continue }
+        if ($known.Count -gt 0) { foreach ($k in $known) { $k.Owner = [string]$c.Owner; $k.InCatalog = $true; if (-not $k.Id) { $k.Id = [string]$c.'Organization Id' } }; continue }
         if (-not $n) { continue }
         $l = New-A2CAdoOrg ([pscustomobject]@{ Name = $n; Source = 'Connected to the tenant'; Billing = $null })
         $l.Status = 'Listed only'
@@ -5754,6 +5820,898 @@ function Get-A2CDatasetAzureDevOps {
     $ok = @($orgs | Where-Object { $_.Status -eq 'Collected' })
     if ($ok.Count -eq 0) { return New-A2CDatasetResult -Status 'Skipped' -Note 'no access to any Azure DevOps organization' }
     if (@($orgs | Where-Object { $_.Status -eq 'No access' }).Count -gt 0 -or @($ok | Where-Object { $_.Problems.Count -gt 0 }).Count -gt 0) { return New-A2CDatasetResult -Status 'Partial' }
+    return New-A2CDatasetResult
+}
+
+# ---- Azure DevOps structure (AzureDevOpsStructure): how each organization is set up ------------------------------
+# Security namespaces whose access control lists are read (IDs from Microsoft Learn, security namespace reference)
+$script:A2CAdoNamespaces = [ordered]@{
+    Project = '52d39943-cb85-4d7f-8fa8-c6baac873819'; Git = '2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87'; Area = '83e28ad4-2d72-4ceb-97b0-c7726d5502c3'
+    Iteration = 'bf7bfa03-b2b7-47db-8113-fa2e002cc5b1'; Build = '33344d9c-fc72-4d6f-aba5-fa317101a7e9'; Release = 'c788c23e-1b46-4162-8f5e-d7585343b5de'
+    Tfvc = 'a39371cf-0841-4c16-bbd3-276e341bc052'; Environment = '83d4c2e6-e57d-4d6e-892b-b87222b7ad20'; Library = 'b7e84409-6553-448a-bbb2-af228e07cbeb'
+    ServiceEndpoints = '49b48001-ca20-4adc-8111-5b60c903a50c'; DistributedTask = '101eae8c-1709-47f9-b228-0e476c35b3ba'
+}
+$script:A2CAdoBigPageSize = 1000   # $top of long lists paged with $skip (pull requests, shelvesets, test results)
+$script:A2CAdoIdentityBatch = 20   # identity descriptors per call when the holders of permissions are named
+
+function New-A2CAdoStructure {
+    # What the AzureDevOpsStructure dataset reads from one organization. Tries/Fails: reads per kind and the failed
+    # ones (one coverage line per kind instead of one per team or board).
+    $s = [ordered]@{ Problems = [System.Collections.Generic.List[string]]::new(); Tries = [ordered]@{}; Fails = [ordered]@{}
+        Policies = $null; PolicyNote = ''; Namespaces = @{}; Identities = @{}; IdentityIds = @{}; Subjects = @{}; DashboardIds = @{}; CheckIds = @{}
+        TfvcUsed = $false }
+    foreach ($k in @('Groups', 'Users', 'ServicePrincipals', 'Memberships', 'Teams', 'Dashboards', 'Nodes', 'Queries', 'Tags', 'Queues', 'Checks',
+            'Acls', 'Wikis', 'PullRequests', 'Shelvesets')) { $s[$k] = [System.Collections.Generic.List[object]]::new() }
+    return [pscustomobject]$s
+}
+
+function Invoke-A2CAdoPart {
+    # One read of the structure: a failure is counted for its kind and the rest goes on.
+    # (Parameter names are unusual on purpose: the scriptblock reads the caller's variables.)
+    param($AdoStructure, [string] $AdoPartKind, [scriptblock] $AdoPartBody)
+    $AdoStructure.Tries[$AdoPartKind] = [int]$AdoStructure.Tries[$AdoPartKind] + 1
+    try { & $AdoPartBody }
+    catch {
+        $a2cFail = $AdoStructure.Fails[$AdoPartKind]
+        if ($null -eq $a2cFail) { $a2cFail = [pscustomobject]@{ N = 0; First = '' }; $AdoStructure.Fails[$AdoPartKind] = $a2cFail }
+        $a2cFail.N = $a2cFail.N + 1
+        if (-not $a2cFail.First) { $a2cFail.First = Get-A2CShortText $_.Exception.Message 200 }
+    }
+}
+
+function Get-A2CAdoObject {
+    # One Azure DevOps object; throws with the error text when it cannot be read.
+    param([string] $Uri)
+    $r = Invoke-A2CAdo $Uri
+    if (-not $r.Ok -or $null -eq $r.Json) { throw $(if ($r.Ok) { 'empty answer' } else { Get-A2CErrorText $r.Error }) }
+    return $r.Json
+}
+
+function Get-A2CAdoPolicyValues {
+    # Policy name -> effective value from the page data of Organization settings > Policies: every object named
+    # "Policy.*" that has an effectiveValue, wherever the page data keeps it.
+    param($Data)
+    $out = [ordered]@{}
+    $stack = [System.Collections.Generic.Stack[object]]::new()
+    $stack.Push($Data)
+    $guard = 0
+    while ($stack.Count -gt 0 -and $guard -lt 100000) {
+        $guard++
+        $x = $stack.Pop()
+        if ($null -eq $x -or $x -is [string] -or $x -is [ValueType]) { continue }
+        if ($x -is [System.Collections.IEnumerable]) { foreach ($e in $x) { $stack.Push($e) }; continue }
+        $n = $x.PSObject.Properties['name']
+        if ($null -ne $n -and [string]$n.Value -like 'Policy.*' -and $null -ne $x.PSObject.Properties['effectiveValue']) {
+            if (-not $out.Contains([string]$n.Value)) { $out[[string]$n.Value] = $x.effectiveValue }
+            continue
+        }
+        foreach ($p in $x.PSObject.Properties) { $stack.Push($p.Value) }
+    }
+    return $out
+}
+
+function Get-A2CAdoDescriptorText {
+    # "type;identifier" of an identity descriptor that arrives as text or as an object
+    param($Descriptor)
+    if ($null -eq $Descriptor) { return '' }
+    if ($Descriptor -is [string]) { return $Descriptor }
+    if ($null -ne $Descriptor.PSObject.Properties['identityType']) { return ([string]$Descriptor.identityType + ';' + [string]$Descriptor.identifier) }
+    return [string]$Descriptor
+}
+
+function Get-A2CAdoQueryTree {
+    # Every shared query of a project at full depth: a list answers two levels, so each folder cut off at that depth is
+    # read again. Personal queries (My Queries) are left out - only those of the signed-in user could be read.
+    param([string] $ProjectUri)
+    $out = [System.Collections.Generic.List[object]]::new()
+    $queue = [System.Collections.Generic.Queue[object]]::new()
+    foreach ($x in (Get-A2CAdoItems ('{0}/_apis/wit/queries?$depth=2&$expand=all&api-version={1}' -f $ProjectUri, $script:A2CAdoApi.Core))) {
+        if ($null -ne $x -and $x.isPublic) { $queue.Enqueue($x) }
+    }
+    $guard = 0
+    while ($queue.Count -gt 0 -and $guard -lt 100000) {
+        $guard++
+        $x = $queue.Dequeue()
+        if (-not $x.isFolder) { $out.Add($x); continue }
+        $kids = @($x.children | Where-Object { $null -ne $_ })
+        if ($x.hasChildren -and $kids.Count -eq 0) {
+            $f = Get-A2CAdoObject ('{0}/_apis/wit/queries/{1}?$depth=2&$expand=all&api-version={2}' -f $ProjectUri, [string]$x.id, $script:A2CAdoApi.Core)
+            $kids = @($f.children | Where-Object { $null -ne $_ })
+        }
+        foreach ($k in $kids) { $queue.Enqueue($k) }
+    }
+    return , $out
+}
+
+function Add-A2CAdoAcls {
+    # The access control lists of one security namespace below a token (with its children), or of the whole namespace
+    # when the token is empty (namespaces whose token format is not documented).
+    param($Structure, [string] $OrgUri, [string] $Kind, [string] $Token, $Project)
+    $ns = $script:A2CAdoNamespaces[$Kind]
+    $u = '{0}/_apis/accesscontrollists/{1}?api-version={2}' -f $OrgUri, $ns, $script:A2CAdoApi.Core
+    if ($Token) { $u = '{0}/_apis/accesscontrollists/{1}?token={2}&recurse=true&api-version={3}' -f $OrgUri, $ns, [uri]::EscapeDataString($Token), $script:A2CAdoApi.Core }
+    # a refused read names its permission set, so coverage.csv tells which one the account may not read
+    try { $items = Get-A2CAdoItems $u } catch { throw ('{0}: {1}' -f $Kind, $_.Exception.Message) }
+    foreach ($acl in $items) { if ($null -ne $acl) { $Structure.Acls.Add([pscustomobject]@{ Kind = $Kind; Project = $Project; Item = $acl }) } }
+}
+
+function Add-A2CAdoDashboard {
+    # A dashboard with its widgets (the list has no widgets); a dashboard that is listed twice is read once
+    param($Structure, $Project, $Team, [string] $BaseUri, $Entry)
+    $id = ([string]$Entry.id).ToLowerInvariant()
+    if (-not $id -or $Structure.DashboardIds.ContainsKey($id)) { return }
+    $full = Get-A2CAdoObject ('{0}/_apis/dashboard/dashboards/{1}?api-version={2}' -f $BaseUri, [string]$Entry.id, $script:A2CAdoApi.Dashboards)
+    $Structure.DashboardIds[$id] = $true
+    $Structure.Dashboards.Add([pscustomobject]@{ Project = $Project; Team = $Team; Item = $full })
+}
+
+function Get-A2CAdoStructure {
+    # How one organization is set up: security groups and their members, policies, teams with their settings, boards,
+    # dashboards, templates and notifications, area and iteration trees, shared queries, tags, approvals and checks,
+    # permissions, wikis, pull requests and TFVC shelvesets. Read-only; one failed read is counted, the others go on.
+    param($Org)
+    $s = New-A2CAdoStructure
+    $v = $script:A2CAdoApi
+    $orgEnc = [uri]::EscapeDataString($Org.Name)
+    $dev = 'https://dev.azure.com/' + $orgEnc
+    $graph = 'https://vssps.dev.azure.com/' + $orgEnc + '/_apis/graph/'
+
+    # ---- organization: security groups with their members (nested groups too), users and service principals
+    Invoke-A2CAdoPart $s 'security groups' {
+        $src = $Org.GraphGroups
+        if ($src.Count -eq 0) { $src = Get-A2CAdoItems ($graph + 'groups?api-version=' + $v.Graph) }
+        foreach ($x in $src) { $s.Groups.Add($x) }
+    }
+    Invoke-A2CAdoPart $s 'users (Graph)' {
+        $src = $Org.GraphUsers
+        if ($src.Count -eq 0) { $src = Get-A2CAdoItems ($graph + 'users?api-version=' + $v.Graph) }
+        foreach ($x in $src) { $s.Users.Add($x) }
+    }
+    Invoke-A2CAdoPart $s 'service principals (Graph)' {
+        foreach ($x in (Get-A2CAdoItems ($graph + 'serviceprincipals?api-version=' + $v.Graph))) { $s.ServicePrincipals.Add($x) }
+    }
+    $i = 0; $t0 = [DateTime]::Now
+    foreach ($g in @($s.Groups)) {
+        $i++
+        Write-A2CProgress -Activity ('Azure DevOps ' + $Org.Name + ': group members') -Current $i -Total $s.Groups.Count -Started $t0 -Item ([string]$g.displayName)
+        Invoke-A2CAdoPart $s 'group members' {
+            foreach ($m in (Get-A2CAdoItems ('{0}Memberships/{1}?direction=down&api-version={2}' -f $graph, [string]$g.descriptor, $v.Graph))) {
+                $s.Memberships.Add([pscustomobject]@{ Group = [string]$g.descriptor; Member = [string]$m.memberDescriptor })
+            }
+        }
+    }
+    Write-A2CProgress -Activity ('Azure DevOps ' + $Org.Name + ': group members') -Completed
+    # members that are no listed group, user or service principal (removed users, other scopes): looked up 50 at a time
+    # (a read that Azure DevOps takes as POST)
+    $known = [System.Collections.Generic.HashSet[string]]::new()
+    foreach ($x in (@($s.Groups) + @($s.Users) + @($s.ServicePrincipals))) { if ($null -ne $x -and $x.descriptor) { [void]$known.Add([string]$x.descriptor) } }
+    $unknown = @($s.Memberships | ForEach-Object { $_.Member } | Where-Object { $_ -and -not $known.Contains($_) } | Select-Object -Unique)
+    for ($b = 0; $b -lt $unknown.Count; $b += 50) {
+        $batch = @($unknown[$b..([math]::Min($unknown.Count, $b + 50) - 1)])
+        Invoke-A2CAdoPart $s 'member names' {
+            $body = '{"lookupKeys":[' + ((@($batch | ForEach-Object { '{"descriptor":' + (ConvertTo-A2CJsonLiteral $_) + '}' })) -join ',') + ']}'
+            $r = Invoke-A2CAdo -Uri ($graph + 'subjectlookup?api-version=' + $v.Graph) -Method POST -Body $body
+            if (-not $r.Ok) { throw (Get-A2CErrorText $r.Error) }
+            if ($null -ne $r.Json -and $null -ne $r.Json.value) { foreach ($p in $r.Json.value.PSObject.Properties) { if ($null -ne $p.Value) { $s.Subjects[$p.Name] = $p.Value } } }
+        }
+    }
+
+    # ---- organization policies: no documented REST API, so the data of the Organization settings > Policies page is
+    # read (GET). Without it, or when its format changes, orgSettings.csv and coverage.csv say so.
+    $r = Invoke-A2CAdo ($dev + '/_settings/organizationPolicy?__rt=fps&__ver=2')
+    if (-not $r.Ok) { $s.PolicyNote = 'Not readable with this account (' + (Get-A2CErrorText $r.Error) + ') - Project Collection Administrators can read them' }
+    else {
+        $pv = Get-A2CAdoPolicyValues $r.Json
+        # page data without a policies data provider: Azure DevOps leaves it out for accounts that may not see them
+        $prov = $null
+        if ($null -ne $r.Json -and $null -ne $r.Json.PSObject.Properties['fps'] -and $null -ne $r.Json.fps.dataProviders) { $prov = $r.Json.fps.dataProviders.data }
+        if ($pv.Count -gt 0) { $s.Policies = $pv }
+        elseif ($null -ne $prov -and @($prov.PSObject.Properties | Where-Object { $_.Name -match 'polic' }).Count -eq 0) {
+            $s.PolicyNote = 'Not shown to this account: the Policies page leaves them out (Project Collection Administrators can read them)'
+        }
+        else { $s.PolicyNote = 'The policy page data had no policies (its format may have changed)' }
+    }
+
+    # ---- permission names of the security namespaces (bit -> name)
+    Invoke-A2CAdoPart $s 'security namespaces' {
+        foreach ($ns in (Get-A2CAdoItems ($dev + '/_apis/securitynamespaces?api-version=' + $v.Core))) {
+            $k = ([string]$ns.namespaceId).ToLowerInvariant()
+            if (-not $k -or $s.Namespaces.ContainsKey($k)) { continue }
+            $acts = @{}
+            foreach ($a in @($ns.actions | Where-Object { $null -ne $_ })) {
+                $n = [string]$a.displayName
+                if (-not $n) { $n = [string]$a.name }
+                $acts[[string][long]$a.bit] = $n
+            }
+            $s.Namespaces[$k] = [pscustomobject]@{ Name = [string]$ns.name; Actions = $acts }
+        }
+    }
+
+    # ---- per project
+    $i = 0; $t0 = [DateTime]::Now
+    foreach ($p in $Org.Projects) {
+        $i++
+        Write-A2CProgress -Activity ('Azure DevOps ' + $Org.Name + ': structure') -Current $i -Total $Org.Projects.Count -Started $t0 -Item ([string]$p.name)
+        $projId = [string]$p.id
+        $pdev = $dev + '/' + $projId
+        $defaultTeam = ''
+        if ($null -ne $p.defaultTeam) { $defaultTeam = ([string]$p.defaultTeam.id).ToLowerInvariant() }
+        $teams = [System.Collections.Generic.List[object]]::new()
+        Invoke-A2CAdoPart $s 'teams' {
+            foreach ($x in (Get-A2CAdoPagedItems ('{0}/_apis/projects/{1}/teams?api-version={2}' -f $dev, $projId, $v.Core) -MaxPages 1000).Items) { $teams.Add($x) }
+        }
+        foreach ($t in $teams) {
+            $tid = [string]$t.id
+            $tdev = $pdev + '/' + $tid
+            $team = [pscustomobject]@{ Project = $p; Item = $t; IsDefault = ($defaultTeam -and $tid.ToLowerInvariant() -eq $defaultTeam); Members = $null; Settings = $null
+                FieldValues = $null; Iterations = $null; Boards = [System.Collections.Generic.List[object]]::new(); Templates = [System.Collections.Generic.List[object]]::new(); Notifications = $null }
+            $s.Teams.Add($team)
+            Invoke-A2CAdoPart $s 'team members' {
+                $team.Members = (Get-A2CAdoPagedItems ('{0}/_apis/projects/{1}/teams/{2}/members?api-version={3}' -f $dev, $projId, $tid, $v.Core) -MaxPages 1000).Items
+            }
+            Invoke-A2CAdoPart $s 'team settings' {
+                $team.Settings = Get-A2CAdoObject ('{0}/_apis/work/teamsettings?api-version={1}' -f $tdev, $v.Core)
+                $team.FieldValues = Get-A2CAdoObject ('{0}/_apis/work/teamsettings/teamfieldvalues?api-version={1}' -f $tdev, $v.Core)
+                $team.Iterations = Get-A2CAdoItems ('{0}/_apis/work/teamsettings/iterations?api-version={1}' -f $tdev, $v.Core)
+            }
+            Invoke-A2CAdoPart $s 'boards' {
+                foreach ($b in (Get-A2CAdoItems ('{0}/_apis/work/boards?api-version={1}' -f $tdev, $v.Core))) {
+                    $bid = [uri]::EscapeDataString([string]$b.id)
+                    $bd = [pscustomobject]@{ Ref = $b; Detail = $null; Cards = $null; Rules = $null }
+                    $team.Boards.Add($bd)
+                    Invoke-A2CAdoPart $s 'board columns and swimlanes' { $bd.Detail = Get-A2CAdoObject ('{0}/_apis/work/boards/{1}?api-version={2}' -f $tdev, $bid, $v.Core) }
+                    Invoke-A2CAdoPart $s 'board card fields' { $bd.Cards = Get-A2CAdoObject ('{0}/_apis/work/boards/{1}/cardsettings?api-version={2}' -f $tdev, $bid, $v.Core) }
+                    Invoke-A2CAdoPart $s 'board card rules' { $bd.Rules = Get-A2CAdoObject ('{0}/_apis/work/boards/{1}/cardrulesettings?api-version={2}' -f $tdev, $bid, $v.Core) }
+                }
+            }
+            $list = [System.Collections.Generic.List[object]]::new()
+            Invoke-A2CAdoPart $s 'dashboards' { foreach ($x in (Get-A2CAdoItems ('{0}/_apis/dashboard/dashboards?api-version={1}' -f $tdev, $v.Dashboards))) { $list.Add($x) } }
+            foreach ($x in $list) { Invoke-A2CAdoPart $s 'dashboards' { Add-A2CAdoDashboard $s $p $t $tdev $x } }
+            $list = [System.Collections.Generic.List[object]]::new()
+            Invoke-A2CAdoPart $s 'work item templates' { foreach ($x in (Get-A2CAdoItems ('{0}/_apis/wit/templates?api-version={1}' -f $tdev, $v.Core))) { $list.Add($x) } }
+            foreach ($x in $list) {
+                Invoke-A2CAdoPart $s 'work item templates' { $team.Templates.Add((Get-A2CAdoObject ('{0}/_apis/wit/templates/{1}?api-version={2}' -f $tdev, [string]$x.id, $v.Core))) }
+            }
+            # the notification subscriptions of the team (personal ones of other users are not readable)
+            Invoke-A2CAdoPart $s 'notification subscriptions' {
+                $team.Notifications = Get-A2CAdoItems ('{0}/_apis/notification/subscriptions?targetId={1}&api-version={2}' -f $dev, $tid, $v.Core)
+            }
+        }
+        # project dashboards (a dashboard a team list already returned is not read again)
+        $list = [System.Collections.Generic.List[object]]::new()
+        Invoke-A2CAdoPart $s 'dashboards' { foreach ($x in (Get-A2CAdoItems ('{0}/_apis/dashboard/dashboards?api-version={1}' -f $pdev, $v.Dashboards))) { $list.Add($x) } }
+        foreach ($x in $list) { Invoke-A2CAdoPart $s 'dashboards' { Add-A2CAdoDashboard $s $p $null $pdev $x } }
+        Invoke-A2CAdoPart $s 'area and iteration paths' {
+            foreach ($root in (Get-A2CAdoItems ('{0}/_apis/wit/classificationnodes?$depth=20&api-version={1}' -f $pdev, $v.Core))) { if ($null -ne $root) { $s.Nodes.Add([pscustomobject]@{ Project = $p; Root = $root }) } }
+        }
+        Invoke-A2CAdoPart $s 'shared queries' { foreach ($q in (Get-A2CAdoQueryTree $pdev)) { $s.Queries.Add([pscustomobject]@{ Project = $p; Item = $q }) } }
+        Invoke-A2CAdoPart $s 'work item tags' { foreach ($x in (Get-A2CAdoItems ('{0}/_apis/wit/tags?api-version={1}' -f $pdev, $v.Core))) { $s.Tags.Add([pscustomobject]@{ Project = $p; Item = $x }) } }
+        $queues = [System.Collections.Generic.List[object]]::new()
+        Invoke-A2CAdoPart $s 'agent queues' {
+            foreach ($x in (Get-A2CAdoItems ('{0}/_apis/distributedtask/queues?api-version={1}' -f $pdev, $v.Core))) { $queues.Add($x); $s.Queues.Add([pscustomobject]@{ Project = $p; Item = $x }) }
+        }
+        # approvals and checks of the project's environments, agent pools, service connections, variable groups and
+        # secure files: one batch read (Azure DevOps takes it as POST) per 50 resources
+        $res = [System.Collections.Generic.List[object]]::new()
+        foreach ($w in @($Org.Environments | Where-Object { [string]$_.Project.id -eq $projId })) { $res.Add(@('environment', [string]$w.Item.id, [string]$w.Item.name)) }
+        foreach ($x in $queues) { $res.Add(@('queue', [string]$x.id, [string]$x.name)) }
+        foreach ($w in @($Org.Endpoints | Where-Object { $_.Projects -contains [string]$p.name })) { $res.Add(@('endpoint', [string]$w.Item.id, [string]$w.Item.name)) }
+        foreach ($w in @($Org.VariableGroups | Where-Object { $_.Projects -contains [string]$p.name })) { $res.Add(@('variablegroup', [string]$w.Item.id, [string]$w.Item.name)) }
+        foreach ($w in @($Org.SecureFiles | Where-Object { [string]$_.Project.id -eq $projId })) { $res.Add(@('securefile', [string]$w.Item.id, [string]$w.Item.name)) }
+        for ($b = 0; $b -lt $res.Count; $b += 50) {
+            $batch = @($res.GetRange($b, [math]::Min(50, $res.Count - $b)))
+            Invoke-A2CAdoPart $s 'approvals and checks' {
+                $body = '[' + ((@($batch | ForEach-Object { '{"type":' + (ConvertTo-A2CJsonLiteral $_[0]) + ',"id":' + (ConvertTo-A2CJsonLiteral $_[1]) + ',"name":' + (ConvertTo-A2CJsonLiteral $_[2]) + '}' })) -join ',') + ']'
+                $r = Invoke-A2CAdo -Uri ('{0}/_apis/pipelines/checks/queryconfigurations?$expand=settings&api-version={1}' -f $pdev, $v.Checks) -Method POST -Body $body
+                if (-not $r.Ok) { throw (Get-A2CErrorText $r.Error) }
+                # a check of a service connection shared by several projects is returned in each of them: kept once
+                if ($null -ne $r.Json) {
+                    foreach ($x in @($r.Json.value | Where-Object { $null -ne $_ })) {
+                        $cid = [string]$x.id
+                        if ($cid -and $s.CheckIds.ContainsKey($cid)) { continue }
+                        if ($cid) { $s.CheckIds[$cid] = $true }
+                        $s.Checks.Add([pscustomobject]@{ Project = $p; Item = $x })
+                    }
+                }
+            }
+        }
+        # permissions: access control lists of the project, its repositories and branches, area and iteration paths,
+        # pipelines, release pipelines and TFVC paths (each with the levels below it)
+        $tokens = [System.Collections.Generic.List[object]]::new()
+        $tokens.Add(@('Project', ('$PROJECT:vstfs:///Classification/TeamProject/' + $projId)))
+        $tokens.Add(@('Git', ('repoV2/' + $projId)))
+        foreach ($n in @($s.Nodes | Where-Object { [string]$_.Project.id -eq $projId })) {
+            $kind = $(if ([string]$n.Root.structureType -eq 'area') { 'Area' } else { 'Iteration' })
+            if ($n.Root.identifier) { $tokens.Add(@($kind, ('vstfs:///Classification/Node/' + [string]$n.Root.identifier))) }
+        }
+        $tokens.Add(@('Build', $projId))
+        $tokens.Add(@('Release', $projId))
+        if (@($Org.Tfvc | Where-Object { [string]$_.Project.id -eq $projId }).Count -gt 0) { $tokens.Add(@('Tfvc', ('$/' + [string]$p.name))) }
+        foreach ($tk in $tokens) { Invoke-A2CAdoPart $s 'permissions' { Add-A2CAdoAcls $s $dev $tk[0] $tk[1] $p } }
+        Invoke-A2CAdoPart $s 'wikis' { foreach ($x in (Get-A2CAdoItems ('{0}/_apis/wiki/wikis?api-version={1}' -f $pdev, $v.Core))) { $s.Wikis.Add([pscustomobject]@{ Project = $p; Item = $x }) } }
+        Invoke-A2CAdoPart $s 'pull requests' {
+            $pr = Get-A2CAdoPagedItems ('{0}/_apis/git/pullrequests?searchCriteria.status=all&api-version={1}' -f $pdev, $v.Core) -PageSize $script:A2CAdoBigPageSize -MaxPages 10000
+            foreach ($x in $pr.Items) { $s.PullRequests.Add([pscustomobject]@{ Project = $p; Item = $x }) }
+        }
+    }
+    Write-A2CProgress -Activity ('Azure DevOps ' + $Org.Name + ': structure') -Completed
+    # namespaces whose token format Microsoft does not document (environments, library, service connections, agent
+    # pools): their access control lists are read for the whole organization at once
+    foreach ($k in @('Environment', 'Library', 'ServiceEndpoints', 'DistributedTask')) { Invoke-A2CAdoPart $s 'permissions' { Add-A2CAdoAcls $s $dev $k '' $null } }
+    # TFVC shelvesets (an organization list) when TFVC is in use; workspaces have no REST API
+    $s.TfvcUsed = ($Org.Tfvc.Count -gt 0)
+    if ($s.TfvcUsed) {
+        Invoke-A2CAdoPart $s 'TFVC shelvesets' {
+            foreach ($x in (Get-A2CAdoPagedItems ('{0}/_apis/tfvc/shelvesets?api-version={1}' -f $dev, $v.Core) -PageSize $script:A2CAdoBigPageSize -MaxPages 10000).Items) { $s.Shelvesets.Add($x) }
+        }
+    }
+    # the holders of the permissions: identity descriptors to names, $A2CAdoIdentityBatch per call
+    $descs = [System.Collections.Generic.List[string]]::new()
+    $seen = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+    foreach ($w in $s.Acls) {
+        if ($null -eq $w.Item.acesDictionary) { continue }
+        foreach ($pp in $w.Item.acesDictionary.PSObject.Properties) { if ($seen.Add($pp.Name)) { $descs.Add($pp.Name) } }
+    }
+    for ($b = 0; $b -lt $descs.Count; $b += $script:A2CAdoIdentityBatch) {
+        $batch = @($descs.GetRange($b, [math]::Min($script:A2CAdoIdentityBatch, $descs.Count - $b)))
+        Invoke-A2CAdoPart $s 'permission holder names' {
+            $u = 'https://vssps.dev.azure.com/{0}/_apis/identities?descriptors={1}&queryMembership=None&api-version={2}' -f $orgEnc, ((@($batch | ForEach-Object { [uri]::EscapeDataString($_) })) -join ','), $v.Core
+            $r = Invoke-A2CAdo $u
+            if (-not $r.Ok -or $null -eq $r.Json) { throw $(if ($r.Ok) { 'empty answer' } else { Get-A2CErrorText $r.Error }) }
+            # one answer per descriptor, in the same order; null for identities that no longer exist. Kept under the
+            # descriptor that was asked for and under the one the identity carries.
+            $vals = @($r.Json.value)
+            $aligned = ($vals.Count -eq $batch.Count)
+            for ($k = 0; $k -lt $vals.Count; $k++) {
+                $x = $vals[$k]
+                if ($null -eq $x) { continue }
+                if ($aligned) { $s.Identities[$batch[$k]] = $x }
+                $key = Get-A2CAdoDescriptorText $x.descriptor
+                if ($key) { $s.Identities[$key] = $x }
+            }
+        }
+    }
+    # who last changed a dashboard: dashboards give only the ID of that identity. IDs the holder read above already
+    # answered are not asked again.
+    foreach ($x in $s.Identities.Values) { if ($null -ne $x -and $x.id) { $s.IdentityIds[([string]$x.id).ToLowerInvariant()] = $x } }
+    $ids = [System.Collections.Generic.List[string]]::new()
+    foreach ($w in $s.Dashboards) {
+        $mb = $w.Item.modifiedBy
+        if ($mb -is [string] -and $mb -match '^[0-9a-fA-F]{8}-[0-9a-fA-F-]{27}$' -and -not $s.IdentityIds.ContainsKey($mb.ToLowerInvariant()) -and -not $ids.Contains($mb.ToLowerInvariant())) { $ids.Add($mb.ToLowerInvariant()) }
+    }
+    for ($b = 0; $b -lt $ids.Count; $b += $script:A2CAdoIdentityBatch) {
+        $batch = @($ids.GetRange($b, [math]::Min($script:A2CAdoIdentityBatch, $ids.Count - $b)))
+        Invoke-A2CAdoPart $s 'dashboard editor names' {
+            $u = 'https://vssps.dev.azure.com/{0}/_apis/identities?identityIds={1}&queryMembership=None&api-version={2}' -f $orgEnc, ($batch -join ','), $v.Core
+            $r = Invoke-A2CAdo $u
+            if (-not $r.Ok -or $null -eq $r.Json) { throw $(if ($r.Ok) { 'empty answer' } else { Get-A2CErrorText $r.Error }) }
+            foreach ($x in @($r.Json.value)) { if ($null -ne $x -and $x.id) { $s.IdentityIds[([string]$x.id).ToLowerInvariant()] = $x } }
+        }
+    }
+    foreach ($k in $s.Fails.Keys) { $f = $s.Fails[$k]; $s.Problems.Add(('{0}: {1} of {2} not readable ({3})' -f $k, $f.N, $s.Tries[$k], $f.First)) }
+    return $s
+}
+
+function Get-A2CDatasetAzureDevOpsStructure {
+    $orgs = @($script:A2C.Data['Ado'] | Where-Object { $null -ne $_ -and $_.Status -eq 'Collected' })
+    if ($orgs.Count -eq 0) {
+        Add-A2CCoverage -Area 'Azure DevOps structure' -Status Skipped -Detail 'No Azure DevOps organization was collected'
+        return New-A2CDatasetResult -Status 'Skipped' -Note 'no Azure DevOps organization'
+    }
+    $partial = $false
+    foreach ($o in $orgs) {
+        Write-A2CLog -Level Detail ('Azure DevOps {0}: groups, teams, boards, dashboards, queries, permissions and checks' -f $o.Name)
+        $s = Get-A2CAdoStructure $o
+        $o.Structure = $s
+        foreach ($pb in $s.Problems) { Write-A2CLog -Level Warn ('Azure DevOps {0}: {1}' -f $o.Name, $pb) }
+        if ($s.Problems.Count -gt 0) { $partial = $true }
+        Add-A2CCoverage -Area ('Azure DevOps structure ' + $o.Name) -Status $(if ($s.Problems.Count -gt 0) { 'Partial' } else { 'Collected' }) -Items $s.Teams.Count -Detail (Join-A2C $s.Problems)
+        if ($null -eq $s.Policies) { Add-A2CCoverage -Area ('Azure DevOps organization policies ' + $o.Name) -Status Skipped -Detail $s.PolicyNote }
+        if ($s.TfvcUsed) { Add-A2CCoverage -Area ('Azure DevOps TFVC workspaces ' + $o.Name) -Status Skipped -Detail 'Not offered by the Azure DevOps REST API (tf.exe workspaces lists them)' }
+        Write-A2CLog -Level Ok ('Azure DevOps {0}: {1} team(s), {2} group(s), {3} dashboard(s), {4} shared queries, {5} access control list(s)' -f $o.Name, $s.Teams.Count, $s.Groups.Count, $s.Dashboards.Count, $s.Queries.Count, $s.Acls.Count)
+    }
+    if ($partial) { return New-A2CDatasetResult -Status 'Partial' }
+    return New-A2CDatasetResult
+}
+
+# ---- Azure DevOps content (AzureDevOpsWorkItems): work items, test plans and the run history -----------------------
+$script:A2CAdoWiqlPage = 19000      # work item IDs per WIQL query: Azure DevOps cuts query results at 20,000 without an error
+$script:A2CAdoWorkItemBatch = 200   # work items per read (the most the work items list takes)
+$script:A2CAdoRevisionPage = 200    # revisions per read
+$script:A2CAdoFailureRows = 100     # failed items listed one by one in coverage.csv (the rest are counted)
+
+function New-A2CAdoArchive {
+    # The rows of the AzureDevOpsWorkItems files of one organization (kept small: the JSON files hold the content)
+    $a = [ordered]@{ Failures = [System.Collections.Generic.List[object]]::new() }
+    foreach ($k in $script:A2CAdoArchiveFiles) { $a[$k] = [System.Collections.Generic.List[object]]::new() }
+    return [pscustomobject]$a
+}
+
+function Add-A2CAdoArchiveFailure {
+    # One item that could not be exported: listed in coverage.csv (the first $A2CAdoFailureRows) and in the log
+    param($Archive, [string] $Area, [string] $Item, [string] $Reason)
+    $Archive.Failures.Add([pscustomobject]@{ Area = $Area; Item = $Item; Reason = (Get-A2CShortText $Reason 200) })
+    Write-A2CLog -Level Verbose ('Not exported: {0} {1} - {2}' -f $Area, $Item, $Reason)
+}
+
+function Get-A2CWiField {
+    # A field of a work item ("System.Title"); $null when absent
+    param($Fields, [string] $Name)
+    if ($null -eq $Fields) { return $null }
+    $p = $Fields.PSObject.Properties[$Name]
+    if ($null -eq $p) { return $null }
+    return $p.Value
+}
+
+function Get-A2CWiPerson {
+    # Display name of an identity field: an object (displayName) or text ("Name <address>")
+    param($Value)
+    if ($null -eq $Value) { return '' }
+    if ($Value -is [string]) { return ($Value -replace '\s*<[^>]*>\s*$', '') }
+    return [string]$Value.displayName
+}
+
+function Get-A2CAdoWorkItemIds {
+    # Every work item ID of a project. WIQL cuts results at 20,000 without an error, so the IDs are read in ranges:
+    # each query asks for the IDs above the last one it got, sorted, at most $A2CAdoWiqlPage at a time.
+    param([string] $ProjectUri)
+    $ids = [System.Collections.Generic.List[int]]::new()
+    $last = 0
+    for ($guard = 0; $guard -lt 100000; $guard++) {
+        $q = 'SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @project AND [System.Id] > {0} ORDER BY [System.Id] ASC' -f $last
+        $r = Invoke-A2CAdo -Uri ('{0}/_apis/wit/wiql?$top={1}&api-version={2}' -f $ProjectUri, $script:A2CAdoWiqlPage, $script:A2CAdoApi.Core) -Method POST -Body ('{"query":' + (ConvertTo-A2CJsonLiteral $q) + '}')
+        if (-not $r.Ok) { throw (Get-A2CErrorText $r.Error) }
+        $page = @()
+        if ($null -ne $r.Json) { $page = @($r.Json.workItems | Where-Object { $null -ne $_ } | ForEach-Object { [int]$_.id }) }
+        $new = @($page | Where-Object { $_ -gt $last } | Sort-Object -Unique)
+        foreach ($id in $new) { $ids.Add($id) }
+        if ($page.Count -lt $script:A2CAdoWiqlPage -or $new.Count -eq 0) { break }
+        $last = $new[$new.Count - 1]
+    }
+    return , $ids
+}
+
+function ConvertFrom-A2CHtmlText {
+    # Text of an HTML fragment (test steps, comments): tags removed, entities decoded, spaces collapsed
+    param([string] $Html)
+    if (-not $Html) { return '' }
+    $t = [regex]::Replace($Html, '<[^>]+>', ' ')
+    $t = [System.Net.WebUtility]::HtmlDecode($t)
+    return (($t -replace '\s+', ' ').Trim())
+}
+
+function ConvertFrom-A2CTestSteps {
+    # The steps of a test case (Microsoft.VSTS.TCM.Steps): @{ Step; Action; Expected; SharedSteps } in order; a shared
+    # steps reference has the ID of its shared steps work item.
+    param([string] $Xml)
+    $out = [System.Collections.Generic.List[object]]::new()
+    if (-not $Xml) { return , $out }
+    $doc = New-Object System.Xml.XmlDocument
+    $doc.XmlResolver = $null
+    try { $doc.LoadXml($Xml) } catch { return , $out }
+    $n = 0
+    foreach ($node in @($doc.DocumentElement.ChildNodes)) {
+        if ($node.LocalName -eq 'step') {
+            $n++
+            $ps = @($node.ChildNodes | Where-Object { $_.LocalName -eq 'parameterizedString' })
+            $out.Add([pscustomobject]@{ Step = $n; Action = $(if ($ps.Count -gt 0) { ConvertFrom-A2CHtmlText $ps[0].InnerText } else { '' })
+                    Expected = $(if ($ps.Count -gt 1) { ConvertFrom-A2CHtmlText $ps[1].InnerText } else { '' }); SharedSteps = $null })
+        }
+        elseif ($node.LocalName -eq 'compref') {
+            $n++
+            $out.Add([pscustomobject]@{ Step = $n; Action = ''; Expected = ''; SharedSteps = [int]$node.GetAttribute('ref') })
+        }
+    }
+    return , $out
+}
+
+function Save-A2CAdoZip {
+    # Downloads a zip from Azure DevOps to a file below the run folder (run logs); '' or the reason it failed
+    param([string] $Uri, [string] $File)
+    $free = Get-A2CFreeSpace $script:A2C.OutDir
+    if ($null -ne $free -and $free -lt 1GB) { return 'less than 1 GB free disk space' }
+    $target = [IO.Path]::Combine($script:A2C.OutDir, $File)
+    [void][IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($target))
+    $r = Invoke-A2CRequest -Method GET -Uri $Uri -Kind 'ado' -OutFile $target
+    if ($r.StatusCode -lt 200 -or $r.StatusCode -ge 300 -or -not (Test-Path -LiteralPath $target)) {
+        if (Test-Path -LiteralPath $target) { Remove-Item -LiteralPath $target -Force -ErrorAction SilentlyContinue }
+        return (Get-A2CErrorText (Get-A2CError $r))
+    }
+    $bad = Test-A2CZipFile $target
+    if ($bad) { Remove-Item -LiteralPath $target -Force -ErrorAction SilentlyContinue; return ('Azure DevOps did not return a zip: ' + $bad) }
+    return ''
+}
+
+function Save-A2CAdoAttachmentFile {
+    # Downloads one file of workItemAttachments.csv (an attachment, or an image linked from the text) to $File below the
+    # run folder, unless -AdoSkipAttachments, a size limit or the disk stops it. The outcome goes into the row:
+    # ExportedTo, or the reason in ExportNote; SizeKB from the file when the work item did not give it.
+    # $Size: bytes when the work item gives them, else $null.
+    param($Row, [string] $Url, [string] $Name, $Size, [string] $File, $Archive, $State, [string] $Area, [string] $Label)
+    $o = $script:A2C.Options
+    if ($o.AdoSkipAttachments) { $Row.ExportNote = 'Not downloaded: -AdoSkipAttachments'; return }
+    # the token is sent to Azure DevOps only
+    if ($Url -notmatch '^https://([a-z0-9-]+\.)?(dev\.azure\.com|visualstudio\.com)/') { $Row.ExportNote = 'Not downloaded: not an Azure DevOps address'; return }
+    $max = [long]$o.AdoAttachmentsMaxMB * 1MB
+    $limit = [long]$o.AdoAttachmentMaxSizeMB * 1MB
+    if ($max -gt 0 -and $State.Bytes -ge $max) {
+        if (-not $State.Capped) { Write-A2CLog -Level Warn ('Attachments: -AdoAttachmentsMaxMB {0} reached, the remaining attachments and images are listed but not downloaded' -f $o.AdoAttachmentsMaxMB) }
+        $State.Capped = $true
+        $Row.ExportNote = 'Not downloaded: -AdoAttachmentsMaxMB reached'
+        return
+    }
+    $free = Get-A2CFreeSpace $script:A2C.OutDir
+    if ($null -ne $free -and $free -lt 1GB) { $Row.ExportNote = 'Not downloaded: less than 1 GB free disk space'; return }
+    $u = '{0}?fileName={1}&download=true&api-version={2}' -f ($Url -replace '\?.*$', ''), [uri]::EscapeDataString($Name), $script:A2CAdoApi.Core
+    if ($limit -gt 0) {
+        # the size before the download: from the work item, or asked with a headers-only request
+        if ($null -eq $Size) { $probe = [long](Get-A2CDownloadSize $u); if ($probe -ge 0) { $Size = $probe } }
+        if ($null -ne $Size -and $Size -gt $limit) { $Row.ExportNote = ('Not downloaded: {0} MB, above -AdoAttachmentMaxSizeMB {1}' -f [math]::Ceiling($Size / 1MB), $o.AdoAttachmentMaxSizeMB); return }
+    }
+    $rel = Get-A2CUniqueFile $File
+    $target = [IO.Path]::Combine($script:A2C.OutDir, $rel)
+    [void][IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($target))
+    # the file itself: asked for a zip (the download default), the same address answers with the file inside a zip
+    $r = Invoke-A2CRequest -Method GET -Uri $u -Kind 'ado' -OutFile $target -Accept 'application/octet-stream'
+    if ($r.StatusCode -lt 200 -or $r.StatusCode -ge 300 -or -not (Test-Path -LiteralPath $target)) {
+        $err = Get-A2CErrorText (Get-A2CError $r)
+        if (Test-Path -LiteralPath $target) { Remove-Item -LiteralPath $target -Force -ErrorAction SilentlyContinue }
+        $Row.ExportNote = 'Failed: ' + (Get-A2CShortText $err 160)
+        Add-A2CAdoArchiveFailure $Archive $Area $Label $err
+        return
+    }
+    $len = (New-Object IO.FileInfo $target).Length
+    $State.Bytes += $len
+    $Row.ExportedTo = $rel
+    if ($null -eq $Row.SizeKB) { $Row.SizeKB = [math]::Round($len / 1KB, 1) }
+}
+
+function Save-A2CAdoAttachment {
+    # One attachment of a work item (a relation): listed in workItemAttachments.csv (Kind Attachment) and downloaded to
+    # <project>/workitems/attachments/<work item>/ (see Save-A2CAdoAttachmentFile).
+    param($Org, $Project, [int] $Id, $Relation, $Archive, $State)
+    $on = $Org.Name; $pn = [string]$Project.name
+    $url = [string]$Relation.url
+    $at = $Relation.attributes
+    $name = ''
+    if ($null -ne $at) { $name = [string]$at.name }
+    if (-not $name) { $name = Get-A2CNameFromId ($url -replace '\?.*$', '') }
+    $size = $null
+    if ($null -ne $at -and $null -ne $at.resourceSize) { $size = [long]$at.resourceSize }
+    $aid = ''
+    if ($url -match '/attachments/([0-9a-fA-F-]{36})') { $aid = $Matches[1] }
+    $row = [ordered]@{ Organization = $on; Project = $pn; Id = $Id; Kind = 'Attachment'; Attachment = $name; SizeKB = $(if ($null -ne $size) { [math]::Round($size / 1KB, 1) } else { $null })
+        Added = Format-A2CAdoDate (Get-A2CFirst $at @('resourceCreatedDate', 'authorizedDate')); Comment = $(if ($null -ne $at) { [string]$at.comment } else { '' })
+        ExportedTo = ''; ExportNote = ''; AttachmentId = $aid }
+    $Archive.workItemAttachments.Add($row)
+    $file = '{0}/workitems/attachments/{1}/{2}' -f (Get-A2CAdoProjectDir $on $pn), $Id, (Get-A2CSafePathSegment $name)
+    Save-A2CAdoAttachmentFile $row $url $name $size $file $Archive $State 'work item attachment' ('{0}/{1} #{2} {3}' -f $on, $pn, $Id, $name)
+}
+
+# An attachment linked from work item text, such as an image pasted into a description, repro steps, test steps or a
+# comment: <img src="https://dev.azure.com/<organization>/<project id>/_apis/wit/attachments/<GUID>?fileName=image.png">.
+# Such links are not relations of the work item. Group 1: the GUID; group 2: the query.
+$script:A2CAdoInlineLinkRx = [regex]::new('https://(?:dev\.azure\.com/[^/\s"''<>?#]+|[a-z0-9-]+\.visualstudio\.com)(?:/[^/\s"''<>?#]+){0,2}/_apis/wit/attachments/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(\?[^\s"''<>#]*)?', 'IgnoreCase')
+
+function Get-A2CAdoInlineLinks {
+    # The attachments linked from the text of a work item: every text field of the work item and of each revision (an
+    # image removed later is still part of the history) and every comment. Test steps hold their HTML encoded inside
+    # XML, so entities are decoded first. Returns GUID (lower case) -> @{ Url; Name } in the order found; Name is the
+    # fileName of the link (a closing parenthesis of Markdown left out), else the GUID.
+    param($Fields, $Comments, $Revisions)
+    $found = [ordered]@{}
+    $texts = [System.Collections.Generic.List[string]]::new()
+    $objs = @($Fields) + @($Comments | Where-Object { $null -ne $_ }) + @($Revisions | Where-Object { $null -ne $_ } | ForEach-Object { $_.fields })
+    foreach ($ob in $objs) {
+        if ($null -eq $ob) { continue }
+        foreach ($p in $ob.PSObject.Properties) { if ($p.Value -is [string] -and $p.Value.IndexOf('/_apis/wit/attachments/', [StringComparison]::OrdinalIgnoreCase) -ge 0) { $texts.Add($p.Value) } }
+    }
+    foreach ($t in $texts) {
+        $d = $t
+        for ($i = 0; $i -lt 3; $i++) { $x = [System.Net.WebUtility]::HtmlDecode($d); if ($x -eq $d) { break }; $d = $x }
+        foreach ($m in $script:A2CAdoInlineLinkRx.Matches($d)) {
+            $g = $m.Groups[1].Value.ToLowerInvariant()
+            if ($found.Contains($g)) { continue }
+            $name = ''
+            if ($m.Groups[2].Value -match '[?&]fileName=([^&]*)') { $name = ([uri]::UnescapeDataString($Matches[1]) -replace '[\x00-\x1f]', '').Trim() }
+            # Markdown, ![image.png](https://...?fileName=image.png): the closing parenthesis is not part of the name
+            while ($name.EndsWith(')') -and ($name.Split(')').Count - 1) -gt ($name.Split('(').Count - 1)) { $name = $name.Substring(0, $name.Length - 1) }
+            if (-not $name) { $name = $g }
+            $found[$g] = [pscustomobject]@{ Url = ($m.Value -replace '\?.*$', ''); Name = $name }
+        }
+    }
+    return , $found
+}
+
+function Save-A2CAdoInlineImages {
+    # The images linked from the text of a work item (Get-A2CAdoInlineLinks): one row each in workItemAttachments.csv
+    # (Kind InlineImage) and the file in <project>/workitems/attachments/<work item>/inline/ (see
+    # Save-A2CAdoAttachmentFile). The file is named after the link; images of one work item that share a name get the
+    # first 8 characters of their GUID added ("image_1a2b3c4d.png"). The work item JSON keeps the links as they are.
+    param($Org, $Project, [int] $Id, $Links, $Archive, $State)
+    $on = $Org.Name; $pn = [string]$Project.name
+    $count = @{}
+    foreach ($g in @($Links.Keys)) { $k = (Get-A2CSafePathSegment $Links[$g].Name).ToLowerInvariant(); $count[$k] = [int]$count[$k] + 1 }
+    foreach ($g in @($Links.Keys)) {
+        $l = $Links[$g]
+        $safe = Get-A2CSafePathSegment $l.Name
+        if ($count[$safe.ToLowerInvariant()] -gt 1) {
+            $dot = $safe.LastIndexOf('.')
+            if ($dot -gt 0) { $safe = $safe.Substring(0, $dot) + '_' + $g.Substring(0, 8) + $safe.Substring($dot) } else { $safe = $safe + '_' + $g.Substring(0, 8) }
+        }
+        $row = [ordered]@{ Organization = $on; Project = $pn; Id = $Id; Kind = 'InlineImage'; Attachment = $l.Name; SizeKB = $null; Added = ''; Comment = ''
+            ExportedTo = ''; ExportNote = ''; AttachmentId = $g }
+        $Archive.workItemAttachments.Add($row)
+        $file = '{0}/workitems/attachments/{1}/inline/{2}' -f (Get-A2CAdoProjectDir $on $pn), $Id, $safe
+        Save-A2CAdoAttachmentFile $row $l.Url $l.Name $null $file $Archive $State 'work item inline image' ('{0}/{1} #{2} {3}' -f $on, $pn, $Id, $l.Name)
+    }
+}
+
+function Save-A2CAdoWorkItem {
+    # One work item: its revisions and its comments (when it has any) are read, all of it is written to
+    # <project>/workitems/<thousands>xxx/<id>.json, its attachments and the images linked from its text are downloaded
+    # and its CSV rows kept.
+    param($Org, $Project, $Item, $Archive, $State)
+    $v = $script:A2CAdoApi
+    $on = $Org.Name; $pn = [string]$Project.name
+    $pdev = 'https://dev.azure.com/{0}/{1}' -f [uri]::EscapeDataString($on), [string]$Project.id
+    $id = [int]$Item.id
+    $f = $Item.fields
+    $label = '{0}/{1} #{2}' -f $on, $pn, $id
+    $rev = [int](Get-A2CWiField $f 'System.Rev')
+    # every revision, the first one too (a work item never changed has one), so "revisions" has "rev" entries
+    $revisions = $null
+    try {
+        $revisions = @((Get-A2CAdoPagedItems ('{0}/_apis/wit/workItems/{1}/revisions?api-version={2}' -f $pdev, $id, $v.Core) -PageSize $script:A2CAdoRevisionPage -MaxPages 10000).Items)
+        if ($revisions.Count -lt $rev) { Add-A2CAdoArchiveFailure $Archive 'work item revisions' $label ('{0} of {1} revisions returned' -f $revisions.Count, $rev) }
+    }
+    catch { Add-A2CAdoArchiveFailure $Archive 'work item revisions' $label $_.Exception.Message; $revisions = $null }
+    $comments = @()
+    if ([int](Get-A2CWiField $f 'System.CommentCount') -gt 0) {
+        $c = Invoke-A2CAdoList ('{0}/_apis/wit/workItems/{1}/comments?$top=200&order=asc&api-version={2}' -f $pdev, $id, $v.Comments)
+        if ($c.Ok) { $comments = @($c.Items) } else { Add-A2CAdoArchiveFailure $Archive 'work item comments' $label (Get-A2CErrorText $c.Error); $comments = $null }
+    }
+    $rels = @($Item.relations | Where-Object { $null -ne $_ })
+    $doc = [ordered]@{ id = $id; rev = $rev; url = [string]$Item.url; fields = $f; relations = $rels; revisions = $revisions; comments = $comments }
+    $file = '{0}/workitems/{1}xxx/{2}.json' -f (Get-A2CAdoProjectDir $on $pn), [math]::Floor($id / 1000), $id
+    Save-A2CExportFile $file (ConvertTo-Json -InputObject $doc -Depth 40)
+    $atts = @($rels | Where-Object { [string]$_.rel -eq 'AttachedFile' })
+    $links = @($rels | Where-Object { [string]$_.rel -ne 'AttachedFile' })
+    # images linked from the text; an attachment of the work item that its text also shows is listed once, as attachment
+    $inline = Get-A2CAdoInlineLinks $f $comments $revisions
+    foreach ($a in $atts) { if ([string]$a.url -match '/attachments/([0-9a-fA-F-]{36})') { $inline.Remove($Matches[1].ToLowerInvariant()) } }
+    $Archive.allWorkItems.Add([ordered]@{
+            Organization = $on; Project = $pn; Id = $id; WorkItemType = [string](Get-A2CWiField $f 'System.WorkItemType'); Title = [string](Get-A2CWiField $f 'System.Title')
+            State = [string](Get-A2CWiField $f 'System.State'); Reason = [string](Get-A2CWiField $f 'System.Reason')
+            AreaPath = [string](Get-A2CWiField $f 'System.AreaPath'); IterationPath = [string](Get-A2CWiField $f 'System.IterationPath')
+            AssignedTo = Get-A2CWiPerson (Get-A2CWiField $f 'System.AssignedTo'); CreatedBy = Get-A2CWiPerson (Get-A2CWiField $f 'System.CreatedBy')
+            Created = Format-A2CAdoDate (Get-A2CWiField $f 'System.CreatedDate'); ChangedBy = Get-A2CWiPerson (Get-A2CWiField $f 'System.ChangedBy')
+            Changed = Format-A2CAdoDate (Get-A2CWiField $f 'System.ChangedDate'); Tags = [string](Get-A2CWiField $f 'System.Tags')
+            Parent = Get-A2CWiField $f 'System.Parent'; Revisions = $rev; Comments = $(if ($null -ne $comments) { @($comments).Count } else { $null })
+            Links = $links.Count; Attachments = $atts.Count; InlineImages = $inline.Count; ExportedFile = $file
+        })
+    foreach ($l in $links) {
+        $tid = $null; $turl = [string]$l.url
+        if ($turl -match '/_apis/wit/workItems/(\d+)$') { $tid = [int]$Matches[1]; $turl = '' }
+        $at = $l.attributes
+        $Archive.workItemLinks.Add([ordered]@{ Organization = $on; Project = $pn; Id = $id; Link = $(if ($null -ne $at) { [string]$at.name } else { '' }); Relation = [string]$l.rel
+                TargetId = $tid; TargetUrl = $turl; Comment = $(if ($null -ne $at) { [string]$at.comment } else { '' }) })
+    }
+    foreach ($a in $atts) { Save-A2CAdoAttachment $Org $Project $id $a $Archive $State }
+    if ($inline.Count -gt 0) { Save-A2CAdoInlineImages $Org $Project $id $inline $Archive $State }
+}
+
+function Get-A2CTestCaseField {
+    # A field of a suite test case: workItemFields is a list of one-field objects
+    param($TestCase, [string] $Name)
+    if ($null -eq $TestCase.workItem) { return $null }
+    foreach ($x in @($TestCase.workItem.workItemFields | Where-Object { $null -ne $_ })) { $p = $x.PSObject.Properties[$Name]; if ($null -ne $p) { return $p.Value } }
+    return $null
+}
+
+function Get-A2CAdoRefName {
+    # The name of a reference that may arrive as { id } only (test runs: plan; test results: configuration): its own
+    # name, else the name read before for that ID, else the ID
+    param($Ref, $Names)
+    if ($null -eq $Ref) { return '' }
+    $n = [string]$Ref.name
+    if ($n) { return $n }
+    $id = [string]$Ref.id
+    if (-not $id) { return '' }
+    if ($null -ne $Names -and $Names.ContainsKey($id)) { return [string]$Names[$id] }
+    return $id
+}
+
+function Save-A2CAdoProjectContent {
+    # Everything the AzureDevOpsWorkItems report exports from one project. A failed item is noted and the rest goes on.
+    param($Org, $Project, $Archive, $State)
+    $v = $script:A2CAdoApi
+    $on = $Org.Name; $pn = [string]$Project.name; $projId = [string]$Project.id
+    $orgEnc = [uri]::EscapeDataString($on)
+    $pdev = 'https://dev.azure.com/{0}/{1}' -f $orgEnc, $projId
+    $label = $on + '/' + $pn
+    # ---- work items, 200 per read
+    $ids = $null
+    try { $ids = (Get-A2CAdoWorkItemIds $pdev).ToArray() } catch { Add-A2CAdoArchiveFailure $Archive 'work item list' $label $_.Exception.Message }
+    if ($null -ne $ids -and $ids.Count -gt 0) {
+        $t0 = [DateTime]::Now
+        for ($b = 0; $b -lt $ids.Count; $b += $script:A2CAdoWorkItemBatch) {
+            $batch = @($ids[$b..([math]::Min($ids.Count, $b + $script:A2CAdoWorkItemBatch) - 1)])
+            Write-A2CProgress -Activity ('Work items ' + $label) -Current $b -Total $ids.Count -Started $t0 -Item ('#' + $batch[0])
+            $r = Invoke-A2CAdo ('{0}/_apis/wit/workitems?ids={1}&$expand=all&errorPolicy=omit&api-version={2}' -f $pdev, ($batch -join ','), $v.Core)
+            if (-not $r.Ok -or $null -eq $r.Json) {
+                $err = $(if ($r.Ok) { 'empty answer' } else { Get-A2CErrorText $r.Error })
+                foreach ($id in $batch) { Add-A2CAdoArchiveFailure $Archive 'work item' ('{0} #{1}' -f $label, $id) $err }
+                continue
+            }
+            $got = @{}
+            foreach ($wi in @($r.Json.value | Where-Object { $null -ne $_ })) {
+                $got[[string]$wi.id] = $true
+                try { Save-A2CAdoWorkItem $Org $Project $wi $Archive $State }
+                catch { Add-A2CAdoArchiveFailure $Archive 'work item' ('{0} #{1}' -f $label, $wi.id) $_.Exception.Message }
+            }
+            foreach ($id in $batch) { if (-not $got.ContainsKey([string]$id)) { Add-A2CAdoArchiveFailure $Archive 'work item' ('{0} #{1}' -f $label, $id) 'not returned (deleted, moved or no access)' } }
+        }
+        Write-A2CProgress -Activity ('Work items ' + $label) -Completed
+    }
+    # ---- test plans, their suites and the test cases of each suite with their steps
+    $plans = $null
+    try { $plans = Get-A2CAdoItems ('{0}/_apis/testplan/plans?includePlanDetails=true&api-version={1}' -f $pdev, $v.Core) }
+    catch { Add-A2CAdoArchiveFailure $Archive 'test plans' $label $_.Exception.Message }
+    $stepsOf = @{}
+    $planNames = @{}   # test runs name their plan by ID only
+    foreach ($plan in @($plans | Where-Object { $null -ne $_ })) {
+        $planNames[[string]$plan.id] = [string]$plan.name
+        $planRow = [ordered]@{ Organization = $on; Project = $pn; Plan = [string]$plan.name; PlanId = [int]$plan.id; State = [string]$plan.state; AreaPath = [string]$plan.areaPath
+            Iteration = [string]$plan.iteration; Owner = $(if ($null -ne $plan.owner) { [string]$plan.owner.displayName } else { '' }); StartDate = Format-A2CAdoDate $plan.startDate
+            EndDate = Format-A2CAdoDate $plan.endDate; Suites = $null; TestCases = 0 }
+        $Archive.testPlans.Add($planRow)
+        $suites = $null
+        try { $suites = Get-A2CAdoItems ('{0}/_apis/testplan/Plans/{1}/suites?api-version={2}' -f $pdev, [int]$plan.id, $v.Core) }
+        catch { Add-A2CAdoArchiveFailure $Archive 'test suites' ('{0} plan {1}' -f $label, $plan.id) $_.Exception.Message; continue }
+        $planRow.Suites = @($suites).Count
+        foreach ($su in $suites) {
+            $cases = $null
+            try { $cases = Get-A2CAdoItems ('{0}/_apis/testplan/Plans/{1}/Suites/{2}/TestCase?witFields=System.Title,Microsoft.VSTS.TCM.Steps&api-version={3}' -f $pdev, [int]$plan.id, [int]$su.id, $v.Core) }
+            catch { Add-A2CAdoArchiveFailure $Archive 'test cases' ('{0} plan {1} suite {2}' -f $label, $plan.id, $su.id) $_.Exception.Message }
+            $Archive.testSuites.Add([ordered]@{ Organization = $on; Project = $pn; Plan = [string]$plan.name; PlanId = [int]$plan.id; Suite = [string]$su.name; SuiteId = [int]$su.id
+                    SuiteType = [string]$su.suiteType; ParentSuiteId = $(if ($null -ne $su.parentSuite) { $su.parentSuite.id } else { $null }); Query = [string]$su.queryString
+                    RequirementId = $su.requirementId; TestCases = $(if ($null -ne $cases) { @($cases).Count } else { $null }) })
+            foreach ($tc in @($cases | Where-Object { $null -ne $_ })) {
+                $tcId = $(if ($null -ne $tc.workItem) { [int]$tc.workItem.id } else { 0 })
+                $steps = ConvertFrom-A2CTestSteps ([string](Get-A2CTestCaseField $tc 'Microsoft.VSTS.TCM.Steps'))
+                $title = [string](Get-A2CTestCaseField $tc 'System.Title')
+                if (-not $title -and $null -ne $tc.workItem) { $title = [string]$tc.workItem.name }
+                $pa = @($tc.pointAssignments | Where-Object { $null -ne $_ })
+                $Archive.testCases.Add([ordered]@{ Organization = $on; Project = $pn; Plan = [string]$plan.name; PlanId = [int]$plan.id; SuiteId = [int]$su.id; TestCaseId = $tcId
+                        Title = $title; Steps = $steps.Count; Configurations = Join-A2C (Get-A2CUnique @($pa | ForEach-Object { [string]$_.configurationName }))
+                        Testers = Join-A2C (Get-A2CUnique @($pa | Where-Object { $null -ne $_.tester } | ForEach-Object { [string]$_.tester.displayName })) })
+                $planRow.TestCases = $planRow.TestCases + 1
+                # the steps belong to the test case (a work item), not to the suite: written once
+                if ($tcId -and -not $stepsOf.ContainsKey($tcId)) {
+                    $stepsOf[$tcId] = $true
+                    foreach ($st in $steps) {
+                        $Archive.testSteps.Add([ordered]@{ Organization = $on; Project = $pn; TestCaseId = $tcId; Step = $st.Step; Action = $st.Action; ExpectedResult = $st.Expected; SharedSteps = $st.SharedSteps })
+                    }
+                }
+            }
+        }
+    }
+    # ---- test runs; the results of manual runs (automated runs come from pipelines: their counts only)
+    $runs = $null
+    try { $runs = (Get-A2CAdoPagedItems ('{0}/_apis/test/runs?includeRunDetails=true&api-version={1}' -f $pdev, $v.Core) -MaxPages 10000).Items }
+    catch { Add-A2CAdoArchiveFailure $Archive 'test runs' $label $_.Exception.Message }
+    $cfgNames = $null   # test results name their configuration by ID only: the project's configurations, read once
+    foreach ($run in @($runs | Where-Object { $null -ne $_ })) {
+        $total = [int]$run.totalTests; $passed = [int]$run.passedTests
+        $row = [ordered]@{ Organization = $on; Project = $pn; RunId = [int]$run.id; Run = [string]$run.name; Plan = Get-A2CAdoRefName $run.plan $planNames
+            State = [string]$run.state; Automated = [bool]$run.isAutomated; Build = Get-A2CAdoRefName $run.build $null
+            Release = Get-A2CAdoRefName $run.release $null; Started = Format-A2CAdoDate $run.startedDate; Completed = Format-A2CAdoDate $run.completedDate
+            TotalTests = $total; PassedTests = $passed; NotPassed = [math]::Max(0, $total - $passed); Owner = $(if ($null -ne $run.owner) { [string]$run.owner.displayName } else { '' }); ResultsExported = $null }
+        $Archive.testRuns.Add($row)
+        if ($run.isAutomated) { continue }
+        if ($null -eq $cfgNames) {
+            $cfgNames = @{}
+            try { foreach ($c in (Get-A2CAdoItems ('{0}/_apis/testplan/configurations?api-version={1}' -f $pdev, $v.Core))) { if ($null -ne $c) { $cfgNames[[string]$c.id] = [string]$c.name } } }
+            catch { Add-A2CAdoArchiveFailure $Archive 'test configurations' $label $_.Exception.Message }
+        }
+        try {
+            $res = (Get-A2CAdoPagedItems ('{0}/_apis/test/Runs/{1}/results?api-version={2}' -f $pdev, [int]$run.id, $v.Core) -PageSize $script:A2CAdoBigPageSize -MaxPages 10000).Items
+            foreach ($x in $res) {
+                $Archive.testResults.Add([ordered]@{ Organization = $on; Project = $pn; RunId = [int]$run.id; ResultId = $x.id; TestCaseId = $(if ($null -ne $x.testCase) { $x.testCase.id } else { $null })
+                        TestCase = [string]$x.testCaseTitle; Outcome = [string]$x.outcome; Started = Format-A2CAdoDate $x.startedDate; Completed = Format-A2CAdoDate $x.completedDate
+                        DurationSec = $(if ($null -ne $x.durationInMs) { [math]::Round([double]$x.durationInMs / 1000, 1) } else { $null })
+                        RunBy = $(if ($null -ne $x.runBy) { [string]$x.runBy.displayName } else { '' }); Configuration = Get-A2CAdoRefName $x.configuration $cfgNames
+                        ErrorMessage = [string]$x.errorMessage })
+            }
+            $row.ResultsExported = $res.Count
+        }
+        catch { Add-A2CAdoArchiveFailure $Archive 'test results' ('{0} run {1}' -f $label, $run.id) $_.Exception.Message }
+    }
+    # ---- pipeline runs (every run the retention policies kept) and releases; their logs with -AdoRunLogs
+    $logs = [bool]$script:A2C.Options.AdoRunLogs
+    $builds = Invoke-A2CAdoList ('{0}/_apis/build/builds?queryOrder=finishTimeDescending&$top=1000&api-version={1}' -f $pdev, $v.Core)
+    if (-not $builds.Ok) { Add-A2CAdoArchiveFailure $Archive 'pipeline runs' $label (Get-A2CErrorText $builds.Error) }
+    foreach ($x in $builds.Items) {
+        $pipe = $(if ($null -ne $x.definition) { [string]$x.definition.name } else { '' })
+        $row = [ordered]@{ Organization = $on; Project = $pn; Pipeline = $pipe; PipelineId = $(if ($null -ne $x.definition) { $x.definition.id } else { $null }); RunId = [int]$x.id
+            BuildNumber = [string]$x.buildNumber; Status = [string]$x.status; Result = [string]$x.result; Reason = [string]$x.reason; Queued = Format-A2CAdoDate $x.queueTime
+            Started = Format-A2CAdoDate $x.startTime; Finished = Format-A2CAdoDate $x.finishTime
+            RequestedFor = $(if ($null -ne $x.requestedFor) { [string]$x.requestedFor.displayName } else { '' }); RequestedBy = $(if ($null -ne $x.requestedBy) { [string]$x.requestedBy.displayName } else { '' })
+            SourceBranch = ([string]$x.sourceBranch -replace '^refs/heads/', ''); SourceVersion = [string]$x.sourceVersion
+            Repository = $(if ($null -ne $x.repository) { [string]$x.repository.name } else { '' }); KeepForever = [bool]$x.keepForever; RetainedByRelease = [bool]$x.retainedByRelease; LogFile = '' }
+        $Archive.pipelineRuns.Add($row)
+        if (-not $logs -or [string]$x.status -ne 'completed') { continue }
+        $rel = '{0}/runs/pipelines/{1}/{2}.zip' -f (Get-A2CAdoProjectDir $on $pn), (Get-A2CSafePathSegment $pipe), [int]$x.id
+        $err = Save-A2CAdoZip ('{0}/_apis/build/builds/{1}/logs?api-version={2}' -f $pdev, [int]$x.id, $v.Core) $rel
+        if ($err) { Add-A2CAdoArchiveFailure $Archive 'pipeline run log' ('{0} {1} run {2}' -f $label, $pipe, $x.id) $err } else { $row.LogFile = $rel }
+    }
+    $rels = Invoke-A2CAdoList ('https://vsrm.dev.azure.com/{0}/{1}/_apis/release/releases?$expand=environments&$top=100&api-version={2}' -f $orgEnc, $projId, $v.Core)
+    if (-not $rels.Ok) { Add-A2CAdoArchiveFailure $Archive 'releases' $label (Get-A2CErrorText $rels.Error) }
+    foreach ($x in $rels.Items) {
+        $envs = @($x.environments | Where-Object { $null -ne $_ })
+        $def = $(if ($null -ne $x.releaseDefinition) { [string]$x.releaseDefinition.name } else { '' })
+        $row = [ordered]@{ Organization = $on; Project = $pn; ReleasePipeline = $def; ReleasePipelineId = $(if ($null -ne $x.releaseDefinition) { $x.releaseDefinition.id } else { $null })
+            ReleaseId = [int]$x.id; Release = [string]$x.name; Status = [string]$x.status; Reason = [string]$x.reason; Created = Format-A2CAdoDate $x.createdOn
+            CreatedBy = $(if ($null -ne $x.createdBy) { [string]$x.createdBy.displayName } else { '' }); Stages = Join-A2C @($envs | ForEach-Object { '{0}: {1}' -f $_.name, $_.status })
+            Description = [string]$x.description; LogFile = '' }
+        $Archive.releaseRuns.Add($row)
+        if (-not $logs -or @($envs | Where-Object { [string]$_.status -and [string]$_.status -ne 'notStarted' }).Count -eq 0) { continue }
+        $rel = '{0}/runs/releases/{1}/{2}.zip' -f (Get-A2CAdoProjectDir $on $pn), (Get-A2CSafePathSegment $def), [int]$x.id
+        $err = Save-A2CAdoZip ('https://vsrm.dev.azure.com/{0}/{1}/_apis/release/releases/{2}/logs?api-version={3}' -f $orgEnc, $projId, [int]$x.id, $v.Core) $rel
+        if ($err) { Add-A2CAdoArchiveFailure $Archive 'release log' ('{0} {1}' -f $label, $x.name) $err } else { $row.LogFile = $rel }
+    }
+}
+
+function Get-A2CDatasetAzureDevOpsWorkItems {
+    # Exports the content of every project of the collected organizations (see Save-A2CAdoProjectContent). Never with
+    # -Mask: work items, comments and attachments are project content.
+    if ($script:A2C.Options.Mask) {
+        Add-A2CCoverage -Area 'Azure DevOps work item export' -Status Skipped -Detail 'Disabled with -Mask (work items, comments, attachments and logs are project content)'
+        return New-A2CDatasetResult -Status 'Skipped' -Note 'Disabled with -Mask'
+    }
+    $orgs = @($script:A2C.Data['Ado'] | Where-Object { $null -ne $_ -and $_.Status -eq 'Collected' })
+    if ($orgs.Count -eq 0) {
+        Add-A2CCoverage -Area 'Azure DevOps work item export' -Status Skipped -Detail 'No Azure DevOps organization was collected'
+        return New-A2CDatasetResult -Status 'Skipped' -Note 'no Azure DevOps organization'
+    }
+    $o = $script:A2C.Options
+    $mb = { param([int] $Value) if ($Value -gt 0) { '{0} MB' -f $Value } else { 'no limit' } }
+    Write-A2CLog -Level Detail ('Work item export: attachments and images in the text {0}, run logs {1}' -f $(if ($o.AdoSkipAttachments) { 'listed only (-AdoSkipAttachments)' } else { 'each up to {0}, in total {1}' -f (& $mb $o.AdoAttachmentMaxSizeMB), (& $mb $o.AdoAttachmentsMaxMB) }),
+        $(if ($o.AdoRunLogs) { 'downloaded' } else { 'not downloaded (add -AdoRunLogs)' }))
+    $state = [pscustomobject]@{ Bytes = [long]0; Capped = $false }
+    $fails = [System.Collections.Generic.List[object]]::new()
+    foreach ($org in $orgs) {
+        $a = New-A2CAdoArchive
+        $org.Archive = $a
+        $i = 0; $t0 = [DateTime]::Now
+        foreach ($p in $org.Projects) {
+            $i++
+            Write-A2CProgress -Activity ('Project content ' + $org.Name) -Current $i -Total $org.Projects.Count -Started $t0 -Item ([string]$p.name)
+            Save-A2CAdoProjectContent $org $p $a $state
+        }
+        Write-A2CProgress -Activity ('Project content ' + $org.Name) -Completed
+        foreach ($x in $a.Failures) { $fails.Add($x) }
+        $files = @($a.allWorkItems | Where-Object { $_['ExportedFile'] }).Count
+        $inl = @($a.workItemAttachments | Where-Object { $_['Kind'] -eq 'InlineImage' })
+        $note = ('{0} work item(s), {1} attachment(s) downloaded, {2} of {3} inline image(s) downloaded ({4} failed), {5} test plan(s), {6} test run(s), ' +
+            '{7} pipeline run(s), {8} release(s)') -f $files, @($a.workItemAttachments | Where-Object { $_['Kind'] -eq 'Attachment' -and $_['ExportedTo'] }).Count,
+            @($inl | Where-Object { $_['ExportedTo'] }).Count, $inl.Count, @($inl | Where-Object { ([string]$_['ExportNote']).StartsWith('Failed') }).Count,
+            $a.testPlans.Count, $a.testRuns.Count, $a.pipelineRuns.Count, $a.releaseRuns.Count
+        if ($a.Failures.Count -gt 0) { $note += ('; {0} item(s) failed' -f $a.Failures.Count) }
+        Add-A2CCoverage -Area ('Azure DevOps work item export ' + $org.Name) -Status $(if ($a.Failures.Count -gt 0) { 'Partial' } else { 'Collected' }) -Items $files -Detail $note
+        Write-A2CLog -Level Ok ('Azure DevOps {0}: {1}' -f $org.Name, $note)
+    }
+    # each failed item with its reason (the first $A2CAdoFailureRows; all of them are in the log)
+    $n = 0
+    foreach ($x in $fails) {
+        if ($n -ge $script:A2CAdoFailureRows) { break }
+        Add-A2CCoverage -Area ('Azure DevOps ' + $x.Area) -Status Failed -Detail ($x.Item + ': ' + $x.Reason)
+        $n++
+    }
+    if ($fails.Count -gt $n) { Add-A2CCoverage -Area 'Azure DevOps work item export' -Status Info -Detail ('{0} more failed item(s) are listed in the general log' -f ($fails.Count - $n)) }
+    if ($fails.Count -gt 0) { Write-A2CLog -Level Warn ('Work item export: {0} item(s) could not be exported - see coverage.csv' -f $fails.Count) }
+    if ($fails.Count -gt 0) { return New-A2CDatasetResult -Status 'Partial' }
     return New-A2CDatasetResult
 }
 
@@ -8971,7 +9929,7 @@ Register-A2CSchema 'ADO/agentPools.csv' ('Organization:name Pool:known PoolId:nu
 Register-A2CSchema 'ADO/agents.csv' ('Organization:name Pool:known Agent:name ComputerName:name Version MajorVersion:num Outdated OS Status ' +
     'Enabled LastJob:date DaysSinceLastJob:num LastJobResult CreatedOn:date AzureVmId:id')
 Register-A2CSchema 'ADO/users.csv' ('Organization:name User:upn DisplayName:name Origin UserType License LicenseSource Status Paid ' +
-    'LastAccess:date DaysSinceLastAccess:num DateAdded:date Domain:fqdn External')
+    'LastAccess:date DaysSinceLastAccess:num DateAdded:date Domain:fqdn External DirectoryAlias:name Groups:list')
 Register-A2CSchema 'ADO/admins.csv' 'Organization:name Group Scope Project:name Member:name MemberUpn:upn MemberType Origin'
 Register-A2CSchema 'ADO/variableGroups.csv' ('Organization:name Projects:list VariableGroup:name VariableGroupId:num Type KeyVault:name ' +
     'ServiceConnection:name Variables:num SecretVariables:num VariableNames:list CreatedBy:name ModifiedOn:date ' +
@@ -9626,6 +10584,9 @@ function New-A2CReportAzureDevOps {
                     CreatedOn = Format-A2CAdoDate $a.createdOn; AzureVmId = $(if ($cn -and $vmByComputer.ContainsKey($cn)) { $vmByComputer[$cn] } else { '' })
                 })
         }
+        # direct group memberships (from the AzureDevOpsStructure report): member descriptor -> "[scope]\group"
+        $memberOf = $null
+        if ($null -ne $o.Structure) { $memberOf = Get-A2CAdoMemberOf $o.Structure }
         foreach ($u in $o.Users) {
             $usr = $u.user
             $upn = [string]$usr.principalName
@@ -9643,7 +10604,8 @@ function New-A2CReportAzureDevOps {
                     Organization = $on; User = $upn; DisplayName = [string]$usr.displayName; Origin = $origin; UserType = $utype
                     License = $lic.Name; LicenseSource = [string]$u.accessLevel.licensingSource; Status = [string]$u.accessLevel.status; Paid = $lic.Paid
                     LastAccess = Format-A2CAdoDate $u.lastAccessedDate; DaysSinceLastAccess = Get-A2CAdoDaysSince $u.lastAccessedDate; DateAdded = Format-A2CAdoDate $u.dateCreated
-                    Domain = $domain; External = $external
+                    Domain = $domain; External = $external; DirectoryAlias = [string]$usr.directoryAlias
+                    Groups = $(if ($null -ne $memberOf -and $memberOf.ContainsKey([string]$usr.descriptor)) { Join-A2C $memberOf[[string]$usr.descriptor] } else { '' })
                 })
         }
         foreach ($w in $o.Admins) {
@@ -9899,18 +10861,789 @@ function New-A2CReportAzureDevOps {
     # the project folders come from the export reports: say which ones did not run
     if ($collected -gt 0) {
         $missing = [System.Collections.Generic.List[string]]::new()
-        foreach ($x in @(@('AzureDevOpsPipelines', 'pipelines'), @('AzureDevOpsRepos', 'Git and TFVC repositories'), @('AzureDevOpsPackages', 'packages'))) {
+        foreach ($x in @(@('AzureDevOpsPipelines', 'pipelines'), @('AzureDevOpsRepos', 'Git and TFVC repositories'), @('AzureDevOpsPackages', 'packages'),
+                @('AzureDevOpsWorkItems', 'work items, test plans and run history'))) {
             if (-not (Test-A2CSelected $x[0])) { $missing.Add(('{0} (add {1} to -Reports)' -f $x[1], $x[0])) }
         }
         if ($missing.Count -gt 0) { Write-A2CLog -Level Detail ('Not exported in this run: ' + [string]::Join(', ', $missing)) }
     }
 }
 
+# ---- Azure DevOps structure (AzureDevOpsStructure) and content (AzureDevOpsWorkItems): ADO/<organization>/ ----------
+Register-A2CSchema 'ADO/securityGroups.csv' 'Organization:name Scope ScopeName:name Group:dn Origin Description:text Members:num MemberGroups:num IsTeam OriginId:guid'
+Register-A2CSchema 'ADO/groupMembers.csv' 'Organization:name Scope ScopeName:name Group:dn Member:dn MemberScope:name MemberUpn:upn MemberType MemberOrigin MemberOriginId:guid'
+Register-A2CSchema 'ADO/orgSettings.csv' 'Organization:name Category Setting Value:note Detail:text Source'
+Register-A2CSchema 'ADO/notificationSubscriptions.csv' ('Organization:name Project:name Team:name Subscription:text SubscriptionId EventType Channel Address:upn Status ' +
+    'Criteria:text ModifiedBy:dn Modified:date')
+Register-A2CSchema 'ADO/teams.csv' ('Organization:name Project:name Team:name TeamId:guid DefaultTeam Description:text Members:num Administrators:list AreaPaths:bpathList ' +
+    'DefaultArea:bpath BacklogIteration:bpath DefaultIteration:bpath Iterations:num IterationPaths:bpathList BacklogLevels WorkingDays BugsBehavior')
+Register-A2CSchema 'ADO/teamMembers.csv' 'Organization:name Project:name Team:name Member:dn MemberUpn:upn MemberType Administrator'
+Register-A2CSchema 'ADO/areaPaths.csv' 'Organization:name Project:name Path:bpath Name:name Level:num Teams:list NodeId:num Identifier:guid'
+Register-A2CSchema 'ADO/iterationPaths.csv' 'Organization:name Project:name Path:bpath Name:name Level:num StartDate:date FinishDate:date Teams:list NodeId:num Identifier:guid'
+Register-A2CSchema 'ADO/boards.csv' 'Organization:name Project:name Team:name Board Columns:num Swimlanes:list CardFields:note CardRules:num TagColors:num Customized Changes'
+Register-A2CSchema 'ADO/boardColumns.csv' 'Organization:name Project:name Team:name Board Column:name Order:num ColumnType WipLimit:num Split DefinitionOfDone:text StateMappings:note'
+Register-A2CSchema 'ADO/boardCardRules.csv' 'Organization:name Project:name Team:name Board RuleType Rule:name Enabled Filter:text Style'
+Register-A2CSchema 'ADO/dashboards.csv' ('Organization:name Project:name Team:name Dashboard:name Scope Widgets:num MarketplaceWidgets:num RefreshMinutes:num ModifiedBy:dn ' +
+    'Modified:date DashboardId:guid ExportedFile:path')
+Register-A2CSchema 'ADO/dashboardWidgets.csv' ('Organization:name Project:name Team:name Dashboard:name Widget:name WidgetType ContributionId Extension Source Row:num Column:num ' +
+    'RowSpan:num ColumnSpan:num Settings:json')
+Register-A2CSchema 'ADO/queries.csv' 'Organization:name Project:name Folder:path Query:name QueryType Wiql:text CreatedBy:dn Modified:date LastExecuted:date QueryId:guid'
+Register-A2CSchema 'ADO/tags.csv' 'Organization:name Project:name Tag:name LastUpdated:date TagId:guid'
+Register-A2CSchema 'ADO/workItemTemplates.csv' 'Organization:name Project:name Team:name Template:name WorkItemType Description:text Fields:json TemplateId:guid'
+Register-A2CSchema 'ADO/permissions.csv' ('Organization:name Project:name ObjectType Object:name Path:bpath Branch:name Identity:dn IdentityScope:name IdentityUpn:upn ' +
+    'IdentityType Allow Deny InheritPermissions Namespace Token:text')
+Register-A2CSchema 'ADO/checks.csv' ('Organization:name Project:name ResourceType Resource:name Check Approvers:list MinApprovers:num RequesterCanApprove Instructions:text ' +
+    'TimeoutMinutes:num Enabled CreatedBy:dn Modified:date CheckId:num')
+Register-A2CSchema 'ADO/tfvcShelvesets.csv' 'Organization:name Owner:dn OwnerUpn:upn Shelvesets:num Newest:date Oldest:date'
+Register-A2CSchema 'ADO/wikis.csv' 'Organization:name Project:name Wiki:name Type Repository:name MappedPath:path Versions:list WikiId:guid'
+Register-A2CSchema 'ADO/pullRequests.csv' ('Organization:name Project:name Repository:name PullRequestId:num Title:text Status SourceBranch:name TargetBranch:name ' +
+    'Created:date Closed:date Author:dn Reviewers:list Draft MergeStatus')
+Register-A2CSchema 'ADO/allWorkItems.csv' ('Organization:name Project:name Id:num WorkItemType Title:text State Reason AreaPath:bpath IterationPath:bpath AssignedTo:dn ' +
+    'CreatedBy:dn Created:date ChangedBy:dn Changed:date Tags:list Parent:num Revisions:num Comments:num Links:num Attachments:num InlineImages:num ExportedFile:path')
+Register-A2CSchema 'ADO/workItemLinks.csv' 'Organization:name Project:name Id:num Link Relation TargetId:num TargetUrl:url Comment:text'
+Register-A2CSchema 'ADO/workItemAttachments.csv' 'Organization:name Project:name Id:num Kind Attachment:name SizeKB:num Added:date Comment:text ExportedTo:path ExportNote:note AttachmentId:guid'
+Register-A2CSchema 'ADO/testPlans.csv' ('Organization:name Project:name Plan:name PlanId:num State AreaPath:bpath Iteration:bpath Owner:dn StartDate:date EndDate:date ' +
+    'Suites:num TestCases:num')
+Register-A2CSchema 'ADO/testSuites.csv' 'Organization:name Project:name Plan:name PlanId:num Suite:name SuiteId:num SuiteType ParentSuiteId:num Query:text RequirementId:num TestCases:num'
+Register-A2CSchema 'ADO/testCases.csv' 'Organization:name Project:name Plan:name PlanId:num SuiteId:num TestCaseId:num Title:text Steps:num Configurations:list Testers:list'
+Register-A2CSchema 'ADO/testSteps.csv' 'Organization:name Project:name TestCaseId:num Step:num Action:text ExpectedResult:text SharedSteps:num'
+Register-A2CSchema 'ADO/testRuns.csv' ('Organization:name Project:name RunId:num Run:name Plan:name State Automated Build:name Release:name Started:date Completed:date ' +
+    'TotalTests:num PassedTests:num NotPassed:num Owner:dn ResultsExported:num')
+Register-A2CSchema 'ADO/testResults.csv' ('Organization:name Project:name RunId:num ResultId:num TestCaseId:num TestCase:text Outcome Started:date Completed:date ' +
+    'DurationSec:num RunBy:dn Configuration ErrorMessage:text')
+Register-A2CSchema 'ADO/pipelineRuns.csv' ('Organization:name Project:name Pipeline:name PipelineId:num RunId:num BuildNumber:name Status Result Reason Queued:date ' +
+    'Started:date Finished:date RequestedFor:dn RequestedBy:dn SourceBranch:name SourceVersion Repository:name KeepForever RetainedByRelease LogFile:path')
+Register-A2CSchema 'ADO/releaseRuns.csv' ('Organization:name Project:name ReleasePipeline:name ReleasePipelineId:num ReleaseId:num Release:name Status Reason ' +
+    'Created:date CreatedBy:dn Stages:note Description:text LogFile:path')
+
+$script:A2CAdoStructureFiles = @('securityGroups', 'groupMembers', 'orgSettings', 'notificationSubscriptions', 'teams', 'teamMembers', 'areaPaths', 'iterationPaths',
+    'boards', 'boardColumns', 'boardCardRules', 'dashboards', 'dashboardWidgets', 'queries', 'tags', 'workItemTemplates', 'permissions', 'checks', 'tfvcShelvesets',
+    'wikis', 'pullRequests')
+$script:A2CAdoArchiveFiles = @('allWorkItems', 'workItemLinks', 'workItemAttachments', 'testPlans', 'testSuites', 'testCases', 'testSteps', 'testRuns', 'testResults',
+    'pipelineRuns', 'releaseRuns')
+foreach ($f in (@($script:A2CAdoStructureFiles) + @($script:A2CAdoArchiveFiles))) { $script:A2CSplitBy['ADO/' + $f + '.csv'] = 'Organization' }
+
+$script:A2CAdoVotes = @{ '10' = 'approved'; '5' = 'approved with suggestions'; '0' = 'no vote'; '-5' = 'waiting for the author'; '-10' = 'rejected' }
+$script:A2CAdoBacklogNames = @{ 'Microsoft.EpicCategory' = 'Epics'; 'Microsoft.FeatureCategory' = 'Features'; 'Microsoft.RequirementCategory' = 'Requirements' }
+$script:A2CAdoCheckResources = @{ environment = 'Environment'; queue = 'Agent pool'; endpoint = 'Service connection'; variablegroup = 'Variable group'; securefile = 'Secure file' }
+$script:A2CAdoIdentityTypes = @{ 'Microsoft.TeamFoundation.Identity' = 'Group'; 'Microsoft.IdentityModel.Claims.ClaimsIdentity' = 'User'
+    'Microsoft.TeamFoundation.BindPendingIdentity' = 'User'; 'Microsoft.TeamFoundation.ServiceIdentity' = 'Service account'
+    'Microsoft.VisualStudio.Services.Claims.AadServicePrincipal' = 'Service principal'; 'Microsoft.TeamFoundation.UnauthenticatedIdentity' = 'Anonymous' }
+# organization policies with a known meaning: category, the setting as Organization settings > Policies names it, $true
+# when the policy turns the setting off ("Disallow..."), and how the value reads (Allowed/Not allowed or On/Off)
+$script:A2CAdoPolicyNames = @{
+    'Policy.DisallowOAuthAuthentication' = @('Application connection', 'Third-party application access via OAuth', $true, 'allow')
+    'Policy.DisallowSecureShell'         = @('Application connection', 'SSH authentication', $true, 'allow')
+    'Policy.DisallowBasicAuthentication' = @('Application connection', 'Alternate authentication credentials', $true, 'allow')
+    'Policy.AllowAnonymousAccess'        = @('Security', 'Allow public projects', $false, 'allow')
+    'Policy.LogAuditEvents'              = @('Security', 'Log audit events', $false, 'on')
+    'Policy.EnforceAADConditionalAccess' = @('Security', 'Enable IP Conditional Access policy validation', $false, 'on')
+    'Policy.DisallowAadGuestUserAccess'  = @('User', 'External guest access', $true, 'allow')
+}
+
+function Test-A2CTrue {
+    # $true for a boolean true or the text "true" (some Azure DevOps settings send flags as text)
+    param($Value)
+    return ($Value -eq $true -or [string]$Value -ieq 'true')
+}
+
+function Get-A2CAdoMemberOf {
+    # The direct groups of each member descriptor as "[scope]\group" names (Groups column of users.csv)
+    param($Structure)
+    $name = @{}
+    foreach ($g in $Structure.Groups) { $n = [string]$g.principalName; if (-not $n) { $n = [string]$g.displayName }; $name[[string]$g.descriptor] = $n }
+    $ix = @{}
+    foreach ($m in $Structure.Memberships) {
+        $n = $name[$m.Group]
+        if (-not $n) { continue }
+        if (-not $ix.ContainsKey($m.Member)) { $ix[$m.Member] = [System.Collections.Generic.List[string]]::new() }
+        if (-not $ix[$m.Member].Contains($n)) { $ix[$m.Member].Add($n) }
+    }
+    return $ix
+}
+
+function ConvertTo-A2CAdoNodePath {
+    # "\Web Shop\Area\Payments" (the path of a classification node) -> "Web Shop\Payments" (as work items show it)
+    param([string] $Path)
+    $segs = @($Path.Trim('\').Split('\') | Where-Object { $_ })
+    if ($segs.Count -eq 0) { return '' }
+    if ($segs.Count -le 2) { return [string]$segs[0] }
+    return ((@($segs[0]) + @($segs | Select-Object -Skip 2)) -join '\')
+}
+
+function Get-A2CAdoNodes {
+    # The nodes of an area or iteration tree, depth first: @{ Node; Path; Level } (the root, named after the project, is 0)
+    param($Root)
+    $out = [System.Collections.Generic.List[object]]::new()
+    if ($null -eq $Root) { return , $out }
+    $stack = [System.Collections.Generic.Stack[object]]::new()
+    $stack.Push(@($Root, 0))
+    while ($stack.Count -gt 0) {
+        $e = $stack.Pop()
+        $n = $e[0]
+        $out.Add([pscustomobject]@{ Node = $n; Path = (ConvertTo-A2CAdoNodePath ([string]$n.path)); Level = [int]$e[1] })
+        $kids = @($n.children | Where-Object { $null -ne $_ })
+        for ($k = $kids.Count - 1; $k -ge 0; $k--) { $stack.Push(@($kids[$k], ([int]$e[1] + 1))) }
+    }
+    return , $out
+}
+
+function Get-A2CAdoNameIndex {
+    # Names by ID within one organization, for security tokens and checks (keys in lower case)
+    param($Org)
+    $ix = [pscustomobject]@{ Project = @{}; Repo = @{}; Build = @{}; Release = @{}; Environment = @{}; VariableGroup = @{}; SecureFile = @{}; Endpoint = @{}
+        Pool = @{}; Queue = @{}; DeploymentGroup = @{}; Node = @{} }
+    foreach ($p in $Org.Projects) { $ix.Project[([string]$p.id).ToLowerInvariant()] = [string]$p.name }
+    foreach ($r in $Org.Repos) { $ix.Repo[([string]$r.id).ToLowerInvariant()] = [string]$r.name }
+    foreach ($w in $Org.Pipelines) { $ix.Build[([string]$w.Project.id).ToLowerInvariant() + '|' + [string]$w.Item.id] = $w.Item }
+    foreach ($w in $Org.Releases) { $ix.Release[([string]$w.Project.id).ToLowerInvariant() + '|' + [string]$w.Item.id] = $w.Item }
+    foreach ($w in $Org.Environments) { $ix.Environment[([string]$w.Project.id).ToLowerInvariant() + '|' + [string]$w.Item.id] = [string]$w.Item.name }
+    foreach ($w in $Org.VariableGroups) { $ix.VariableGroup[[string]$w.Item.id] = [string]$w.Item.name }
+    foreach ($w in $Org.SecureFiles) { $ix.SecureFile[([string]$w.Item.id).ToLowerInvariant()] = [string]$w.Item.name }
+    foreach ($w in $Org.Endpoints) { $ix.Endpoint[([string]$w.Item.id).ToLowerInvariant()] = [string]$w.Item.name }
+    foreach ($x in $Org.Pools) { $ix.Pool[[string]$x.id] = [string]$x.name }
+    foreach ($w in $Org.DeploymentGroups) { $ix.DeploymentGroup[([string]$w.Project.id).ToLowerInvariant() + '|' + [string]$w.Item.id] = [string]$w.Item.name }
+    if ($null -ne $Org.Structure) {
+        foreach ($w in $Org.Structure.Queues) { $ix.Queue[[string]$w.Item.id] = [string]$w.Item.name }
+        foreach ($n in $Org.Structure.Nodes) {
+            foreach ($e in (Get-A2CAdoNodes $n.Root)) { $ix.Node[([string]$e.Node.identifier).ToLowerInvariant()] = [pscustomobject]@{ Path = $e.Path; Name = [string]$e.Node.name; ProjectId = [string]$n.Project.id } }
+        }
+    }
+    return $ix
+}
+
+function ConvertFrom-A2CAdoHexName {
+    # A branch name segment of a Git security token: its UTF-16 little-endian bytes in hex ("6d00610069006e00" = main)
+    param([string] $Hex)
+    if (-not $Hex -or $Hex.Length % 4 -ne 0 -or $Hex -notmatch '^[0-9a-fA-F]+$') { return $Hex }
+    $bytes = New-Object byte[] ([int]($Hex.Length / 2))
+    for ($i = 0; $i -lt $bytes.Length; $i++) { $bytes[$i] = [Convert]::ToByte($Hex.Substring($i * 2, 2), 16) }
+    return [Text.Encoding]::Unicode.GetString($bytes)
+}
+
+function ConvertFrom-A2CAdoToken {
+    # What a security token stands for: @{ ProjectId; ObjectType; Object; Path; Branch }. A form that is not known keeps
+    # the token as the object, with project IDs replaced by project names.
+    param([string] $Kind, [string] $Token, $Ix)
+    $g = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
+    $r = [ordered]@{ ProjectId = ''; ObjectType = ''; Object = ''; Path = ''; Branch = '' }
+    $name = { param($Table, [string] $Key) $n = [string]$Table[$Key]; if ($n) { $n } else { $Key } }
+    switch ($Kind) {
+        'Project' {
+            if ($Token -match ('TeamProject/(' + $g + ')')) { $r.ProjectId = $Matches[1]; $r.ObjectType = 'Project'; $r.Object = & $name $Ix.Project $Matches[1].ToLowerInvariant() }
+        }
+        'Git' {
+            # repoV2/<project>[/<repository>[/refs/heads|tags/<name in hex, per segment>/]]
+            $parts = @($Token.Split('/'))
+            if ($parts.Count -ge 2 -and $parts[1] -match ('^' + $g + '$')) {
+                $r.ProjectId = $parts[1]
+                if ($parts.Count -eq 2 -or -not $parts[2]) { $r.ObjectType = 'Git repositories'; $r.Object = '(all repositories)' }
+                else {
+                    $r.ObjectType = 'Git repository'
+                    $r.Object = & $name $Ix.Repo $parts[2].ToLowerInvariant()
+                    if ($parts.Count -gt 4 -and $parts[3] -eq 'refs') {
+                        $isTag = ($parts[4] -eq 'tags')
+                        $r.ObjectType = $(if ($isTag) { 'Git tag' } else { 'Git branch' })
+                        $r.Branch = (@($parts | Select-Object -Skip 5 | Where-Object { $_ } | ForEach-Object { ConvertFrom-A2CAdoHexName $_ }) -join '/')
+                        if (-not $r.Branch) { $r.Branch = $(if ($isTag) { '(all tags)' } else { '(all branches)' }) }
+                    }
+                }
+            }
+        }
+        { $_ -eq 'Area' -or $_ -eq 'Iteration' } {
+            # the identifiers of the node and its parents, joined with ":"
+            $ids = @([regex]::Matches($Token, $g) | ForEach-Object { $_.Value })
+            if ($ids.Count -gt 0) {
+                $n = $Ix.Node[$ids[$ids.Count - 1].ToLowerInvariant()]
+                $r.ObjectType = $(if ($Kind -eq 'Area') { 'Area path' } else { 'Iteration path' })
+                if ($null -ne $n) { $r.Path = $n.Path; $r.Object = $n.Name; $r.ProjectId = $n.ProjectId } else { $r.Object = $ids[$ids.Count - 1] }
+            }
+        }
+        { $_ -eq 'Build' -or $_ -eq 'Release' } {
+            # <project>[/<folder>...]/<definition>[/Environment/<stage>]
+            $parts = @($Token.Split('/') | Where-Object { $_ })
+            $isBuild = ($Kind -eq 'Build')
+            if ($parts.Count -gt 0 -and $parts[0] -match ('^' + $g + '$')) {
+                $r.ProjectId = $parts[0]
+                $stage = ''
+                $ei = [array]::IndexOf($parts, 'Environment')
+                if (-not $isBuild -and $ei -gt 1 -and $ei -lt $parts.Count - 1) { $stage = $parts[$ei + 1]; $parts = @($parts | Select-Object -First $ei) }
+                if ($parts.Count -eq 1) {
+                    $r.ObjectType = $(if ($isBuild) { 'Pipelines' } else { 'Release pipelines' })
+                    $r.Object = $(if ($isBuild) { '(all pipelines)' } else { '(all release pipelines)' })
+                }
+                else {
+                    $last = $parts[$parts.Count - 1]
+                    $key = $parts[0].ToLowerInvariant() + '|' + $last
+                    $def = $(if ($isBuild) { $Ix.Build[$key] } else { $Ix.Release[$key] })
+                    if ($last -match '^\d+$' -and $null -ne $def) {
+                        $r.ObjectType = $(if ($isBuild) { 'Pipeline' } else { 'Release pipeline' })
+                        $r.Object = [string]$def.name
+                        $r.Path = (@($parts | Select-Object -Skip 1 -First ($parts.Count - 2)) -join '\')
+                        if ($stage) {
+                            $st = @($def.environments | Where-Object { $null -ne $_ -and [string]$_.id -eq $stage })
+                            $r.ObjectType = 'Release stage'
+                            $r.Object = $r.Object + ' / ' + $(if ($st.Count -gt 0) { [string]$st[0].name } else { $stage })
+                        }
+                    }
+                    else { $r.ObjectType = $(if ($isBuild) { 'Pipeline folder' } else { 'Release folder' }); $r.Path = (@($parts | Select-Object -Skip 1) -join '\') }
+                }
+            }
+        }
+        'Tfvc' { $r.ObjectType = 'TFVC path'; $r.Path = $Token }
+        'Environment' {
+            if ($Token -match ('^Environments/(' + $g + ')(?:/(\d+))?$')) {
+                $r.ProjectId = $Matches[1]
+                if ($Matches[2]) { $r.ObjectType = 'Environment'; $r.Object = & $name $Ix.Environment ($Matches[1].ToLowerInvariant() + '|' + $Matches[2]) }
+                else { $r.ObjectType = 'Environments'; $r.Object = '(all environments)' }
+            }
+        }
+        'Library' {
+            if ($Token -match ('^Library/(' + $g + ')(?:/(VariableGroup|SecureFile)/([^/]+))?$')) {
+                $r.ProjectId = $Matches[1]
+                if ($Matches[2] -eq 'VariableGroup') { $r.ObjectType = 'Variable group'; $r.Object = & $name $Ix.VariableGroup $Matches[3] }
+                elseif ($Matches[2] -eq 'SecureFile') { $r.ObjectType = 'Secure file'; $r.Object = & $name $Ix.SecureFile $Matches[3].ToLowerInvariant() }
+                else { $r.ObjectType = 'Library'; $r.Object = '(all variable groups and secure files)' }
+            }
+        }
+        'ServiceEndpoints' {
+            if ($Token -match ('^endpoints/(' + $g + '|Collection)(?:/(' + $g + '))?$')) {
+                if ($Matches[1] -ne 'Collection') { $r.ProjectId = $Matches[1] }
+                if ($Matches[2]) { $r.ObjectType = 'Service connection'; $r.Object = & $name $Ix.Endpoint $Matches[2].ToLowerInvariant() }
+                else { $r.ObjectType = 'Service connections'; $r.Object = '(all service connections)' }
+            }
+        }
+        'DistributedTask' {
+            if ($Token -match '^AgentPools(?:/(\d+))?$') {
+                if ($Matches[1]) { $r.ObjectType = 'Agent pool'; $r.Object = & $name $Ix.Pool $Matches[1] } else { $r.ObjectType = 'Agent pools'; $r.Object = '(all agent pools)' }
+            }
+            elseif ($Token -match ('^AgentQueues/(' + $g + ')(?:/(\d+))?$')) {
+                $r.ProjectId = $Matches[1]
+                if ($Matches[2]) { $r.ObjectType = 'Agent pool (project)'; $r.Object = & $name $Ix.Queue $Matches[2] } else { $r.ObjectType = 'Agent pools (project)'; $r.Object = '(all agent pools)' }
+            }
+            elseif ($Token -match ('^MachineGroups/(' + $g + ')(?:/(\d+))?$')) {
+                $r.ProjectId = $Matches[1]
+                if ($Matches[2]) { $r.ObjectType = 'Deployment group'; $r.Object = & $name $Ix.DeploymentGroup ($Matches[1].ToLowerInvariant() + '|' + $Matches[2]) }
+                else { $r.ObjectType = 'Deployment groups'; $r.Object = '(all deployment groups)' }
+            }
+        }
+    }
+    if (-not $r.ObjectType) {
+        $r.ObjectType = $Kind
+        $r.Object = [regex]::Replace($Token, $g, { param($m) $n = [string]$Ix.Project[$m.Value.ToLowerInvariant()]; if ($n) { $n } else { $m.Value } })
+    }
+    return [pscustomobject]$r
+}
+
+function Get-A2CAdoIdentityProperty {
+    # A property of an identity ("Account" = sign-in address of a user); properties arrive as { "$type", "$value" }
+    param($Identity, [string] $Name)
+    if ($null -eq $Identity -or $null -eq $Identity.properties) { return '' }
+    $p = $Identity.properties.PSObject.Properties[$Name]
+    if ($null -eq $p -or $null -eq $p.Value) { return '' }
+    if ($null -ne $p.Value.PSObject.Properties['$value']) { return [string]$p.Value.'$value' }
+    return [string]$p.Value
+}
+
+function Resolve-A2CAdoIdentityRef {
+    # The name of an identity that an object gives as a reference ({ displayName }) or only by its ID (dashboards):
+    # the ID is looked up in the identities read by ID; '' when it is not found (a removed identity)
+    param($Ref, $IdentityIds)
+    if ($null -eq $Ref) { return '' }
+    if ($Ref -is [string]) {
+        $x = $null
+        if ($null -ne $IdentityIds) { $x = $IdentityIds[$Ref.ToLowerInvariant()] }
+        if ($null -eq $x) { return '' }
+        $n = [string]$x.customDisplayName
+        if (-not $n) { $n = [string]$x.providerDisplayName }
+        return $n
+    }
+    return [string]$Ref.displayName
+}
+
+function Get-A2CAdoAceHolder {
+    # Who holds an access control entry: @{ Name; Scope; Upn; Type } from the identity read for its descriptor
+    # ("[Web Shop]\Contributors" -> Name Contributors, Scope Web Shop)
+    param([string] $Descriptor, $Identities)
+    $x = $Identities[$Descriptor]
+    $parts = $Descriptor -split ';', 2
+    $kind = $script:A2CAdoIdentityTypes[$parts[0]]
+    if (-not $kind) { $kind = $parts[0] }
+    $id = $parts[$parts.Count - 1]
+    $name = ''; $upn = ''
+    if ($null -ne $x) {
+        if ($x.isContainer -eq $true) { $kind = 'Group' }
+        $name = [string]$x.customDisplayName
+        if (-not $name) { $name = [string]$x.providerDisplayName }
+        if ($kind -eq 'User') { $upn = Get-A2CAdoIdentityProperty $x 'Account' }
+    }
+    # a user that is not found (removed): the sign-in address is part of its descriptor ("<tenant>\<address>")
+    if ($kind -eq 'User' -and -not $upn -and $id -match '\\([^\\]+@[^\\]+)$') { $upn = $Matches[1] }
+    if (-not $name) { $name = $(if ($upn) { $upn } else { $id }) }
+    $scope = ''
+    if ($name -match '^\[([^\]]+)\]\\(.+)$') { $scope = $Matches[1]; $name = $Matches[2] }
+    return [pscustomobject]@{ Name = $name; Scope = $scope; Upn = $upn; Type = $kind }
+}
+
+function Get-A2CAdoBitNames {
+    # Names of the permissions set in an allow or deny mask ("bit 64" when the namespace does not name a bit)
+    param([long] $Bits, $Actions)
+    if ($Bits -eq 0) { return '' }
+    $l = [System.Collections.Generic.List[string]]::new()
+    for ($i = 0; $i -lt 32; $i++) {
+        $b = [long]1 -shl $i
+        if (($Bits -band $b) -eq 0) { continue }
+        $n = $null
+        if ($null -ne $Actions) { $n = $Actions[[string]$b] }
+        if (-not $n) { $n = 'bit ' + $b }
+        $l.Add([string]$n)
+    }
+    return (Join-A2C $l)
+}
+
+function Get-A2CAdoGroupScope {
+    # Where a security group belongs: Project (with its name), Organization, or Entra ID for Microsoft Entra groups
+    param($Group, $Ix)
+    $d = [string]$Group.domain
+    if ($d -match 'Classification/TeamProject/([0-9a-fA-F-]{36})') {
+        $n = [string]$Ix.Project[$Matches[1].ToLowerInvariant()]
+        return [pscustomobject]@{ Scope = 'Project'; Name = $(if ($n) { $n } else { $Matches[1] }) }
+    }
+    if ([string]$Group.origin -eq 'aad') { return [pscustomobject]@{ Scope = 'Entra ID'; Name = '' } }
+    if ([string]$Group.principalName -match '^\[([^\]]+)\]\\') {
+        $sn = $Matches[1]
+        if (@($Ix.Project.Values | Where-Object { $_ -eq $sn }).Count -gt 0) { return [pscustomobject]@{ Scope = 'Project'; Name = $sn } }
+    }
+    return [pscustomobject]@{ Scope = 'Organization'; Name = '' }
+}
+
+function Get-A2CAdoSubjectKind {
+    # User, Group, Service principal or Service account of a Graph subject (from the subject, else its descriptor prefix)
+    param([string] $Descriptor, $Subject)
+    if ($null -ne $Subject -and $Subject.subjectKind) {
+        switch ([string]$Subject.subjectKind) {
+            'group' { return 'Group' }
+            'servicePrincipal' { return 'Service principal' }
+            'user' { if ($Descriptor -like 'svc.*') { return 'Service account' }; return 'User' }
+        }
+    }
+    if ($Descriptor -match '^(aadgp|vssgp)\.') { return 'Group' }
+    if ($Descriptor -like 'aadsp.*') { return 'Service principal' }
+    if ($Descriptor -like 'svc.*') { return 'Service account' }
+    if ($Descriptor -match '^(aad|msa|bnd|imp)\.') { return 'User' }
+    return 'Unknown'
+}
+
+function Get-A2CAdoWidgetSource {
+    # Built-in widget or one of a Marketplace extension, by the extension in its contribution ID (publisher.extension.widget)
+    param($Widget, $Extensions)
+    $cid = [string]$Widget.contributionId
+    $parts = $cid.Split('.')
+    $ext = $(if ($parts.Count -ge 2) { $parts[0] + '.' + $parts[1] } else { $cid })
+    $inst = @($Extensions | Where-Object { $null -ne $_ -and ([string]$_.publisherId + '.' + [string]$_.extensionId) -ieq $ext })
+    $builtIn = $false
+    if ($inst.Count -gt 0) { $builtIn = ([string]$inst[0].flags -match 'builtIn') }
+    elseif ($parts.Count -ge 2 -and $parts[0] -ieq 'ms' -and $parts[1] -like 'vss-*') { $builtIn = $true }
+    $label = $(if ($builtIn) { 'Built-in' } elseif ($inst.Count -gt 0) { 'Marketplace extension' } else { 'Marketplace extension (not installed)' })
+    return [pscustomobject]@{ Extension = $ext; Source = $label; Marketplace = (-not $builtIn) }
+}
+
+function Get-A2CAdoIterationText {
+    # The path of a team iteration as work items show it ("Web Shop\Sprint 1"). Team settings give it relative to the
+    # project ("\Sprint 1"; "" for the root, whose name is the project); the team iteration list gives it whole.
+    param($Iteration, [string] $Project)
+    if ($null -eq $Iteration) { return '' }
+    $p = [string]$Iteration.path
+    if ($p.StartsWith('\') -and $Project) { return ($Project + $p) }
+    if ($p) { return $p }
+    return [string]$Iteration.name
+}
+
+function Get-A2CAdoCriteriaText {
+    # The conditions of a notification subscription filter: "Field operator value", joined with their And/Or
+    param($Filter)
+    if ($null -eq $Filter -or $null -eq $Filter.criteria) { return '' }
+    $parts = [System.Collections.Generic.List[string]]::new()
+    foreach ($c in @($Filter.criteria.clauses | Where-Object { $null -ne $_ })) {
+        $t = ('{0} {1} {2}' -f $c.fieldName, $c.operator, $c.value).Trim()
+        if ($parts.Count -gt 0 -and $c.logicalOperator) { $t = [string]$c.logicalOperator + ' ' + $t }
+        $parts.Add($t)
+    }
+    return ($parts -join ' ')
+}
+
+function Get-A2CAdoVoteText {
+    param($Vote)
+    $k = [string][int]$Vote
+    if ($script:A2CAdoVotes.ContainsKey($k)) { return $script:A2CAdoVotes[$k] }
+    return ('vote ' + $k)
+}
+
+function Get-A2CAdoResourceName {
+    # Name of a pipeline resource of a check (environment, agent queue, service connection, variable group, secure file)
+    param($Ix, [string] $Type, [string] $ProjectId, [string] $Id)
+    switch ($Type) {
+        'environment' { return [string]$Ix.Environment[$ProjectId.ToLowerInvariant() + '|' + $Id] }
+        'queue' { return [string]$Ix.Queue[$Id] }
+        'endpoint' { return [string]$Ix.Endpoint[$Id.ToLowerInvariant()] }
+        'variablegroup' { return [string]$Ix.VariableGroup[$Id] }
+        'securefile' { return [string]$Ix.SecureFile[$Id.ToLowerInvariant()] }
+    }
+    return $Id
+}
+
+function New-A2CAdoCardRuleRow {
+    param([string] $Org, [string] $Project, [string] $Team, [string] $Board, [string] $Type, $Rule)
+    $style = ''
+    if ($null -ne $Rule.settings) { $style = Join-A2C @($Rule.settings.PSObject.Properties | ForEach-Object { '{0}={1}' -f $_.Name, $_.Value }) }
+    return [ordered]@{ Organization = $Org; Project = $Project; Team = $Team; Board = $Board; RuleType = $Type; Rule = [string]$Rule.name
+        Enabled = (Test-A2CTrue $Rule.isEnabled); Filter = [string]$Rule.filter; Style = $style }
+}
+
+function Add-A2CAdoBoardRows {
+    # boards.csv, boardColumns.csv and boardCardRules.csv rows of one team board. A board counts as customized when a
+    # column is not named after a state it holds, a column is split or has a definition of done, or it has swimlanes,
+    # card style rules or tag colors. WIP limits and card fields are listed but not counted: their defaults differ by process.
+    param($Rows, [string] $Org, [string] $Project, [string] $Team, $Board)
+    $b = $Board.Detail
+    $name = [string]$Board.Ref.name
+    $cols = @(); $lanes = @()
+    if ($null -ne $b) {
+        $cols = @($b.columns | Where-Object { $null -ne $_ })
+        $lanes = @($b.rows | Where-Object { $null -ne $_ -and $_.name } | ForEach-Object { [string]$_.name })
+    }
+    $renamed = 0; $split = 0; $dod = 0; $order = 0
+    foreach ($c in $cols) {
+        $order++
+        $maps = @()
+        if ($null -ne $c.stateMappings) { $maps = @($c.stateMappings.PSObject.Properties) }
+        $states = @($maps | ForEach-Object { [string]$_.Value })
+        if ($states.Count -gt 0 -and $states -notcontains [string]$c.name) { $renamed++ }
+        if ($c.isSplit) { $split++ }
+        if ([string]$c.description) { $dod++ }
+        $Rows['boardColumns'].Add([ordered]@{ Organization = $Org; Project = $Project; Team = $Team; Board = $name; Column = [string]$c.name; Order = $order
+                ColumnType = [string]$c.columnType; WipLimit = $c.itemLimit; Split = [bool]$c.isSplit; DefinitionOfDone = [string]$c.description
+                StateMappings = Join-A2C @($maps | ForEach-Object { '{0}={1}' -f $_.Name, $_.Value }) })
+    }
+    $fill = @(); $tags = @()
+    if ($null -ne $Board.Rules -and $null -ne $Board.Rules.rules) {
+        $fill = @($Board.Rules.rules.fill | Where-Object { $null -ne $_ })
+        $tags = @($Board.Rules.rules.tagStyle | Where-Object { $null -ne $_ })
+    }
+    foreach ($x in $fill) { $Rows['boardCardRules'].Add((New-A2CAdoCardRuleRow $Org $Project $Team $name 'Card style' $x)) }
+    foreach ($x in $tags) { $Rows['boardCardRules'].Add((New-A2CAdoCardRuleRow $Org $Project $Team $name 'Tag color' $x)) }
+    $cards = ''
+    if ($null -ne $Board.Cards -and $null -ne $Board.Cards.cards) {
+        $cards = Join-A2C @($Board.Cards.cards.PSObject.Properties | ForEach-Object { '{0}: {1}' -f $_.Name, ((@($_.Value | Where-Object { $null -ne $_ } | ForEach-Object { [string]$_.fieldIdentifier })) -join ', ') })
+    }
+    $changes = [System.Collections.Generic.List[string]]::new()
+    if ($renamed -gt 0) { $changes.Add(('columns not named after a state: {0}' -f $renamed)) }
+    if ($split -gt 0) { $changes.Add(('split columns: {0}' -f $split)) }
+    if ($dod -gt 0) { $changes.Add(('definition of done: {0}' -f $dod)) }
+    if ($lanes.Count -gt 0) { $changes.Add(('swimlanes: {0}' -f $lanes.Count)) }
+    if ($fill.Count -gt 0) { $changes.Add(('card style rules: {0}' -f $fill.Count)) }
+    if ($tags.Count -gt 0) { $changes.Add(('tag colors: {0}' -f $tags.Count)) }
+    $Rows['boards'].Add([ordered]@{ Organization = $Org; Project = $Project; Team = $Team; Board = $name; Columns = $(if ($null -ne $b) { $cols.Count } else { $null })
+            Swimlanes = Join-A2C $lanes; CardFields = $cards; CardRules = $fill.Count; TagColors = $tags.Count
+            Customized = $(if ($null -ne $b) { $changes.Count -gt 0 } else { $null }); Changes = Join-A2C $changes })
+}
+
+function New-A2CReportAzureDevOpsStructure {
+    $orgs = @($script:A2C.Data['Ado'] | Where-Object { $null -ne $_ -and $_.Status -eq 'Collected' -and $null -ne $_.Structure })
+    if ($orgs.Count -eq 0) { return }
+    $rows = @{}
+    foreach ($f in $script:A2CAdoStructureFiles) { $rows[$f] = [System.Collections.Generic.List[object]]::new() }
+    $mask = [bool]$script:A2C.Options.Mask
+    $exported = 0
+    $tenantName = ''
+    foreach ($x in @($script:A2C.Data['EntraOrg'])) { if ($null -ne $x -and $x.displayName) { $tenantName = [string]$x.displayName } }
+    $pageData = 'Organization settings > Policies (page data: no documented API)'
+    foreach ($o in $orgs) {
+        $on = $o.Name
+        $s = $o.Structure
+        $ix = Get-A2CAdoNameIndex $o
+
+        # ---- organization settings: tenant, billing, users, policies
+        $setting = { param($Category, $Setting, $Value, $Detail, $Source) $rows['orgSettings'].Add([ordered]@{ Organization = $on; Category = $Category; Setting = $Setting; Value = $Value; Detail = $Detail; Source = $Source }) }
+        & $setting 'Microsoft Entra ID' 'Connected tenant' $script:A2C.TenantId $tenantName 'Sign-in: Azure DevOps accepted a token of this tenant'
+        & $setting 'Microsoft Entra ID' 'In the organization list of the tenant' $(if ($o.InCatalog) { 'Yes' } else { 'No' }) '' 'Organization settings > Microsoft Entra > Download'
+        $b = $o.Billing
+        if ($null -ne $b) {
+            $sid = [string]$b.subscriptionId
+            & $setting 'Billing' 'Billing subscription' ('{0} ({1})' -f (Get-A2CSubName $sid), $sid) ('resource group ' + (Get-A2CRgFromId ([string]$b.id))) 'Azure: Microsoft.VisualStudio/account resource'
+        }
+        else { & $setting 'Billing' 'Billing subscription' '' 'No billing link (Microsoft.VisualStudio/account) in the scanned subscriptions' 'Azure' }
+        $users = $o.Users.Count
+        & $setting 'Users' 'Users' $users $(if ($users -gt 100) { 'More than 100: after a switch to another Microsoft Entra tenant, Microsoft Support resolves the disconnected users' } else { '' }) 'User entitlements'
+        if ($null -ne $s.Policies) {
+            foreach ($k in $s.Policies.Keys) {
+                $val = $s.Policies[$k]
+                $known = $script:A2CAdoPolicyNames[$k]
+                if ($null -eq $known) { & $setting 'Policy' $k (Format-A2CCell $val) '' $pageData; continue }
+                $isOn = Test-A2CTrue $val
+                if ($known[2]) { $isOn = -not $isOn }
+                $txt = $(if ($known[3] -eq 'allow') { if ($isOn) { 'Allowed' } else { 'Not allowed' } } elseif ($isOn) { 'On' } else { 'Off' })
+                & $setting ('Policy: ' + $known[0]) $known[1] $txt ('{0} = {1}' -f $k, (Format-A2CCell $val)) $pageData
+            }
+        }
+        else { & $setting 'Policy' '(not read)' '' $s.PolicyNote $pageData }
+
+        # ---- security groups and their members (a member can be a group: nested groups)
+        $teamIds = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+        foreach ($t in $s.Teams) { [void]$teamIds.Add([string]$t.Item.id) }
+        $subject = @{}
+        foreach ($x in (@($s.Groups) + @($s.Users) + @($s.ServicePrincipals))) { if ($null -ne $x -and $x.descriptor) { $subject[[string]$x.descriptor] = $x } }
+        foreach ($k in @($s.Subjects.Keys)) { if (-not $subject.ContainsKey($k)) { $subject[$k] = $s.Subjects[$k] } }
+        $membersOf = @{}
+        foreach ($m in $s.Memberships) {
+            if (-not $membersOf.ContainsKey($m.Group)) { $membersOf[$m.Group] = [System.Collections.Generic.List[string]]::new() }
+            $membersOf[$m.Group].Add($m.Member)
+        }
+        foreach ($g in $s.Groups) {
+            $sc = Get-A2CAdoGroupScope $g $ix
+            $ms = @($membersOf[[string]$g.descriptor] | Where-Object { $_ })
+            $origin = [string]$g.origin
+            if ($script:A2CAdoOrigins.ContainsKey($origin)) { $origin = $script:A2CAdoOrigins[$origin] }
+            $rows['securityGroups'].Add([ordered]@{ Organization = $on; Scope = $sc.Scope; ScopeName = $sc.Name; Group = [string]$g.displayName; Origin = $origin
+                    Description = [string]$g.description; Members = $ms.Count; MemberGroups = @($ms | Where-Object { (Get-A2CAdoSubjectKind $_ $subject[$_]) -eq 'Group' }).Count
+                    IsTeam = $teamIds.Contains([string]$g.originId); OriginId = [string]$g.originId })
+            foreach ($md in $ms) {
+                $x = $subject[$md]
+                $mt = Get-A2CAdoSubjectKind $md $x
+                $mname = ''; $mscope = ''; $mupn = ''; $mo = ''; $moid = ''
+                if ($null -ne $x) {
+                    $mname = [string]$x.displayName; $moid = [string]$x.originId; $mo = [string]$x.origin
+                    if ($script:A2CAdoOrigins.ContainsKey($mo)) { $mo = $script:A2CAdoOrigins[$mo] }
+                    if ($mt -eq 'Group') { $mscope = (Get-A2CAdoGroupScope $x $ix).Name } elseif ($mt -eq 'User') { $mupn = [string]$x.principalName }
+                }
+                $rows['groupMembers'].Add([ordered]@{ Organization = $on; Scope = $sc.Scope; ScopeName = $sc.Name; Group = [string]$g.displayName; Member = $mname
+                        MemberScope = $mscope; MemberUpn = $mupn; MemberType = $mt; MemberOrigin = $mo; MemberOriginId = $moid })
+            }
+        }
+
+        # ---- teams with their members, settings, boards, templates and notification subscriptions
+        $teamArea = [System.Collections.Generic.List[object]]::new()   # @(project id, team, area path, include children)
+        $teamIter = [System.Collections.Generic.List[object]]::new()   # @(project id, team, iteration path)
+        foreach ($t in $s.Teams) {
+            $x = $t.Item
+            $pn = [string]$t.Project.name; $tn = [string]$x.name; $tpid = ([string]$t.Project.id).ToLowerInvariant()
+            $mem = @($t.Members | Where-Object { $null -ne $_ })
+            $st = $t.Settings; $fv = $t.FieldValues
+            $areas = [System.Collections.Generic.List[string]]::new()
+            $defArea = ''
+            if ($null -ne $fv) {
+                $defArea = [string]$fv.defaultValue
+                foreach ($fx in @($fv.values | Where-Object { $null -ne $_ })) {
+                    $areas.Add([string]$fx.value + $(if ($fx.includeChildren) { ' (+children)' } else { '' }))
+                    $teamArea.Add(@($tpid, $tn, [string]$fx.value, [bool]$fx.includeChildren))
+                }
+            }
+            $iters = @($t.Iterations | Where-Object { $null -ne $_ })
+            foreach ($it in $iters) { $teamIter.Add(@($tpid, $tn, [string]$it.path)) }
+            $levels = @()
+            if ($null -ne $st -and $null -ne $st.backlogVisibilities) {
+                $levels = @($st.backlogVisibilities.PSObject.Properties | Where-Object { $_.Value -eq $true } | ForEach-Object { $bn = $script:A2CAdoBacklogNames[$_.Name]; if ($bn) { $bn } else { $_.Name } })
+            }
+            $defIter = ''
+            if ($null -ne $st) { $defIter = Get-A2CAdoIterationText $st.defaultIteration $pn; if (-not $defIter) { $defIter = [string]$st.defaultIterationMacro } }
+            $rows['teams'].Add([ordered]@{ Organization = $on; Project = $pn; Team = $tn; TeamId = [string]$x.id; DefaultTeam = [bool]$t.IsDefault; Description = [string]$x.description
+                    Members = $(if ($null -ne $t.Members) { $mem.Count } else { $null })
+                    Administrators = Join-A2C @($mem | Where-Object { $_.isTeamAdmin -and $null -ne $_.identity } | ForEach-Object { [string]$_.identity.displayName })
+                    AreaPaths = Join-A2C $areas; DefaultArea = $defArea; BacklogIteration = $(if ($null -ne $st) { Get-A2CAdoIterationText $st.backlogIteration $pn } else { '' })
+                    DefaultIteration = $defIter; Iterations = $(if ($null -ne $t.Iterations) { $iters.Count } else { $null })
+                    IterationPaths = Join-A2C @($iters | ForEach-Object { Get-A2CAdoIterationText $_ $pn }); BacklogLevels = Join-A2C $levels
+                    WorkingDays = $(if ($null -ne $st) { Join-A2C @($st.workingDays) } else { '' }); BugsBehavior = $(if ($null -ne $st) { [string]$st.bugsBehavior } else { '' }) })
+            foreach ($m in $mem) {
+                $idn = $m.identity
+                if ($null -eq $idn) { continue }
+                $isGroup = ($idn.isContainer -eq $true)
+                $rows['teamMembers'].Add([ordered]@{ Organization = $on; Project = $pn; Team = $tn; Member = [string]$idn.displayName; MemberUpn = $(if ($isGroup) { '' } else { [string]$idn.uniqueName })
+                        MemberType = $(if ($isGroup) { 'Group' } else { 'User' }); Administrator = [bool]$m.isTeamAdmin })
+            }
+            foreach ($bd in $t.Boards) { Add-A2CAdoBoardRows $rows $on $pn $tn $bd }
+            foreach ($tp in @($t.Templates | Where-Object { $null -ne $_ })) {
+                $rows['workItemTemplates'].Add([ordered]@{ Organization = $on; Project = $pn; Team = $tn; Template = [string]$tp.name; WorkItemType = [string]$tp.workItemTypeName
+                        Description = [string]$tp.description; Fields = ConvertTo-A2CJsonString $tp.fields; TemplateId = [string]$tp.id })
+            }
+            foreach ($ns in @($t.Notifications | Where-Object { $null -ne $_ })) {
+                $ch = $ns.channel
+                $rows['notificationSubscriptions'].Add([ordered]@{ Organization = $on; Project = $pn; Team = $tn; Subscription = [string]$ns.description; SubscriptionId = [string]$ns.id
+                        EventType = $(if ($null -ne $ns.filter) { [string]$ns.filter.eventType } else { '' }); Channel = $(if ($null -ne $ch) { [string]$ch.type } else { '' })
+                        Address = $(if ($null -ne $ch -and $ch.useCustomAddress) { [string]$ch.address } else { '' }); Status = [string]$ns.status; Criteria = Get-A2CAdoCriteriaText $ns.filter
+                        ModifiedBy = $(if ($null -ne $ns.lastModifiedBy) { [string]$ns.lastModifiedBy.displayName } else { '' }); Modified = Format-A2CAdoDate $ns.modifiedDate })
+            }
+        }
+
+        # ---- area and iteration trees with the teams that use each node
+        foreach ($n in $s.Nodes) {
+            $isArea = ([string]$n.Root.structureType -eq 'area')
+            $pn = [string]$n.Project.name; $tpid = ([string]$n.Project.id).ToLowerInvariant()
+            foreach ($e in (Get-A2CAdoNodes $n.Root)) {
+                $nd = $e.Node; $path = $e.Path
+                if ($isArea) {
+                    $users2 = @($teamArea | Where-Object { $_[0] -eq $tpid -and ($_[2] -ieq $path -or ($_[3] -and $path.StartsWith($_[2] + '\', [StringComparison]::OrdinalIgnoreCase))) } | ForEach-Object { $_[1] })
+                    $rows['areaPaths'].Add([ordered]@{ Organization = $on; Project = $pn; Path = $path; Name = [string]$nd.name; Level = $e.Level; Teams = Join-A2C (Get-A2CUnique $users2)
+                            NodeId = $nd.id; Identifier = [string]$nd.identifier })
+                }
+                else {
+                    $users2 = @($teamIter | Where-Object { $_[0] -eq $tpid -and $_[2] -ieq $path } | ForEach-Object { $_[1] })
+                    $at = $nd.attributes
+                    $rows['iterationPaths'].Add([ordered]@{ Organization = $on; Project = $pn; Path = $path; Name = [string]$nd.name; Level = $e.Level
+                            StartDate = $(if ($null -ne $at) { Format-A2CAdoDate $at.startDate } else { '' }); FinishDate = $(if ($null -ne $at) { Format-A2CAdoDate $at.finishDate } else { '' })
+                            Teams = Join-A2C (Get-A2CUnique $users2); NodeId = $nd.id; Identifier = [string]$nd.identifier })
+                }
+            }
+        }
+
+        # ---- dashboards with every widget; the full dashboard as JSON (not with -Mask)
+        foreach ($w in $s.Dashboards) {
+            $d = $w.Item
+            $pn = [string]$w.Project.name
+            $tn = $(if ($null -ne $w.Team) { [string]$w.Team.name } else { '' })
+            $file = ''
+            if (-not $mask) {
+                $file = Get-A2CUniqueFile ('{0}/dashboards/{1}{2}.json' -f (Get-A2CAdoProjectDir $on $pn), $(if ($tn) { (Get-A2CSafePathSegment $tn) + '/' } else { '' }), (Get-A2CSafePathSegment ([string]$d.name)))
+                Save-A2CExportFile $file (ConvertTo-Json -InputObject $d -Depth 40)
+                $exported++
+            }
+            $widgets = @($d.widgets | Where-Object { $null -ne $_ })
+            $market = 0
+            foreach ($wd in $widgets) {
+                $src = Get-A2CAdoWidgetSource $wd $o.Extensions
+                if ($src.Marketplace) { $market++ }
+                # the widget type: typeId, else the part of the contribution ID after publisher.extension
+                $wtype = [string]$wd.typeId
+                if (-not $wtype) { $wtype = ([string]$wd.contributionId -replace '^[^.]+\.[^.]+\.', '') }
+                $rows['dashboardWidgets'].Add([ordered]@{ Organization = $on; Project = $pn; Team = $tn; Dashboard = [string]$d.name; Widget = [string]$wd.name; WidgetType = $wtype
+                        ContributionId = [string]$wd.contributionId; Extension = $src.Extension; Source = $src.Source
+                        Row = $(if ($null -ne $wd.position) { $wd.position.row } else { $null }); Column = $(if ($null -ne $wd.position) { $wd.position.column } else { $null })
+                        RowSpan = $(if ($null -ne $wd.size) { $wd.size.rowSpan } else { $null }); ColumnSpan = $(if ($null -ne $wd.size) { $wd.size.columnSpan } else { $null })
+                        Settings = [string]$wd.settings })
+            }
+            $rows['dashboards'].Add([ordered]@{ Organization = $on; Project = $pn; Team = $tn; Dashboard = [string]$d.name; Scope = [string]$d.dashboardScope; Widgets = $widgets.Count
+                    MarketplaceWidgets = $market; RefreshMinutes = $d.refreshInterval; ModifiedBy = Resolve-A2CAdoIdentityRef $d.modifiedBy $s.IdentityIds
+                    Modified = Format-A2CAdoDate $d.modifiedDate; DashboardId = [string]$d.id; ExportedFile = $file })
+        }
+
+        # ---- shared queries, tags
+        foreach ($w in $s.Queries) {
+            $q = $w.Item
+            $path = [string]$q.path
+            $folder = ''
+            $cut = $path.LastIndexOf('/')
+            if ($cut -gt 0) { $folder = $path.Substring(0, $cut) }
+            $rows['queries'].Add([ordered]@{ Organization = $on; Project = [string]$w.Project.name; Folder = $folder; Query = [string]$q.name; QueryType = [string]$q.queryType
+                    Wiql = [string]$q.wiql; CreatedBy = $(if ($null -ne $q.createdBy) { [string]$q.createdBy.displayName } else { '' }); Modified = Format-A2CAdoDate $q.lastModifiedDate
+                    LastExecuted = Format-A2CAdoDate $q.lastExecutedDate; QueryId = [string]$q.id })
+        }
+        foreach ($w in $s.Tags) {
+            $rows['tags'].Add([ordered]@{ Organization = $on; Project = [string]$w.Project.name; Tag = [string]$w.Item.name; LastUpdated = Format-A2CAdoDate $w.Item.lastUpdated; TagId = [string]$w.Item.id })
+        }
+
+        # ---- permissions: one row per access control entry, holders named
+        foreach ($w in $s.Acls) {
+            $acl = $w.Item
+            if ($null -eq $acl.acesDictionary) { continue }
+            $tok = ConvertFrom-A2CAdoToken $w.Kind ([string]$acl.token) $ix
+            $nsInfo = $s.Namespaces[[string]$script:A2CAdoNamespaces[$w.Kind]]
+            $acts = $null; $nsName = $w.Kind
+            if ($null -ne $nsInfo) { $acts = $nsInfo.Actions; $nsName = $nsInfo.Name }
+            $pn = ''
+            if ($tok.ProjectId) { $pn = [string]$ix.Project[$tok.ProjectId.ToLowerInvariant()] }
+            if (-not $pn -and $null -ne $w.Project) { $pn = [string]$w.Project.name }
+            foreach ($pp in $acl.acesDictionary.PSObject.Properties) {
+                $ace = $pp.Value
+                $allow = [long]$ace.allow; $deny = [long]$ace.deny
+                if ($allow -eq 0 -and $deny -eq 0) { continue }
+                $h = Get-A2CAdoAceHolder $pp.Name $s.Identities
+                $rows['permissions'].Add([ordered]@{ Organization = $on; Project = $pn; ObjectType = $tok.ObjectType; Object = $tok.Object; Path = $tok.Path; Branch = $tok.Branch
+                        Identity = $h.Name; IdentityScope = $h.Scope; IdentityUpn = $h.Upn; IdentityType = $h.Type; Allow = Get-A2CAdoBitNames $allow $acts
+                        Deny = Get-A2CAdoBitNames $deny $acts; InheritPermissions = [bool]$acl.inheritPermissions; Namespace = $nsName; Token = [string]$acl.token })
+            }
+        }
+
+        # ---- approvals and checks
+        foreach ($w in $s.Checks) {
+            $c = $w.Item
+            $rt = ''; $rid = ''; $rn = ''
+            if ($null -ne $c.resource) { $rt = [string]$c.resource.type; $rid = [string]$c.resource.id; $rn = [string]$c.resource.name }
+            if (-not $rn) { $rn = Get-A2CAdoResourceName $ix $rt ([string]$w.Project.id) $rid }
+            $set = $c.settings
+            $tname = $(if ($null -ne $c.type) { [string]$c.type.name } else { '' })
+            $check = switch ($tname) { 'Approval' { 'Approval' } 'ExtendsCheck' { 'Required template' } 'ExclusiveLock' { 'Exclusive lock' } default { $tname } }
+            if ($tname -eq 'Task Check' -and $null -ne $set) {
+                $dn = [string]$set.displayName
+                if (-not $dn -and $null -ne $set.definitionRef) { $dn = [string]$set.definitionRef.name }
+                if ($dn) { $check = $dn }
+            }
+            $appr = ($tname -eq 'Approval' -and $null -ne $set)
+            $rows['checks'].Add([ordered]@{ Organization = $on; Project = [string]$w.Project.name
+                    ResourceType = $(if ($script:A2CAdoCheckResources.ContainsKey($rt)) { $script:A2CAdoCheckResources[$rt] } else { $rt }); Resource = $rn; Check = $check
+                    Approvers = $(if ($appr) { Join-A2C @($set.approvers | Where-Object { $null -ne $_ } | ForEach-Object { [string]$_.displayName }) } else { '' })
+                    MinApprovers = $(if ($appr) { $set.minRequiredApprovers } else { $null })
+                    # requesterCannotBeApprover is only stored when it is set: without it the requester may approve
+                    RequesterCanApprove = $(if ($appr) { -not (Test-A2CTrue $set.requesterCannotBeApprover) } else { $null })
+                    Instructions = $(if ($appr) { [string]$set.instructions } else { '' }); TimeoutMinutes = $c.timeout; Enabled = (-not (Test-A2CTrue $c.isDisabled))
+                    CreatedBy = $(if ($null -ne $c.createdBy) { [string]$c.createdBy.displayName } else { '' }); Modified = Format-A2CAdoDate $c.modifiedOn; CheckId = $c.id })
+        }
+
+        # ---- TFVC shelvesets per owner (count and dates; no content)
+        $byOwner = [ordered]@{}
+        foreach ($x in $s.Shelvesets) {
+            $k = ''
+            if ($null -ne $x.owner) { $k = [string]$x.owner.uniqueName; if (-not $k) { $k = [string]$x.owner.displayName } }
+            if (-not $byOwner.Contains($k)) { $byOwner[$k] = [System.Collections.Generic.List[object]]::new() }
+            $byOwner[$k].Add($x)
+        }
+        foreach ($k in $byOwner.Keys) {
+            $l = $byOwner[$k]
+            $dates = @($l | ForEach-Object { ConvertTo-A2CUtc $_.createdDate } | Where-Object { $null -ne $_ } | Sort-Object)
+            $own = $l[0].owner
+            $rows['tfvcShelvesets'].Add([ordered]@{ Organization = $on; Owner = $(if ($null -ne $own) { [string]$own.displayName } else { '' }); OwnerUpn = $(if ($null -ne $own) { [string]$own.uniqueName } else { '' })
+                    Shelvesets = $l.Count; Newest = $(if ($dates.Count -gt 0) { Format-A2CDate $dates[$dates.Count - 1] } else { '' }); Oldest = $(if ($dates.Count -gt 0) { Format-A2CDate $dates[0] } else { '' }) })
+        }
+
+        # ---- wikis and pull requests (lists only)
+        foreach ($w in $s.Wikis) {
+            $x = $w.Item
+            $rows['wikis'].Add([ordered]@{ Organization = $on; Project = [string]$w.Project.name; Wiki = [string]$x.name; Type = [string]$x.type
+                    Repository = $(if ($x.repositoryId) { [string]$ix.Repo[([string]$x.repositoryId).ToLowerInvariant()] } else { '' }); MappedPath = [string]$x.mappedPath
+                    Versions = Join-A2C @($x.versions | Where-Object { $null -ne $_ } | ForEach-Object { [string]$_.version }); WikiId = [string]$x.id })
+        }
+        foreach ($w in $s.PullRequests) {
+            $x = $w.Item
+            $rows['pullRequests'].Add([ordered]@{ Organization = $on; Project = [string]$w.Project.name; Repository = $(if ($null -ne $x.repository) { [string]$x.repository.name } else { '' })
+                    PullRequestId = $x.pullRequestId; Title = [string]$x.title; Status = [string]$x.status
+                    SourceBranch = ([string]$x.sourceRefName -replace '^refs/heads/', ''); TargetBranch = ([string]$x.targetRefName -replace '^refs/heads/', '')
+                    Created = Format-A2CAdoDate $x.creationDate; Closed = Format-A2CAdoDate $x.closedDate; Author = $(if ($null -ne $x.createdBy) { [string]$x.createdBy.displayName } else { '' })
+                    Reviewers = Join-A2C @($x.reviewers | Where-Object { $null -ne $_ } | ForEach-Object { '{0} ({1})' -f $_.displayName, (Get-A2CAdoVoteText $_.vote) })
+                    Draft = [bool]$x.isDraft; MergeStatus = [string]$x.mergeStatus })
+        }
+    }
+    foreach ($f in $script:A2CAdoStructureFiles) { Add-A2CRows ('ADO/' + $f + '.csv') $rows[$f] }
+    Write-A2CLog -Level Ok ('Azure DevOps structure: {0} team(s), {1} group(s), {2} permission entries, {3} check(s){4}' -f $rows['teams'].Count, $rows['securityGroups'].Count,
+        $rows['permissions'].Count, $rows['checks'].Count, $(if ($exported -gt 0) { ('; {0} dashboard(s) as JSON' -f $exported) } else { '' }))
+}
+
+function New-A2CReportAzureDevOpsWorkItems {
+    # The files are written while the AzureDevOpsWorkItems dataset reads each project; its CSV rows are added here.
+    $orgs = @($script:A2C.Data['Ado'] | Where-Object { $null -ne $_ -and $null -ne $_.Archive })
+    if ($orgs.Count -eq 0) { return }
+    foreach ($f in $script:A2CAdoArchiveFiles) {
+        $l = [System.Collections.Generic.List[object]]::new()
+        foreach ($o in $orgs) { foreach ($r in $o.Archive.$f) { $l.Add($r) } }
+        Add-A2CRows ('ADO/' + $f + '.csv') $l
+    }
+    $n = 0
+    foreach ($o in $orgs) { $n += $o.Archive.allWorkItems.Count }
+    Write-A2CLog -Level Ok ('{0} Azure DevOps work item(s) exported to ADO\<organization>\<project>\workitems' -f $n)
+}
+
 #endregion
 
 #region ============================== 8. FINDINGS =====================================================
 
-Register-A2CSchema 'findings.csv' 'Id Severity Category Title:note Count:num AffectedFile Recommendation:note LearnMore:url Detail:note'
+Register-A2CSchema 'findings.csv' 'Id Severity Category Title Count:num AffectedFile Recommendation LearnMore:url Detail:note'   # title and recommendation: catalog text
 
 $script:A2CFindingRules = [System.Collections.Generic.List[object]]::new()
 $script:A2CSeverityOrder = @{ High = 0; Medium = 1; Low = 2; Info = 3 }
@@ -10233,6 +11966,24 @@ Register-A2CFinding -Id 'ADO-15' -Severity Medium -Category Security -Title 'Pip
 Register-A2CFinding -Id 'ADO-16' -Severity Medium -Category Security -Title 'Pipeline scripts or task inputs that seem to contain a password or key' -Needs @('Report:AzureDevOps') -File 'ADO/pipelineSecrets.csv' `
     -Recommendation 'Check each line: move the value to a secret variable or a Key Vault and rotate it - it is visible to everyone who can read the pipeline or its repository.' -Url 'https://learn.microsoft.com/azure/devops/pipelines/security/secrets' `
     -Evaluate { $r = @((Get-A2CRows 'ADO/pipelineSecrets.csv') | Where-Object { @('YAML file', 'Classic step') -contains [string]$_['Source'] }); New-A2CFindingResult $r.Count (Get-A2CTopText @($r | ForEach-Object { $_['Issue'] })) }
+Register-A2CFinding -Id 'ADO-17' -Severity Medium -Category Migration -Title 'Azure DevOps organizations with more than 100 users (a switch to another Entra tenant needs Microsoft Support)' -Needs @('Report:AzureDevOps') -File 'ADO/organizations.csv' `
+    -Recommendation 'Users are matched by sign-in address after a switch to another Microsoft Entra tenant. Above 100 users the Resolve and invite features for disconnected users do not work: plan the user mapping with Microsoft Support (users.csv has every sign-in address).' -Url 'https://learn.microsoft.com/azure/devops/organizations/accounts/change-azure-ad-connection' `
+    -Evaluate {
+        $r = @((Get-A2CRows 'ADO/organizations.csv') | Where-Object { "$($_['Users'])" -ne '' -and [int]$_['Users'] -gt 100 })
+        New-A2CFindingResult $r.Count (Join-A2C @($r | ForEach-Object { '{0} ({1} users)' -f $_['Organization'], $_['Users'] }) ', ')
+    }
+Register-A2CFinding -Id 'ADO-18' -Severity Medium -Category Migration -Title 'Azure DevOps users who would be disconnected by a switch to another Entra tenant (Microsoft accounts and guests)' -Needs @('Report:AzureDevOps') -File 'ADO/users.csv' `
+    -Recommendation 'Personal Microsoft accounts are not mapped to the new tenant and guests need a guest account there: invite them first or plan their mapping, or they lose access after the switch.' -Url 'https://learn.microsoft.com/azure/devops/organizations/accounts/faq-azure-access' `
+    -Evaluate { $r = @((Get-A2CRows 'ADO/users.csv') | Where-Object { $_['Origin'] -eq 'Microsoft account' -or $_['UserType'] -eq 'guest' }); New-A2CFindingResult $r.Count (Get-A2CTopText @($r | ForEach-Object { if ($_['Origin'] -eq 'Microsoft account') { 'Microsoft account' } else { 'guest' } })) }
+Register-A2CFinding -Id 'ADO-19' -Severity Low -Category Migration -Title 'Azure DevOps dashboard widgets from Marketplace extensions' -Needs @('Report:AzureDevOpsStructure') -File 'ADO/dashboardWidgets.csv' `
+    -Recommendation 'Install these extensions in the target organization before the dashboards are rebuilt; widgets of an extension that is not installed show an error. "(not installed)" marks widgets whose extension is already gone.' -Url 'https://learn.microsoft.com/azure/devops/marketplace/install-extension' `
+    -Evaluate { $r = @((Get-A2CRows 'ADO/dashboardWidgets.csv') | Where-Object { [string]$_['Source'] -like 'Marketplace*' }); New-A2CFindingResult $r.Count (Get-A2CTopText @($r | ForEach-Object { $_['Extension'] })) }
+Register-A2CFinding -Id 'ADO-20' -Severity Info -Category Migration -Title 'Customized Azure DevOps boards (columns, swimlanes or card rules)' -Needs @('Report:AzureDevOpsStructure') -File 'ADO/boards.csv' `
+    -Recommendation 'Board settings belong to the team and are not part of the process: recreate them for each team (boardColumns.csv and boardCardRules.csv have the details).' -Url 'https://learn.microsoft.com/azure/devops/boards/boards/add-columns' `
+    -Evaluate { $r = @((Get-A2CRows 'ADO/boards.csv') | Where-Object { $_['Customized'] -eq $true }); New-A2CFindingResult $r.Count ('by team: ' + (Get-A2CTopText @($r | ForEach-Object { $_['Team'] }))) }
+Register-A2CFinding -Id 'ADO-21' -Severity Medium -Category Security -Title 'Azure DevOps permissions granted to users directly instead of through a group' -Needs @('Report:AzureDevOpsStructure') -File 'ADO/permissions.csv' `
+    -Recommendation 'Grant permissions to groups and add the users to them: direct grants are hard to review, are forgotten when people leave and must be recreated one by one in a new organization.' -Url 'https://learn.microsoft.com/azure/devops/organizations/security/security-best-practices' `
+    -Evaluate { $r = @((Get-A2CRows 'ADO/permissions.csv') | Where-Object { $_['IdentityType'] -eq 'User' }); New-A2CFindingResult $r.Count (Get-A2CTopText @($r | ForEach-Object { $_['ObjectType'] })) }
 
 #endregion
 
@@ -10374,8 +12125,10 @@ $script:A2CMaskKeepPatterns = @('^(?i)(GatewaySubnet|AzureFirewallSubnet|AzureFi
     '^(?i)(0\.0\.0\.0/0|::/0|168\.63\.129\.16|1\.1\.1\.1|1\.0\.0\.1|8\.8\.8\.8|8\.8\.4\.4|9\.9\.9\.9)$',
     # everyday Azure DevOps names (pools, environments, branches) identify nobody; masking them would also garble notes
     '^(?i)(Azure Pipelines|Hosted( .+)?|Production|Prod|Staging|Test|Testing|Dev|Development|QA|UAT|Main|Develop)$',
-    # placeholders of our own (branchPolicies.csv)
-    '^\((all repositories|all branches|default branch)\)$',
+    # placeholders of our own (branchPolicies.csv, permissions.csv)
+    '^\((all [a-z ]+|default branch)\)$',
+    # built-in query folders and workflow states (board columns are named after them)
+    '^(?i)(Shared Queries|My Queries|New|Active|Resolved|Closed|Removed|Done|To Do|Doing|Proposed|Approved|Committed|In Progress|Completed)$',
     # feed views and public upstream sources of Azure Artifacts
     '^(?i)@?(Local|Prerelease|Release)$', '^(?i)(npmjs|NuGet Gallery|nuget\.org|PyPI|Maven Central|Google Maven Repository|Gradle Plugins|JitPack|crates\.io|PowerShell Gallery)$',
     # everyday TFVC folder names
@@ -10571,6 +12324,8 @@ function Protect-A2CValue {
         }
         'note'     { return (Protect-A2CNote $s) }
         'path'     { return [string]::Join('/', @($s -split '/' | ForEach-Object { if ($script:A2CMask.Allow.Contains($_)) { $_ } else { Protect-A2CAtom -Kind 'name' -Value $_ } })) }
+        'bpath'    { return (Protect-A2CTreePath $s) }
+        'bpathList' { return [string]::Join('; ', @($s -split '; ' | ForEach-Object { Protect-A2CTreePath $_ })) }
         'tfvc'     { return [string]::Join('/', @($s -split '/' | ForEach-Object { if (-not $_ -or $_ -eq '$') { $_ } else { Protect-A2CAtom -Kind 'name' -Value $_ } })) }
         'list'     { return [string]::Join('; ', @($s -split '; ' | ForEach-Object { Protect-A2CListItem $_ })) }
         'ipList'   { return [string]::Join('; ', @($s -split '; ' | ForEach-Object { [string]::Join(', ', @($_ -split ',\s*' | ForEach-Object { Protect-A2CListItem $_ })) })) }
@@ -10589,6 +12344,16 @@ function Protect-A2CValue {
     }
 }
 
+function Protect-A2CTreePath {
+    # An Azure DevOps area, iteration or folder path ("Web Shop\Checkout\Payments"), each level masked; a trailing
+    # " (+children)" (team area paths) is kept.
+    param([string] $Value)
+    if (-not $Value) { return $Value }
+    $suffix = ''
+    if ($Value -match '^(.*?)(\s*\(\+children\))$') { $Value = $Matches[1]; $suffix = $Matches[2] }
+    return ([string]::Join('\', @($Value -split '\\' | ForEach-Object { if (-not $_) { $_ } else { Protect-A2CAtom -Kind 'name' -Value $_ } })) + $suffix)
+}
+
 function Protect-A2CListItem {
     # A list element: path "vnet/subnet", "ASG:name", "name(note)", IP/CIDR, service tag or name.
     param([string] $Value)
@@ -10605,10 +12370,22 @@ function Protect-A2CListItem {
     return (Protect-A2CAtom -Kind 'name' -Value $Value)
 }
 
+function Test-A2CMaskDocUrl {
+    # A single documentation link (Microsoft Learn and other microsoft.com pages, it4it.solutions): public text that the
+    # safety net leaves as it is. Not GitHub: a GitHub link can name a customer's own organization and repository.
+    param([string] $Url)
+    if ($Url -notmatch '^https?://([^/:\s]+)[^\s]*$') { return $false }
+    $h = $Matches[1]
+    foreach ($x in @('microsoft.com', 'it4it.solutions')) { if ($h -ieq $x -or $h.EndsWith('.' + $x, [StringComparison]::OrdinalIgnoreCase)) { return $true } }
+    return $false
+}
+
 function Remove-A2CMaskResidue {
-    # Safety net: replaces any registered original that is still present as a token.
+    # Safety net: replaces any registered original that is still present as a token. Fixed labels ("(all pipelines)")
+    # and public links stay: a registered name can also be a common word ("pipelines").
     param([string] $Text)
     if (-not $Text -or $Text.Length -lt 4) { return $Text }
+    if ((Test-A2CMaskKeep $Text) -or (Test-A2CMaskDocUrl $Text)) { return $Text }
     $out = $Text
     foreach ($tok in [regex]::Split($Text, '[\s"'',;/=:@|()\[\]{}<>]+')) {
         if ($tok.Length -lt 4) { continue }
@@ -10623,9 +12400,12 @@ function Remove-A2CMaskResidue {
 
 function Protect-A2CNote {
     # Our own text: mask GUIDs, public IPs and multi-word names (subscriptions, roles, policies, management groups).
+    # Whole registered names go first: a multi-word name is replaced as a substring, and inside a longer name (an Azure
+    # DevOps project inside the organization name) it would leave the rest of that name readable.
     param([string] $Text)
     $s = [regex]::Replace($Text, '[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}', { param($mm) Get-A2CMaskGuid $mm.Value })
     $s = [regex]::Replace($s, '\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b', { param($mm) $x = Protect-A2CIp $mm.Value; if ($null -ne $x) { $x } else { $mm.Value } })
+    $s = Remove-A2CMaskResidue $s
     foreach ($m in $script:A2CMask.Multi) {
         if ($s.IndexOf($m, [StringComparison]::OrdinalIgnoreCase) -ge 0) {
             $s = [regex]::Replace($s, [regex]::Escape($m), $script:A2CMask.Map[$m].Replace('$', '$$'), [Text.RegularExpressions.RegexOptions]::IgnoreCase)
@@ -10804,6 +12584,43 @@ function Complete-A2CMaskDictionary {
                 if ($idn.Name -and -not (Test-A2CMaskKeep $idn.Name) -and -not $allow.Contains($idn.Name)) { [void](Add-A2CMaskEntry 'dn' $idn.Name 'Name ') }
             }
         }
+        # AzureDevOpsStructure: teams, groups, people, dashboards, queries, area and iteration nodes, tags, wikis, templates
+        $st = $o.Structure
+        if ($null -eq $st) { continue }
+        foreach ($t in $st.Teams) {
+            $n = [string]$t.Item.name
+            if ($n -and -not (Test-A2CMaskKeep $n)) { [void](Add-A2CMaskEntry 'adodn' $n 'Team ') }
+            foreach ($tp in @($t.Templates | Where-Object { $null -ne $_ -and $_.name })) { [void](Add-A2CMaskEntry 'name' ([string]$tp.name) 'template-') }
+            foreach ($bd in @($t.Boards | Where-Object { $null -ne $_.Detail })) {
+                foreach ($lane in @($bd.Detail.rows | Where-Object { $null -ne $_ -and $_.name })) { if (-not (Test-A2CMaskKeep ([string]$lane.name))) { [void](Add-A2CMaskEntry 'name' ([string]$lane.name) 'lane-') } }
+            }
+            foreach ($m in @($t.Members | Where-Object { $null -ne $_ -and $null -ne $_.identity })) {
+                $n = [string]$m.identity.displayName
+                if ($n -and -not $allow.Contains($n) -and -not (Test-A2CMaskKeep $n)) { [void](Add-A2CMaskEntry 'dn' $n 'Name ') }
+            }
+        }
+        foreach ($g in $st.Groups) { $n = [string]$g.displayName; if ($n -and -not (Test-A2CMaskKeep $n) -and -not $allow.Contains($n)) { [void](Add-A2CMaskEntry 'adodn' $n 'Group ') } }
+        foreach ($u in (@($st.Users) + @($st.ServicePrincipals) + @($st.Subjects.Values))) {
+            if ($null -eq $u) { continue }
+            $n = [string]$u.displayName
+            if ($n -and -not $allow.Contains($n) -and -not (Test-A2CMaskKeep $n)) { [void](Add-A2CMaskEntry 'dn' $n 'Name ') }
+            if ($u.directoryAlias) { [void](Add-A2CMaskEntry 'upn' ([string]$u.directoryAlias) 'u-') }
+        }
+        foreach ($x in @($st.Identities.Values)) {
+            $n = [string]$x.providerDisplayName
+            if ($n -match '^\[([^\]]+)\]\\(.+)$') { $n = $Matches[2] }
+            if ($n -and -not (Test-A2CMaskKeep $n) -and -not $allow.Contains($n)) { [void](Add-A2CMaskEntry 'dn' $n 'Name ') }
+        }
+        foreach ($w in $st.Dashboards) {
+            if ($w.Item.name) { [void](Add-A2CMaskEntry 'name' ([string]$w.Item.name) 'dashboard-') }
+            foreach ($wd in @($w.Item.widgets | Where-Object { $null -ne $_ -and $_.name })) { [void](Add-A2CMaskEntry 'name' ([string]$wd.name) 'widget-') }
+        }
+        foreach ($w in $st.Queries) { if ($w.Item.name) { [void](Add-A2CMaskEntry 'name' ([string]$w.Item.name) 'query-') } }
+        foreach ($nd in $st.Nodes) {
+            foreach ($e in (Get-A2CAdoNodes $nd.Root)) { $n = [string]$e.Node.name; if ($e.Level -gt 0 -and $n -and -not (Test-A2CMaskKeep $n)) { [void](Add-A2CMaskEntry 'name' $n 'node-') } }
+        }
+        foreach ($w in $st.Tags) { $n = [string]$w.Item.name; if ($n -and -not (Test-A2CMaskKeep $n)) { [void](Add-A2CMaskEntry 'name' $n 'tag-') } }
+        foreach ($w in $st.Wikis) { if ($w.Item.name) { [void](Add-A2CMaskEntry 'name' ([string]$w.Item.name) 'wiki-') } }
     }
     # names that can contain spaces are also searched as substrings in free-form notes
     $script:A2CMask.Multi = @($script:A2CMask.Kinds.Keys | Where-Object { @('sub', 'mgdn', 'role', 'policydn', 'adodn') -contains $script:A2CMask.Kinds[$_] -and $_.Length -ge 4 } | Sort-Object { -1 * $_.Length })
@@ -11374,6 +13191,7 @@ function New-A2COptions {
         CostDays = 30; Mask = $false; MaskMapPath = ''; Zip = $false; NoExcel = $false; NoHtml = $false
         MoveSupportFile = ''; UseDeviceAuthentication = $false; AdoOrganization = @(); AdoRepoMaxSizeMB = 1024; AdoPackageVersions = 'Latest'; AdoPackagesMaxMB = 5120; AdoPackageMaxSizeMB = 0; AdoPackageTypes = @(); ArtifactToolPath = ''; TemplateFormat = 'Both'; PropertiesMaxChars = 32000; Delimiter = ','
         RequiredTags = @(); IacTagNames = @()
+        AdoAttachmentMaxSizeMB = 100; AdoAttachmentsMaxMB = 5120; AdoSkipAttachments = $false; AdoRunLogs = $false
         V1 = @{}; Now = [DateTime]::UtcNow
     }
     if ($null -eq $Params) { $Params = @{} }

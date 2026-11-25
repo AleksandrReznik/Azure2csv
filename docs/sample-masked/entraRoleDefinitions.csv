@@ -1,2 +1,2 @@
 ﻿"DisplayName","Description","IsEnabled","Permissions","AssignableScopes","Assignments","TemplateId","Id"
-"Helpdesk Lite","[masked]","True","microsoft.directory/users/password/update; microsoft.directory/users/basic/update","/","0","3f6fcfc1-0636-47f4-8588-570536148282","3f6fcfc1-0636-47f4-8588-570536148282"
+"Helpdesk Lite","[masked]","True","microsoft.directory/users/password/update; microsoft.directory/users/basic/update","/","0","e9fbe5b4-2ebd-4436-92a9-daba4e3839bb","e9fbe5b4-2ebd-4436-92a9-daba4e3839bb"

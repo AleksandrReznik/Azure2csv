@@ -1,5 +1,63 @@
 # Changelog
 
+## 2.2.0 - 2026-11-25
+
+65 reports, about 65 findings.
+
+### Azure DevOps structure (`AzureDevOpsStructure`, new)
+In every profile that has `AzureDevOps` (Standard, Migration, Security, Full). How each organization is set up, to
+rebuild it or map its users to another Microsoft Entra tenant:
+- `securityGroups.csv`, `groupMembers.csv`: every security group with its direct members (users, groups, service
+  principals), so nested groups show up; members that no list returns are looked up by descriptor.
+- `orgSettings.csv`: the connected Entra tenant, the billing subscription, the number of users and the organization
+  policies (third-party OAuth, SSH, public projects, external guests and the others on the Policies page).
+- `notificationSubscriptions.csv`: the notification subscriptions of every team.
+- `teams.csv`, `teamMembers.csv`: members and administrators, default team, area paths, iterations, backlog levels,
+  working days, bugs behavior.
+- `areaPaths.csv`, `iterationPaths.csv`: the area and iteration trees with dates and the teams that use each node.
+- `boards.csv`, `boardColumns.csv`, `boardCardRules.csv`: columns with state mapping, WIP limits, split and definition
+  of done; swimlanes; card fields; card style rules and tag colors.
+- `dashboards.csv`, `dashboardWidgets.csv`: team and project dashboards with every widget (name, type, contribution
+  ID, built-in or Marketplace, position, size, settings); every dashboard also as JSON (not with `-Mask`).
+- `queries.csv`: every shared query at any folder depth with its WIQL text.
+- `tags.csv`, `workItemTemplates.csv`.
+- `permissions.csv`: the access control lists of the project, repositories and branches, area and iteration paths,
+  pipelines, release pipelines and stages, TFVC paths, environments, library, service connections and agent pools,
+  with the holders named.
+- `checks.csv`: approvals and checks of environments, agent pools, service connections, variable groups and secure
+  files.
+- `tfvcShelvesets.csv` (per owner, no content), `wikis.csv`, `pullRequests.csv` (lists only).
+- `users.csv`: new columns `DirectoryAlias` and `Groups` (the groups the user is a direct member of).
+- New findings ADO-17 to ADO-21:
+  - organizations with more than 100 users (a switch to another Entra tenant then needs Microsoft Support);
+  - users who would be disconnected by such a switch (Microsoft accounts and guests);
+  - dashboard widgets from Marketplace extensions;
+  - customized boards;
+  - permissions granted to users directly instead of through a group.
+
+### Azure DevOps work item export (`AzureDevOpsWorkItems`, new, only when named)
+- Every work item as JSON with all fields, relations, every revision (also the only one of a work item never
+  changed) and comments, plus `allWorkItems.csv`, `workItemLinks.csv` and `workItemAttachments.csv`.
+- Attachments as files: `-AdoAttachmentMaxSizeMB` (default 100), `-AdoAttachmentsMaxMB` (default 5120) and
+  `-AdoSkipAttachments` (list only).
+- Images pasted into work item text (descriptions, repro steps, test steps, comments, and older revisions) are not
+  relations of the work item; they are found by their links and downloaded into an `inline` folder next to the
+  attachments. `workItemAttachments.csv` has the column `Kind` (`Attachment` or `InlineImage`), `allWorkItems.csv`
+  the column `InlineImages`, and `coverage.csv` counts the images downloaded and failed.
+- Test plans, suites, test cases with their steps, test runs and the results of manual runs.
+- Pipeline runs and releases as an archive (`pipelineRuns.csv`, `releaseRuns.csv`); their logs with `-AdoRunLogs`.
+- WIQL cuts results at 20,000 without an error: the IDs are read in ranges. A failed item is listed in
+  `coverage.csv` and the export goes on. Never with `-Mask`.
+
+### Other
+- Azure DevOps answers that carry `Retry-After` (also with HTTP 200, near the rate limit) make the script wait before
+  the next call.
+- Azure DevOps permission errors (TF50309) name the missing permission instead of repeating the signed-in account.
+- `-Mask`: in the script's own notes, a name inside a longer one (an Azure DevOps project inside the organization
+  name) was replaced first and left the rest of the longer name readable; whole names are now replaced first. Finding
+  titles and recommendations, Microsoft Learn links and labels such as "(all pipelines)" are no longer garbled when a
+  name in the tenant is also a common word.
+
 ## 2.1.0 - 2026-10-23
 
 63 reports, about 60 findings.

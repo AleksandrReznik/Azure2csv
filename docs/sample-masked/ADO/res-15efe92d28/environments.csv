@@ -1,0 +1,2 @@
+﻿"Organization","Project","Environment","EnvironmentId","Resources","ResourceTypes","Approvals","Checks","CheckTypes","CreatedOn","LastModifiedOn","OpenToAllPipelines","DeployedBy","LastDeployment","DaysSinceLastDeployment"
+"res-15efe92d28","Project 1cd76e52c2","Production","1","1","kubernetes","1","2","Approval; Task Check","2024-01-01T00:00:00Z","2026-01-01T00:00:00Z","False","Pipeline 77dd73e000","2026-09-28T10:11:00Z","0"

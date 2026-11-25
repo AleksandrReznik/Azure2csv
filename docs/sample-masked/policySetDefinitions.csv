@@ -1,2 +1,2 @@
 ﻿"Name","DisplayName","PolicyType","Category","Version","Deprecated","Preview","PolicyCount","DefinedAt","AssignmentCount","Parameters","Description","Id"
-"pol-7095e6c842","Policy 273d0a6fe3","Custom","General","","False","False","2","/providers/Microsoft.Management/managementGroups/mg-932c041806","1","allowedLocations","","/providers/Microsoft.Management/managementGroups/mg-932c041806/providers/Microsoft.Authorization/policySetDefinitions/pol-7095e6c842"
+"pol-37fa7ed282","Policy fdc6e45d80","Custom","General","","False","False","2","/providers/Microsoft.Management/managementGroups/mg-1fd702510e","1","allowedLocations","","/providers/Microsoft.Management/managementGroups/mg-1fd702510e/providers/Microsoft.Authorization/policySetDefinitions/pol-37fa7ed282"

@@ -1,0 +1,4 @@
+﻿"Organization","Project","Repository","RepositoryId","SizeMB","DefaultBranch","LastCommit","DaysSinceLastCommit","Disabled","Fork","BranchPolicies","MinReviewers","BuildValidation","ExportedTo","Pipelines","PipelineNames"
+"res-15efe92d28","Project 1cd76e52c2","repo-484018eacf","15542905-da39-44af-a659-ce24fd2cd4df","50","main","2026-09-20T00:00:00Z","9","False","False","2","2","True","","1","Pipeline 77dd73e000"
+"res-15efe92d28","Project 1cd76e52c2","repo-bf2d13951b","84ee3283-5ad5-4c49-8a83-64af12b55557","1","main","2025-08-01T00:00:00Z","424","False","False","1","","True","","0",""
+"res-15efe92d28","Project 924e99b5f5","repo-ddd1d22ba1","7f4814b0-7917-449b-b93b-2e2c802fecb3","0","master","","","True","False","0","","False","","0",""

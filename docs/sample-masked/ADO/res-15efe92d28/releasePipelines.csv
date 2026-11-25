@@ -1,0 +1,2 @@
+﻿"Organization","Project","ReleasePipeline","ReleasePipelineId","Folder","Stages","StageCount","LastRelease","LastReleaseDate","DaysSinceLastRelease","CreatedBy","ModifiedOn","ExportedFile","ServiceConnections","AzureSubscriptions"
+"res-15efe92d28","Project 1cd76e52c2","Release 96febfd975","5","","Dev; Prod","2","x-24b3dc7d51","2026-06-01T00:00:00Z","120","User cab0977b7f","2026-06-01T00:00:00Z","","x-8a228aecec(WIF)","sub-a40635b1f0"

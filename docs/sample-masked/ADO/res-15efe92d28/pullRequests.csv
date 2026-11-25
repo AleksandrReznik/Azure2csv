@@ -1,0 +1,4 @@
+﻿"Organization","Project","Repository","PullRequestId","Title","Status","SourceBranch","TargetBranch","Created","Closed","Author","Reviewers","Draft","MergeStatus"
+"res-15efe92d28","Project 1cd76e52c2","repo-484018eacf","7","[masked]","active","x-73e2a26fb0","main","2026-09-20T00:00:00Z","","User 8f168f32a5","x-d786cc85a4(approved); x-209dd5ad28(no vote)","False","succeeded"
+"res-15efe92d28","Project 1cd76e52c2","repo-484018eacf","6","[masked]","completed","x-f5a8d5c9ba","main","2026-08-01T00:00:00Z","2026-08-02T00:00:00Z","User cab0977b7f","x-43a87aa1c4(rejected)","False","succeeded"
+"res-15efe92d28","Project 1cd76e52c2","repo-484018eacf","5","[masked]","abandoned","x-de97dbd68b","main","2025-01-01T00:00:00Z","2025-01-05T00:00:00Z","User 8f168f32a5","","False","succeeded"

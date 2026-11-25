@@ -1,0 +1,7 @@
+﻿"Organization","Project","Team","Member","MemberUpn","MemberType","Administrator"
+"contoso-ado","Web Shop","Web Shop Team","Alex Admin","alex.admin@contoso.onmicrosoft.com","User","True"
+"contoso-ado","Web Shop","Web Shop Team","Former Dev","former.dev@contoso.com","User","False"
+"contoso-ado","Web Shop","Marketing","Pat Partner","pat@fabrikam.com","User","False"
+"contoso-ado","Web Shop","Marketing","[Web Shop]\Contoso Leads","","Group","False"
+"contoso-ado","Web Shop","Marketing","Alex Admin","alex.admin@contoso.onmicrosoft.com","User","True"
+"contoso-ado","Legacy App","Legacy App Team","Former Dev","former.dev@contoso.com","User","True"

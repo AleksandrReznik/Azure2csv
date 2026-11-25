@@ -1,0 +1,2 @@
+﻿"Organization","Project","Team","Template","WorkItemType","Description","Fields","TemplateId"
+"contoso-ado","Web Shop","Web Shop Team","Contoso bug template","Bug","Contoso standard bug","{""System.Title"":""[Bug] "",""System.Tags"":""triage"",""Microsoft.VSTS.Common.Priority"":""2""}","a7a7a7a7-0000-0000-0000-0000000000f1"

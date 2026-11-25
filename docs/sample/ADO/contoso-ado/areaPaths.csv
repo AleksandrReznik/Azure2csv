@@ -1,0 +1,5 @@
+﻿"Organization","Project","Path","Name","Level","Teams","NodeId","Identifier"
+"contoso-ado","Web Shop","Web Shop","Web Shop","0","Web Shop Team","1","a5a5a5a5-0000-0000-0000-000000000000"
+"contoso-ado","Web Shop","Web Shop\Contoso Checkout","Contoso Checkout","1","Marketing","2","a5a5a5a5-0000-0000-0000-000000000001"
+"contoso-ado","Web Shop","Web Shop\Contoso Checkout\Payments","Payments","2","Marketing","3","a5a5a5a5-0000-0000-0000-000000000002"
+"contoso-ado","Legacy App","Legacy App","Legacy App","0","Legacy App Team","7","a5a5a5a5-0000-0000-0000-000000000010"

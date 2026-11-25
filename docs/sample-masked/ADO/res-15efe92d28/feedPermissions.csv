@@ -1,0 +1,5 @@
+﻿"Organization","Project","Scope","Feed","FeedId","Identity","IdentityScope","Role","Inherited","IdentityId"
+"res-15efe92d28","","Organization","feed-bff81e92c4","dea417dc-37f5-4f35-9886-abee90551ea7","Project Collection Administrators","res-15efe92d28","administrator","False","ceb01b4c-48d3-497a-836e-ad5dcd91567a"
+"res-15efe92d28","","Organization","feed-bff81e92c4","dea417dc-37f5-4f35-9886-abee90551ea7","Name af533851e3","","contributor","False","6bfb9ac1-4924-45fd-80a5-b34604404863"
+"res-15efe92d28","","Organization","feed-bff81e92c4","dea417dc-37f5-4f35-9886-abee90551ea7","User 95448f4c24","","reader","True","ec0acf40-ba8a-4bbd-8c81-492aefa1f6b1"
+"res-15efe92d28","","Organization","feed-bff81e92c4","dea417dc-37f5-4f35-9886-abee90551ea7","Name c0cd8f9a13","","collaborator","False","2511d689-77af-42ce-8e75-954f21428e5e"

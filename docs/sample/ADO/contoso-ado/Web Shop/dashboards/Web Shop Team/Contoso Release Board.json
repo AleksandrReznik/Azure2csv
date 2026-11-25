@@ -1,0 +1,72 @@
+{
+  "id": "d5d5d5d5-0000-0000-0000-000000000001",
+  "name": "Contoso Release Board",
+  "dashboardScope": "project_Team",
+  "groupId": "f0f0f0f0-0000-0000-0000-000000000001",
+  "refreshInterval": 5,
+  "modifiedDate": "2026-09-01T00:00:00Z",
+  "modifiedBy": "b1b1b1b1-0000-0000-0000-0000000000a1",
+  "widgets": [
+    {
+      "id": "25700e6c-7a10-4da3-9fb7-cbd82d1b9964",
+      "name": "Release notes",
+      "contributionId": "ms.vss-dashboards-web.Microsoft.VisualStudioOnline.Dashboards.MarkdownWidget",
+      "position": {
+        "row": 1,
+        "column": 1
+      },
+      "size": {
+        "rowSpan": 1,
+        "columnSpan": 2
+      },
+      "settings": "{\"text\":\"Contoso release notes\"}",
+      "settingsVersion": {
+        "major": 1,
+        "minor": 0,
+        "patch": 0
+      },
+      "isEnabled": true
+    },
+    {
+      "id": "fe45918a-45df-4e9d-a5b4-c8a6b26fed3d",
+      "name": "Quality gate",
+      "contributionId": "sonarsource.sonarqube.sonarqube-quality-gate-widget",
+      "position": {
+        "row": 1,
+        "column": 3
+      },
+      "size": {
+        "rowSpan": 1,
+        "columnSpan": 1
+      },
+      "settings": "{\"project\":\"webshop\"}",
+      "settingsVersion": {
+        "major": 1,
+        "minor": 0,
+        "patch": 0
+      },
+      "isEnabled": true,
+      "typeId": "SonarQube.QualityGate"
+    },
+    {
+      "id": "935696e2-2591-4f23-b875-0dbd383e04fa",
+      "name": "Contoso burndown",
+      "contributionId": "contoso-labs.burndown.burndown-widget",
+      "position": {
+        "row": 2,
+        "column": 1
+      },
+      "size": {
+        "rowSpan": 2,
+        "columnSpan": 2
+      },
+      "settings": null,
+      "settingsVersion": {
+        "major": 1,
+        "minor": 0,
+        "patch": 0
+      },
+      "isEnabled": true
+    }
+  ]
+}

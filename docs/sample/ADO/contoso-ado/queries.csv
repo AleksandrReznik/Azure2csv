@@ -1,0 +1,4 @@
+﻿"Organization","Project","Folder","Query","QueryType","Wiql","CreatedBy","Modified","LastExecuted","QueryId"
+"contoso-ado","Web Shop","Shared Queries","Contoso Blockers","tree","SELECT [System.Id] FROM WorkItems WHERE [System.Title] CONTAINS 'Contoso'","Alex Admin","2026-07-01T00:00:00Z","2026-09-27T00:00:00Z","c7c7c7c7-0000-0000-0000-000000000005"
+"contoso-ado","Web Shop","Shared Queries/Contoso Team","Contoso Active Bugs","flat","SELECT [System.Id] FROM WorkItems WHERE [System.Title] CONTAINS 'Contoso'","Alex Admin","2026-07-01T00:00:00Z","2026-09-27T00:00:00Z","c7c7c7c7-0000-0000-0000-000000000004"
+"contoso-ado","Web Shop","Shared Queries/Contoso Team/Contoso Deep","Contoso Deep Query","oneHop","SELECT [System.Id] FROM WorkItems WHERE [System.Title] CONTAINS 'Contoso'","Alex Admin","2026-07-01T00:00:00Z","2026-09-27T00:00:00Z","c7c7c7c7-0000-0000-0000-000000000006"

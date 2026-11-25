@@ -2,7 +2,9 @@
 
 **Inventory a whole Azure tenant in minutes and get a migration-readiness view of it.** The output is CSV files, an
 optional Excel workbook and a self-contained HTML dashboard. It covers resources, networking, RBAC, Azure Policy,
-Entra ID, diagnostic settings, backup, retirements and orphaned resources, plus what can (and cannot) be moved.
+Entra ID, diagnostic settings, backup, retirements and orphaned resources, plus what can (and cannot) be moved. It
+also inventories the Azure DevOps organizations of the tenant, down to teams, boards, permissions and, on request,
+every work item.
 
 On request it also writes a **configuration snapshot**: every resource as a JSON file with its properties uncut, the
 child resources Resource Graph does not list, and Azure's own ARM template and Bicep export of every resource group.
@@ -104,10 +106,10 @@ If you downloaded the file from the internet on Windows, run `Unblock-File .\azu
 | Profile | Contents |
 |---|---|
 | `Quick` | Every report based on Resource Graph: inventory, network, compute (including Compute Gallery images and Image Builder), data, monitoring, Defender plans, Lighthouse. Runs in minutes; good for Cloud Shell. |
-| `Standard` | Quick, plus diagnostic settings, RBAC (with PIM and deny assignments), locks, Azure Policy, resource providers, tenant transfer, Entra ID (without group members) and Azure DevOps. |
-| `Full` | Everything, including the opt-in reports Snapshot, ArmTemplates, ChildResources, Cost, AzureCode, AzureDevOpsPipelines, EntraGroupMembers and EntraAppAssignments (not AzureDevOpsRepos, AzureDevOpsPackages and AppCode, which run only when named). |
-| `Migration` | Inventory, network, compute, data, monitoring, backup, move support, cross-references, locks, ARM deployment history, RBAC, Policy, resource providers, tenant transfer, managed identities, retirements, orphans, Azure DevOps. |
-| `Security` | RBAC, Defender plans, Lighthouse, Entra ID with Conditional Access (when readable), NSG rules, firewalls, application gateways, gateways, public IPs, private endpoints, storage, SQL, Key Vault, diagnostic settings, Policy, Advisor, locks, retirements, Azure DevOps. |
+| `Standard` | Quick, plus diagnostic settings, RBAC (with PIM and deny assignments), locks, Azure Policy, resource providers, tenant transfer, Entra ID (without group members) and Azure DevOps (inventory and structure). |
+| `Full` | Everything, including the opt-in reports Snapshot, ArmTemplates, ChildResources, Cost, AzureCode, AzureDevOpsPipelines, EntraGroupMembers and EntraAppAssignments (not AzureDevOpsRepos, AzureDevOpsPackages, AzureDevOpsWorkItems and AppCode, which run only when named). |
+| `Migration` | Inventory, network, compute, data, monitoring, backup, move support, cross-references, locks, ARM deployment history, RBAC, Policy, resource providers, tenant transfer, managed identities, retirements, orphans, Azure DevOps (inventory and structure). |
+| `Security` | RBAC, Defender plans, Lighthouse, Entra ID with Conditional Access (when readable), NSG rules, firewalls, application gateways, gateways, public IPs, private endpoints, storage, SQL, Key Vault, diagnostic settings, Policy, Advisor, locks, retirements, Azure DevOps (inventory and structure). |
 | `Governance` | Management groups, Policy, RBAC, Defender plans, Lighthouse, resource providers, locks, ARM deployment history, tags, diagnostic settings, Advisor. |
 
 **Scope:** `-TenantId`, `-SubscriptionId` (array or comma list), `-ExcludeSubscriptionId`, `-ManagementGroupId`.
@@ -185,9 +187,11 @@ pwsh -File .\azure2csv.ps1 -Profile Full -AddReports AzureDevOpsRepos, AzureDevO
 | Operations | `Orphans` | orphans.csv | Fast | Quick, Standard, Full, Migration | Orphaned/unused resources: unattached disks, unused public IPs, NICs, NSGs, empty resource groups... |
 | Operations | `Cost` \* | cost.csv, costByResourceGroup.csv (+ Cost column) | Slow | Full | Actual cost per resource and per resource group for the last -CostDays days (Cost Management API) |
 | Operations | `AzureDevOps` | ADO\ folder: organizations, projects, repositories, branch policies, pipelines, service connections, pipeline secrets, agents, users, processes (JSON)... | Slow | Standard, Full, Migration, Security | Azure DevOps organizations billed to the subscriptions or named with -AdoOrganization: projects, Git and TFVC repos, branch policies, pipelines (triggers, runs, service connections, environments, variable groups they use), service connections (last use), plain-text secrets, agents, users, feeds and packages, integrations, work items, customized processes |
+| Operations | `AzureDevOpsStructure` | ADO\<organization>\ securityGroups, groupMembers, orgSettings, notificationSubscriptions, teams, teamMembers, areaPaths, iterationPaths, boards, boardColumns, boardCardRules, dashboards, dashboardWidgets, queries, tags, workItemTemplates, permissions, checks, tfvcShelvesets, wikis, pullRequests (+ dashboards as JSON) | Medium | Standard, Full, Migration, Security | How each Azure DevOps organization is set up, to rebuild it or map its users to a new tenant: security groups with members (nested groups too), organization policies, notification subscriptions, teams (members, area and iteration paths, backlog settings), area and iteration trees, boards (columns, swimlanes, card fields and rules), dashboards and widgets, shared queries, tags, work item templates, permissions (access control lists), approvals and checks, TFVC shelvesets, wikis and pull requests |
 | Operations | `AzureDevOpsPipelines` \* | ADO\<organization>\<project>\pipelines\ folder (+ ExportedFile columns) | Slow | Full | Export every Azure DevOps pipeline: YAML files from Azure Repos, pipeline and release definitions as JSON (settings included - opt-in, never with -Mask) |
 | Operations | `AzureDevOpsRepos` \*\* | ADO\<organization>\<project>\repos\ folder (+ ExportedTo columns) | Slow |  | Export the default branch of every Azure DevOps Git repository and every TFVC branch (files, no history; up to -AdoRepoMaxSizeMB each) - only when named, never with -Mask |
 | Operations | `AzureDevOpsPackages` \*\* | ADO\<organization>\<project>\feeds\ folder (+ ExportedTo column in packages.csv) | Slow |  | Download the packages published to Azure Artifacts feeds, Universal Packages with Microsoft ArtifactTool (latest versions, or all with -AdoPackageVersions All; up to -AdoPackagesMaxMB) - only when named, never with -Mask |
+| Operations | `AzureDevOpsWorkItems` \*\* | ADO\<organization>\<project>\workitems\ folder (JSON per work item, attachments, images from the text), allWorkItems.csv, workItemLinks.csv, workItemAttachments.csv, testPlans.csv, testSuites.csv, testCases.csv, testSteps.csv, testRuns.csv, testResults.csv, pipelineRuns.csv, releaseRuns.csv (+ run logs with -AdoRunLogs) | Slow |  | Export the content of every project: each work item with all fields, revisions, links and comments as JSON, attachments and the images linked from work item text (up to -AdoAttachmentMaxSizeMB each and -AdoAttachmentsMaxMB in total), test plans, suites, test cases with steps, test runs and results, pipeline and release runs (logs with -AdoRunLogs) - thousands of calls, only when named, never with -Mask |
 | Governance | `ManagementGroups` | managementGroups.csv | Fast | Quick, Standard, Full, Migration, Governance | Management group hierarchy and where every subscription sits |
 | Governance | `Policy` | policyAssignments.csv, policyDefinitions.csv, policySetDefinitions.csv, policyExemptions.csv, policyCompliance.csv | Medium | Standard, Full, Migration, Security, Governance | Azure Policy assignments (incl. inherited and at management groups without subscriptions), definitions, initiatives, exemptions and compliance |
 | Governance | `RBAC` | RBAC_role_assignments.csv, RBAC_roles.csv, RBAC_eligible_assignments.csv, RBAC_deny_assignments.csv | Medium | Standard, Full, Migration, Security, Governance | Role assignments with resolved principals (orphaned, guests), time-bound and eligible assignments (PIM), deny assignments, custom/used role definitions |
@@ -215,7 +219,7 @@ resource files) are written only when there is something to list: no ExpressRout
 
 **Every run also writes:**
 - `summary.html`
-- `findings.csv`: about 60 checks with severity, count, recommendation and a Microsoft Learn link.
+- `findings.csv`: about 65 checks with severity, count, recommendation and a Microsoft Learn link.
 - `coverage.csv`: what was collected, skipped (and why) or not selected.
 - `yyyyMMdd-HHmmss__run.json`: timings, API calls, versions.
 - `yyyyMMdd-HHmmss__general_log.txt` (same time as the folder name): everything the run reported, written line by
@@ -294,7 +298,12 @@ ADO\
   organizations.csv            every organization: source, status, owner, billing subscription, totals
   <organization>\              one folder per organization that was read
     projects.csv ... processes.csv
+    securityGroups.csv ...     with the AzureDevOpsStructure report (below)
+    allWorkItems.csv ...       with the AzureDevOpsWorkItems report (below)
     <project>\
+      dashboards\<team>\       every dashboard as JSON, with the AzureDevOpsStructure report
+      workitems\               one JSON file per work item and the attachments, with the AzureDevOpsWorkItems report
+      runs\                    pipeline and release logs, with AzureDevOpsWorkItems and -AdoRunLogs
       pipelines\               with the AzureDevOpsPipelines report (below)
       repos\<repository>\      with the AzureDevOpsRepos report (below)
       repos\TFVC\<branch>\     TFVC branches, with the AzureDevOpsRepos report
@@ -312,7 +321,7 @@ ADO\
 | `releasePipelines.csv` | Classic release pipelines: stages, last release, service connections and Azure subscriptions |
 | `serviceConnections.csv` | Type, authentication (workload identity federation or secret), Azure subscription, identity, secret expiry, Azure roles; last use and the pipelines that used it (from the last 100 uses); open to all pipelines or the number of pipelines allowed |
 | `agentPools.csv`, `agents.csv` | Microsoft-hosted, self-hosted, scale set and Managed DevOps Pools; agent version, status, last job, matching Azure VM |
-| `users.csv`, `admins.csv` | License, origin (Entra, Microsoft account), guest, domain, external, last access; administrator group members |
+| `users.csv`, `admins.csv` | License, origin (Entra, Microsoft account), guest, domain, external, last access, directory alias, and the groups the user is a direct member of (`Groups`, filled by the AzureDevOpsStructure report); administrator group members |
 | `variableGroups.csv`, `secureFiles.csv` | Variable names and secret flags, Key Vault links, files to re-upload; the pipelines that may use them, or open to all pipelines |
 | `pipelineSecrets.csv` | Variables named like secrets (password, token, key...) but not marked secret, variables written into YAML files, and lines of YAML files and classic steps that seem to contain a password or key: names, line numbers and step names only |
 | `environments.csv`, `deploymentGroups.csv` | Deployment targets, approvals and checks, the pipelines that deployed and when; target machines |
@@ -397,6 +406,96 @@ NuGet Gallery...) are not downloaded; they can be restored from their source.
   downloaded.
 - Never runs with `-Mask`.
 
+**Structure (`AzureDevOpsStructure`).** Part of every profile that has `AzureDevOps` (Standard, Migration, Security
+and Full). It reads how each organization is set up, as the material to rebuild it or to map its users to another
+Microsoft Entra tenant. A small organization takes a few hundred calls; each team adds about twenty (members,
+settings, boards, dashboards, templates).
+
+| File (in `ADO\<organization>\`) | Content |
+|---|---|
+| `securityGroups.csv`, `groupMembers.csv` | Every security group (organization, project, team and Microsoft Entra groups) with its direct members: users, groups (so nested groups show up as members) and service principals. A member that no list returns, such as a removed user, is looked up by its descriptor |
+| `orgSettings.csv` | The Microsoft Entra tenant the organization is connected to, the billing subscription (from its `Microsoft.VisualStudio/account` resource, when that is in the scanned subscriptions), the number of users, and the organization policies: third-party application access via OAuth, SSH authentication, public projects, external guest access, audit events and the others on the Policies page |
+| `notificationSubscriptions.csv` | The notification subscriptions of every team: event, filter conditions, channel and custom address, status |
+| `teams.csv`, `teamMembers.csv` | Every team: default team or not, members and administrators, area paths (with or without their children), backlog and default iteration, its iterations, backlog levels, working days, how bugs are shown |
+| `areaPaths.csv`, `iterationPaths.csv` | The area and iteration trees of every project (iterations with start and finish dates) and the teams that use each node |
+| `boards.csv`, `boardColumns.csv`, `boardCardRules.csv` | Every team board: columns with their state mapping, WIP limit, split and definition of done; swimlanes; the fields on the cards; card style rules and tag colors; whether the board is customized |
+| `dashboards.csv`, `dashboardWidgets.csv` | Team and project dashboards with every widget: name, type, contribution ID, extension (built-in or Marketplace), position, size and settings. Every dashboard is also saved as JSON in `<project>\dashboards\<team>\` (not with `-Mask`) |
+| `queries.csv` | Every shared query at any folder depth: folder, name, type (flat, tree, one hop) and the WIQL text |
+| `tags.csv`, `workItemTemplates.csv` | The work item tags of every project; the work item templates of every team with their field values |
+| `permissions.csv` | One row per access control entry of the project, Git repositories and branches (branch names decoded), area and iteration paths, pipelines and pipeline folders, release pipelines and stages, TFVC paths, environments, library (variable groups and secure files), service connections and agent pools. The holder is named (a group with its scope, a user with the sign-in address), with the permissions allowed and denied and whether the object inherits permissions |
+| `checks.csv` | Approvals and checks of environments, agent pools, service connections, variable groups and secure files: approvers, minimum approvers, whether the requester may approve, instructions, timeout, enabled |
+| `tfvcShelvesets.csv` | TFVC shelvesets per owner: how many, the newest and the oldest (no content) |
+| `wikis.csv`, `pullRequests.csv` | Wikis (project or code wiki, repository, folder, branches); pull requests of every status with title, branches, dates, author and reviewers with their vote |
+
+- Only permissions that are set on an object are listed; inherited permissions are not repeated on every child.
+  Microsoft documents no token format for the security namespaces of environments, the library, service connections
+  and agent pools, so those are read for the whole organization at once. A holder that no longer exists keeps its
+  identifier (for a user, the sign-in address).
+- The organization policies have no documented REST API. The script reads the data of the Organization settings >
+  Policies page (a GET that only reads) and names the policies it knows; any others appear with their internal name.
+  For an account that may not see the policies the page leaves them out; then, or if Microsoft changes that page,
+  `orgSettings.csv` and `coverage.csv` say that the policies were not read, and why.
+- Reading every permission and the policies needs Project Collection Administrator. A member sees what its own
+  permissions allow; anything refused is counted in `coverage.csv` (one line per kind, for example "boards: 1 of 40
+  not readable"). A refused permission read names the permission set and the permission that is missing.
+- Approvals and checks are read with one batch query per project (Azure DevOps takes it as a POST; it only reads).
+
+**Work item export (`AzureDevOpsWorkItems`, only when named).** Exports the content of every project. Never part of
+`-Profile Full`, never with `-Mask`: work items, comments and attachments are project content.
+
+```powershell
+.\azure2csv.ps1 -Reports AzureDevOps, AzureDevOpsWorkItems -AdoOrganization contoso
+.\azure2csv.ps1 -Reports AzureDevOps, AzureDevOpsWorkItems -AdoRunLogs -AdoAttachmentMaxSizeMB 500
+.\azure2csv.ps1 -Reports AzureDevOps, AzureDevOpsWorkItems -AdoSkipAttachments          # list attachments and images only
+```
+
+| File | Content |
+|---|---|
+| `<project>\workitems\<n>xxx\<id>.json` | Every work item with all its fields, its relations (links and attachments), every revision and every comment (`12xxx` holds IDs 12000 to 12999) |
+| `allWorkItems.csv` | One row per work item: ID, type, title, state, reason, area and iteration path, assigned to, created and changed (by whom), tags, parent, counts of revisions, comments, links, attachments and images in the text (`InlineImages`), and its JSON file |
+| `workItemLinks.csv` | Every link: relation, the target work item or URL (commits, builds, hyperlinks), comment |
+| `workItemAttachments.csv` | Every attachment (`Kind` = `Attachment`) and every image linked from the text (`Kind` = `InlineImage`): file name, size, date, comment, the attachment GUID, and where it was saved (`<project>\workitems\attachments\<id>\`, images in its `inline\` subfolder) or why not |
+| `testPlans.csv`, `testSuites.csv`, `testCases.csv`, `testSteps.csv` | Test plans, their suites (static, requirement-based, query-based), the test cases of each suite with configurations and testers, and every step with its action and expected result (shared steps by ID) |
+| `testRuns.csv`, `testResults.csv` | Every test run with its counts; the results of manual runs: outcome, tester, duration, configuration, error message |
+| `pipelineRuns.csv`, `releaseRuns.csv` | Every pipeline run the retention policies kept: result, times, who requested it, branch and commit; every release with the status of each stage. With `-AdoRunLogs` the logs of each run are saved as a zip in `<project>\runs\` |
+
+- WIQL returns at most 20,000 work items per query and cuts the rest without an error, so the IDs are read in
+  ranges: each query asks for the IDs after the last one it got.
+- One call reads 200 work items. The revisions of every work item are read (one call per work item, so the JSON
+  always holds every revision), comments only for work items that have some. Thousands of work items mean thousands
+  of calls, and Azure DevOps rate limits apply: the script waits whenever Azure DevOps asks it to (HTTP 429, or
+  `Retry-After` on any answer).
+- Images pasted into a description, repro steps, test steps or a comment are attachments too, but they are not in the
+  relations of the work item: the text links to them (`.../_apis/wit/attachments/<GUID>?fileName=image.png`). The
+  script finds these links in every field, every comment and every revision (an image removed later is still part of
+  the history) and downloads each image once per work item into `inline\`. Images of one work item that share a file
+  name get the first 8 characters of their GUID added (`image_1a2b3c4d.png`). The JSON files keep the links as they
+  are; `workItemAttachments.csv` maps each GUID to its file.
+- Attachments and images larger than `-AdoAttachmentMaxSizeMB` (default 100; 0 = no limit) are listed but not
+  downloaded. The downloads stop after `-AdoAttachmentsMaxMB` in total (default 5120; 0 = no limit) or when less than
+  1 GB of disk space is left. When a work item does not give the size (images never do), it is asked before the
+  download.
+- The results of automated test runs are not read: pipelines create them, often thousands per run.
+  `testRuns.csv` has their counts.
+- A work item, attachment, test run or log that cannot be read is listed in `coverage.csv` with the reason (the first
+  100 one by one, all of them in the log); the export goes on. Deleted work items (the recycle bin) are not exported.
+
+**What cannot be exported.** These are not available to the script and it does not try: personal access tokens and
+SSH keys of other users, secret values (secret variables, service connection credentials, the content of secure
+files), personal queries ("My Queries") and personal dashboards of other users, and the notification subscriptions of
+individual users. The REST API offers nothing for TFVC workspaces (`tf workspaces` lists them); `coverage.csv` notes it.
+
+**Azure DevOps findings:**
+
+| ID | Finding |
+|---|---|
+| ADO-01 to ADO-16 | Public projects, secret-based service connections, unused paid licenses, offline or old agents, classic pipelines, Microsoft accounts and guests, TFVC, unused repositories, variable groups and service connections, pipelines with a missing repository or no run for a year, empty agent pools, resources open to all pipelines, secrets in pipelines |
+| ADO-17 | Organizations with more than 100 users: after a switch to another Microsoft Entra tenant, the disconnected users are resolved with Microsoft Support |
+| ADO-18 | Users who would be disconnected by such a switch: Microsoft accounts and guests |
+| ADO-19 | Dashboard widgets from Marketplace extensions (the extension must be installed in a new organization first) |
+| ADO-20 | Customized boards (columns, swimlanes or card rules), which are team settings to recreate |
+| ADO-21 | Permissions granted to users directly instead of through a group |
+
 ## Code export
 
 The `AzureCode` report (opt-in, part of `-Profile Full`) exports the code and definitions stored in your Azure
@@ -452,6 +551,8 @@ rights on the app (Website Contributor or more). With Reader each app is listed 
 | Objects at management groups without subscriptions | Reader at those management groups (Reader on the root management group covers it). |
 | Cost | Cost Management Reader. Not available for some offer types; the report says so and continues. |
 | Azure DevOps | A member of the organization. Areas your account cannot read (for example users, secure files, the uses of a service connection or pipeline permissions) are listed in `coverage.csv` and the organization row. |
+| Azure DevOps structure (`AzureDevOpsStructure`) | A member reads what its permissions allow; Project Collection Administrator reads every permission and the organization policies. What is refused is counted in `coverage.csv`. |
+| Azure DevOps work items (`AzureDevOpsWorkItems`) | Read access to the projects (Basic access). Work items, test plans or logs that are refused are listed in `coverage.csv`. |
 | ARM deployment history (`Deployments`) | **Reader**. One call per resource group; a resource group that is refused is named in `coverage.csv`. |
 | Azure Artifacts feeds | Reader on a feed lists its packages, download counts and settings, and downloads the packages. Feed permissions (`feedPermissions.csv`) are readable by feed owners; with a lower role the organization row says so. |
 | App code (`AppCode`) | Publish rights on the apps (Website Contributor or more). |
@@ -465,7 +566,7 @@ rights on the app (Website Contributor or more). With Reader each app is listed 
 - public IP addresses and tag values
 
 For example `vm-app01` becomes `vm-3f9c2a1b7e` everywhere. Private IP ranges are kept, because they are needed for
-address planning. Free text and JSON properties are removed, and no code or packages are exported. Package names are masked, except packages cached from public upstream sources such as npmjs or NuGet Gallery.
+address planning. Free text and JSON properties are removed, and no code, packages, dashboards or work items are exported. Package names are masked, except packages cached from public upstream sources such as npmjs or NuGet Gallery.
 
 The mapping file (`<run>.PRIVATE-maskmap.csv`) and the log (`yyyyMMdd-HHmmss__general_log.PRIVATE.txt`) are written
 **next to** the run folder, never inside it or inside the zip. Share the zip, keep the map. A self-check in `coverage.csv` confirms that no original names are
@@ -482,6 +583,10 @@ The three snapshot reports differ a lot in cost. `Snapshot` adds a few Resource 
 the files. `ArmTemplates` makes one or two calls per resource group and Azure can take up to a minute for a large
 one. `ChildResources` makes several calls per storage account, SQL server, private endpoint and so on; it prints the
 minimum number of calls before it starts, and thousands of resources mean thousands of calls.
+
+Azure DevOps counts calls against a rate limit per user. `AzureDevOpsStructure` makes about twenty calls per team.
+`AzureDevOpsWorkItems` makes one call per 200 work items plus one per work item with history or comments, and one
+per attachment and log. When Azure DevOps asks the script to slow down, it waits and continues.
 
 ## Upgrading from v1
 
@@ -504,8 +609,9 @@ When the PSScriptAnalyzer module is installed, the suite also runs it with the r
 ## FAQ
 
 **Does it change anything in my tenant?** No. It uses only read operations: GET requests, Resource Graph queries,
-the Cost Management query, Microsoft Graph `getByIds`, the Azure Artifacts download-count query and, for the
-`ArmTemplates` report, Azure's "Export template" call (a POST that only reads).
+the Cost Management query, Microsoft Graph `getByIds`, the Azure Artifacts download-count query, the Azure DevOps
+work item queries (WIQL), subject lookup and approvals-and-checks query and, for the `ArmTemplates` report, Azure's
+"Export template" call. These are POST requests that only read.
 
 **Can I rebuild my environment from the output?** It gives you the material: the configuration of every resource
 as JSON, the child resources, and Azure's template of every resource group. It does not give you the data, the

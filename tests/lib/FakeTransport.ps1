@@ -78,8 +78,8 @@ function New-TWZip {
 }
 
 function Invoke-A2CHttp {
-    param([string] $Method = 'GET', [Parameter(Mandatory)] [string] $Uri, [string] $Body, [string] $Kind = 'arm', [string] $OutFile)
-    $global:TWRequests.Add([pscustomobject]@{ Method = $Method; Uri = $Uri; Body = $Body; Kind = $Kind })
+    param([string] $Method = 'GET', [Parameter(Mandatory)] [string] $Uri, [string] $Body, [string] $Kind = 'arm', [string] $OutFile, [string] $Accept)
+    $global:TWRequests.Add([pscustomobject]@{ Method = $Method; Uri = $Uri; Body = $Body; Kind = $Kind; Accept = $Accept })
     foreach ($t in $global:TW.Throttle) {
         if ($Uri -match $t.Pattern -and $t.Remaining -gt 0) {
             $t.Remaining--
@@ -192,6 +192,8 @@ function Reset-TWState {
     $script:A2CToolsRoot = [IO.Path]::Combine($global:TWOut, 'tools-' + [guid]::NewGuid().ToString('N').Substring(0, 8))
     $script:A2CMoveMinRows = 5
     $script:A2CAdoPageSize = 1   # page through every Azure DevOps $top/$skip list
+    # and through the long lists, the WIQL ID ranges, the revisions and the identity batches
+    $script:A2CAdoBigPageSize = 2; $script:A2CAdoWiqlPage = 2; $script:A2CAdoRevisionPage = 1; $script:A2CAdoIdentityBatch = 3
 }
 
 function Invoke-TWRun {
